@@ -605,16 +605,31 @@
     var linhas = String(texto || "").split(/\r?\n/);
 
     function limpar(bruta) {
-      var l = bruta
+      return bruta
         .replace(/^[\s\u2022\u25e6\u25aa\u00b7*\-\u2013\u2014+>]+/, "")
         .replace(/^\[[\sxX\u2713\u2714]?\]\s*/, "")
         .replace(/^\d+[.)]\s+/, "")
         .replace(/[\u2705\u2611\u274c\u2714\ufe0f]/g, "")
         .trim();
-      // Número solto no fim é a conta da semana passada, não o nome do item.
-      // "Arroz 2" vira "Arroz"; "Arroz 5kg" e "Leite 1L" ficam como estão,
-      // porque aí o número tem unidade colada e faz parte do nome.
-      var semConta = l.replace(/\s+[-\u2013\u2014:=xX\u00d7]?\s*[([]?\s*\d+(?:[.,]\d+)?\s*[)\]]?\s*$/, "").trim();
+    }
+
+    // Depois do travessão vem a quantidade de costume, que é o formato que a
+    // bancada e as listas do próprio app escrevem: "Alho — 4", "Batata — 2 kg".
+    function separarQuanto(l) {
+      var m = /^(.*\S)\s+[\u2014\u2013]\s*(\d+(?:[.,]\d+)?)\s*([^\d]*)$/.exec(l);
+      if (!m) return null;
+      return {
+        nome: m[1].trim(),
+        qtd: Number(String(m[2]).replace(",", ".")),
+        unidade: (m[3] || "").replace(/[()]/g, "").trim()
+      };
+    }
+
+    // Número solto no fim, sem travessão, é a conta da semana passada e não o
+    // nome do item: "Arroz 2" vira "Arroz". "Arroz 5kg" e "Papel alumínio
+    // 30x4" ficam como estão, porque ali o número está colado ao que vem antes.
+    function tirarConta(l) {
+      var semConta = l.replace(/\s+[-:=xX\u00d7]?\s*[([]?\s*\d+(?:[.,]\d+)?\s*[)\]]?\s*$/, "").trim();
       return semConta || l;
     }
 
@@ -655,6 +670,8 @@
         return;
       }
       l = l.replace(/\s{2,}/g, " ");
+      var quanto = separarQuanto(l);
+      if (quanto) l = quanto.nome; else l = tirarConta(l);
       var chave = normalizar(l);
       if (!chave || vistos[chave]) return;
       vistos[chave] = true;
@@ -662,7 +679,11 @@
       // da bancada de edição usa para trazer as correções de volta.
       var palpite = adivinhar(l, grupo);
       if (grupo) palpite = { categoria: grupo.cat, destino: grupo.destino };
-      saida.push({ nome: l, categoria: palpite.categoria, destino: palpite.destino });
+      saida.push({
+        nome: l, categoria: palpite.categoria, destino: palpite.destino,
+        qtdPadrao: quanto ? quanto.qtd : null,
+        unidade: quanto ? quanto.unidade : ""
+      });
     });
     return saida;
   }
@@ -1116,7 +1137,10 @@
       html += "<" + (edita ? "button" : "div") + ' class="fila"' +
         (edita ? ' type="button" data-acao="editar" data-id="' + it.id + '"' : "") +
         ' data-busca="' + esc(normalizar(it.nome + " " + it.categoria)) + '">' +
-        '<span class="nome">' + esc(it.nome) + (it.unidade ? ' <span class="meta">' + esc(it.unidade) + "</span>" : "") + "</span>" +
+        '<span class="nome">' + esc(it.nome) +
+        (it.qtdPadrao || it.unidade
+          ? ' <span class="meta">' + esc(((it.qtdPadrao || "") + " " + (it.unidade || "")).trim()) + "</span>"
+          : "") + "</span>" +
         '<span class="meta">' + esc(e.vezes ? e.vezes + "x" : "") + "</span>" +
         "</" + (edita ? "button" : "div") + ">";
     });
@@ -1176,7 +1200,12 @@
   async function marcar(id, quer) {
     await garantirRodada();
     var m = marcado(id) || {};
-    var corpo = { precisa: !!quer, qtd: m.qtd || 1, quando: hoje(), por: S.quem || "" };
+    var it = S.itens[id] || {};
+    var corpo = {
+      precisa: !!quer,
+      qtd: m.qtd || it.qtdPadrao || 1,
+      quando: hoje(), por: S.quem || ""
+    };
     S.rodada.marcados = S.rodada.marcados || {};
     S.rodada.marcados[id] = Object.assign({}, m, corpo);
     desenhar();
@@ -1256,6 +1285,7 @@
       existentes[chave] = true;
       novos[novoId()] = {
         nome: it.nome, categoria: it.categoria, destino: it.destino,
+        qtdPadrao: it.qtdPadrao || null,
         unidade: it.unidade || "", obs: it.obs || "",
         ordem: maiorOrdem + i + 1
       };
@@ -1482,6 +1512,8 @@
       pilula("destino", "horti", (it ? it.destino : "mercado") === "horti", "Hiperideal · esposa") +
       pilula("destino", "mercado", (it ? it.destino : "mercado") !== "horti", "iFood · você") +
       "</div></div>" +
+      '<div class="campo-bloco"><label class="rotulo" for="f-qtd">Quantidade de costume (opcional)</label>' +
+      '<input class="campo" id="f-qtd" inputmode="decimal" value="' + esc(it && it.qtdPadrao ? it.qtdPadrao : "") + '" placeholder="4"></div>' +
       '<div class="campo-bloco"><label class="rotulo" for="f-un">Unidade (opcional)</label>' +
       '<input class="campo" id="f-un" value="' + esc(it ? it.unidade || "" : "") + '" placeholder="kg, pacote, dúzia"></div>' +
       '<div class="campo-bloco"><label class="rotulo" for="f-obs">Observação fixa (opcional)</label>' +
@@ -1641,8 +1673,10 @@
         var escolhido = document.querySelector('#f-destino .pilula[aria-pressed="true"]');
         var dest = escolhido ? escolhido.getAttribute("data-valor") : "mercado";
         var cat = document.getElementById("f-cat").value.trim() || adivinhar(nome, null).categoria;
+        var qtdBruta = parseFloat(String(document.getElementById("f-qtd").value).replace(",", "."));
         var dados = {
           nome: nome, categoria: cat, destino: dest,
+          qtdPadrao: isNaN(qtdBruta) || qtdBruta <= 0 ? null : qtdBruta,
           unidade: document.getElementById("f-un").value.trim(),
           obs: document.getElementById("f-obs").value.trim()
         };
