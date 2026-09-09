@@ -1,0 +1,1685 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<title>Mercado de Sexta</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2A5E5E">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Mercado">
+<meta name="description" content="A lista de compras da casa: marcar o que está acabando durante a semana e pedir na sexta.">
+<style>
+  :root { color-scheme: light dark; }
+  html, body { margin: 0; }
+  img { max-width: 100%; }
+  [hidden] { display: none !important; }
+</style>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script src="config.js"></script>
+</head>
+<body>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --verde: #2A5E5E;
+    --verde-fundo: rgba(42,94,94,.09);
+    --verde-fundo-fraco: rgba(42,94,94,.04);
+    --horti: #3F7D52;
+    --horti-fundo: rgba(63,125,82,.10);
+    --mercado: #B4691F;
+    --mercado-fundo: rgba(180,105,31,.10);
+    --chao: #F6F7F5;
+    --folha: #FFFFFF;
+    --folha-2: #FBFCFB;
+    --linha: #E3E7E3;
+    --linha-forte: #CFD6D1;
+    --tinta: #1C2320;
+    --tinta-fraca: #5D6B64;
+    --tinta-fraquinha: #8A968F;
+    --alerta: #9B6B12;
+    --alerta-fundo: rgba(155,107,18,.10);
+    --sombra: 0 1px 2px rgba(28,35,32,.05);
+    --raio: 12px;
+    --raio-p: 8px;
+    --fonte: "Sora", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --verde: #7FBDB4;
+      --verde-fundo: rgba(127,189,180,.12);
+      --verde-fundo-fraco: rgba(127,189,180,.06);
+      --horti: #83C193;
+      --horti-fundo: rgba(131,193,147,.13);
+      --mercado: #E0A45E;
+      --mercado-fundo: rgba(224,164,94,.13);
+      --chao: #111614;
+      --folha: #1A211E;
+      --folha-2: #1E2622;
+      --linha: #2B3531;
+      --linha-forte: #3C4842;
+      --tinta: #E7EDE9;
+      --tinta-fraca: #9BA9A1;
+      --tinta-fraquinha: #74827A;
+      --alerta: #E4B75F;
+      --alerta-fundo: rgba(228,183,95,.13);
+      --sombra: 0 1px 2px rgba(0,0,0,.3);
+    }
+  }
+  :root[data-theme="dark"] {
+    --verde: #7FBDB4;
+    --verde-fundo: rgba(127,189,180,.12);
+    --verde-fundo-fraco: rgba(127,189,180,.06);
+    --horti: #83C193;
+    --horti-fundo: rgba(131,193,147,.13);
+    --mercado: #E0A45E;
+    --mercado-fundo: rgba(224,164,94,.13);
+    --chao: #111614;
+    --folha: #1A211E;
+    --folha-2: #1E2622;
+    --linha: #2B3531;
+    --linha-forte: #3C4842;
+    --tinta: #E7EDE9;
+    --tinta-fraca: #9BA9A1;
+    --tinta-fraquinha: #74827A;
+    --alerta: #E4B75F;
+    --alerta-fundo: rgba(228,183,95,.13);
+    --sombra: 0 1px 2px rgba(0,0,0,.3);
+  }
+
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body {
+    margin: 0;
+    background: var(--chao);
+    color: var(--tinta);
+    font-family: var(--fonte);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.45;
+    -webkit-text-size-adjust: 100%;
+  }
+  button, input, select, textarea { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  :focus-visible { outline: 2px solid var(--verde); outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+
+  #app { max-width: 620px; margin: 0 auto; padding: 0 12px 92px; }
+  #portao { padding-top: 18vh; }
+  .portao-card { max-width: 380px; margin: 0 auto; }
+
+  /* ---- topo ---- */
+  .top {
+    position: sticky; top: 0; z-index: 20;
+    background: var(--chao);
+    padding: 14px 0 10px;
+    display: flex; align-items: baseline; gap: 10px;
+    border-bottom: 1px solid var(--linha);
+    margin-bottom: 14px;
+  }
+  .top h1 { margin: 0; font-size: 17px; font-weight: 500; letter-spacing: -.2px; color: var(--verde); }
+  .top .semana { font-size: 12px; color: var(--tinta-fraca); margin-left: auto; white-space: nowrap; }
+  .quem {
+    border: 1px solid var(--linha-forte); background: var(--folha);
+    border-radius: 999px; padding: 3px 10px; font-size: 11px; color: var(--tinta-fraca);
+  }
+
+  /* ---- cartões ---- */
+  .card {
+    background: var(--folha); border: 1px solid var(--linha);
+    border-radius: var(--raio); box-shadow: var(--sombra);
+    margin-bottom: 12px; overflow: hidden;
+  }
+  .card > h2 {
+    margin: 0; padding: 9px 14px;
+    font-size: 12px; font-weight: 500; letter-spacing: .3px; text-transform: uppercase;
+    color: var(--verde); background: var(--verde-fundo);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card > h2 .cont { margin-left: auto; font-size: 11px; letter-spacing: 0; text-transform: none; color: var(--tinta-fraca); font-variant-numeric: tabular-nums; }
+  .corpo { padding: 14px; }
+  .corpo.sem-topo { padding-top: 12px; }
+
+  .sub { font-size: 12px; color: var(--tinta-fraca); margin: 0 0 10px; }
+  .vazio { padding: 22px 14px; text-align: center; color: var(--tinta-fraca); font-size: 13px; }
+
+  /* ---- botões ---- */
+  .btn {
+    border: 1px solid var(--linha-forte); background: var(--folha);
+    border-radius: var(--raio-p); padding: 9px 14px; font-size: 13px; font-weight: 500;
+    color: var(--tinta); display: inline-flex; align-items: center; gap: 7px; justify-content: center;
+  }
+  .btn:active { background: var(--folha-2); }
+  .btn.principal { background: var(--verde); border-color: var(--verde); color: #fff; }
+  :root[data-theme="dark"] .btn.principal, :root:not([data-theme="light"]) .btn.principal { color: #10201E; }
+  @media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) .btn.principal { color: #fff; } }
+  .btn.larga { width: 100%; }
+  .btn.miuda { padding: 6px 10px; font-size: 12px; }
+  .btn[disabled] { opacity: .45; pointer-events: none; }
+  .linha-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  /* ---- pílulas / chips ---- */
+  .pilulas { display: flex; gap: 6px; flex-wrap: wrap; }
+  .pilula {
+    border: 1px solid var(--linha-forte); background: var(--folha);
+    border-radius: 999px; padding: 5px 12px; font-size: 12px; color: var(--tinta-fraca);
+  }
+  .pilula[aria-pressed="true"] { background: var(--verde); border-color: var(--verde); color: #fff; font-weight: 500; }
+  :root[data-theme="dark"] .pilula[aria-pressed="true"] { color: #10201E; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .pilula[aria-pressed="true"] { color: #10201E; } }
+
+  .tag { font-size: 10px; letter-spacing: .3px; text-transform: uppercase; padding: 2px 7px; border-radius: 999px; font-weight: 500; white-space: nowrap; }
+  .tag.horti { background: var(--horti-fundo); color: var(--horti); }
+  .tag.mercado { background: var(--mercado-fundo); color: var(--mercado); }
+
+  /* ---- rodada: um por um ---- */
+  .progresso { height: 4px; background: var(--linha); border-radius: 999px; overflow: hidden; margin: 0 0 4px; }
+  .progresso i { display: block; height: 100%; background: var(--verde); border-radius: 999px; transition: width .18s ease; }
+  .progresso-txt { font-size: 11px; color: var(--tinta-fraquinha); font-variant-numeric: tabular-nums; display: flex; justify-content: space-between; }
+
+  .foco { text-align: center; padding: 6px 0 2px; }
+  .foco .cat { font-size: 11px; letter-spacing: .4px; text-transform: uppercase; color: var(--tinta-fraquinha); }
+  .foco .nome { font-size: 26px; font-weight: 500; letter-spacing: -.4px; margin: 4px 0 6px; text-wrap: balance; line-height: 1.2; user-select: text; -webkit-user-select: text; }
+  .foco .qtd-grande { font-size: 13px; color: var(--tinta-fraca); }
+  .copiado { font-size: 12px; color: var(--verde); text-align: center; margin-top: 8px; min-height: 17px; }
+  .foco .dica { font-size: 12px; color: var(--tinta-fraca); min-height: 16px; }
+  .foco .dica.quente { color: var(--alerta); }
+  .decisao { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+  .decisao .btn { padding: 16px 10px; font-size: 15px; }
+  .btn.sim { background: var(--verde); border-color: var(--verde); color: #fff; }
+  :root[data-theme="dark"] .btn.sim { color: #10201E; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .btn.sim { color: #10201E; } }
+  .btn.nao { background: var(--folha-2); }
+  .pe { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; }
+  .link { background: none; border: 0; color: var(--tinta-fraca); font-size: 12px; text-decoration: underline; text-underline-offset: 3px; padding: 4px 2px; }
+  .link.forte { color: var(--verde); }
+
+  /* ---- listas de itens ---- */
+  .grupo-titulo {
+    font-size: 11px; letter-spacing: .4px; text-transform: uppercase; color: var(--tinta-fraca);
+    background: var(--verde-fundo-fraco); padding: 5px 14px; border-top: 1px solid var(--linha); border-bottom: 1px solid var(--linha);
+  }
+  .fila { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid var(--linha); border-left: 3px solid transparent; width: 100%; text-align: left; background: none; border-top: 0; border-right: 0; }
+  .fila:last-child { border-bottom: 0; }
+  .fila.horti { border-left-color: var(--horti); }
+  .fila.mercado { border-left-color: var(--mercado); }
+  .fila .nome { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+  .fila .meta { font-size: 11px; color: var(--tinta-fraquinha); }
+  .fila.marcado { background: var(--verde-fundo-fraco); }
+  .fila.marcado .nome { font-weight: 500; }
+  .fila.feito .nome { color: var(--tinta-fraquinha); text-decoration: line-through; }
+  .caixa {
+    width: 22px; height: 22px; flex: none; border: 1.5px solid var(--linha-forte); border-radius: 6px;
+    display: grid; place-items: center; background: var(--folha);
+  }
+  .caixa svg { width: 13px; height: 13px; opacity: 0; }
+  .fila.marcado .caixa, .fila.feito .caixa { background: var(--verde); border-color: var(--verde); }
+  .fila.marcado .caixa svg, .fila.feito .caixa svg { opacity: 1; }
+  .qtd { display: flex; align-items: center; gap: 6px; flex: none; }
+  .qtd button { width: 26px; height: 26px; border-radius: 6px; border: 1px solid var(--linha-forte); background: var(--folha); font-size: 15px; line-height: 1; display: grid; place-items: center; color: var(--tinta-fraca); }
+  .qtd span { min-width: 34px; text-align: center; font-size: 12px; font-variant-numeric: tabular-nums; color: var(--tinta-fraca); }
+
+  /* ---- texto para copiar ---- */
+  .texto-lista {
+    width: 100%; min-height: 120px; resize: vertical; margin-top: 10px;
+    border: 1px solid var(--linha); border-radius: var(--raio-p); padding: 10px;
+    background: var(--folha-2); color: var(--tinta); font-size: 13px; line-height: 1.6;
+  }
+  .aviso-copia { font-size: 11px; color: var(--tinta-fraca); margin-top: 6px; }
+
+  /* ---- busca e campos ---- */
+  .campo, .selec {
+    width: 100%; border: 1px solid var(--linha-forte); border-radius: var(--raio-p);
+    padding: 9px 11px; background: var(--folha); font-size: 14px;
+  }
+  .rotulo { display: block; font-size: 11px; letter-spacing: .3px; text-transform: uppercase; color: var(--tinta-fraca); margin: 0 0 4px; }
+  .campo-bloco { margin-bottom: 12px; }
+
+  /* ---- abas de baixo ---- */
+  .abas {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
+    background: var(--folha); border-top: 1px solid var(--linha);
+    display: flex; padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0px));
+  }
+  .abas .aba {
+    flex: 1; background: none; border: 0; padding: 6px 2px; border-radius: var(--raio-p);
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    font-size: 11px; color: var(--tinta-fraca);
+  }
+  .abas .aba svg { width: 18px; height: 18px; }
+  .abas .aba[aria-current="true"] { color: var(--verde); font-weight: 500; background: var(--verde-fundo); }
+
+  /* ---- modal ---- */
+  .fundo-modal {
+    position: fixed; top: 0; left: 0; right: 0; height: 100vh; height: 100dvh;
+    z-index: 50; background: rgba(16,22,20,.5);
+    display: flex; align-items: flex-end; justify-content: center; padding: 0;
+  }
+  @media (min-width: 560px) { .fundo-modal { align-items: center; padding: 20px; } }
+  .modal {
+    background: var(--folha); width: 100%; max-width: 560px; overflow: auto;
+    max-height: 86vh; max-height: 86dvh;
+    border-radius: var(--raio) var(--raio) 0 0; border: 1px solid var(--linha);
+  }
+  /* o rodapé acompanha a rolagem: no iPhone a barra do Safari come o pé da folha */
+  .acoes-fim {
+    position: sticky; bottom: -1px; z-index: 2;
+    background: var(--folha); border-top: 1px solid var(--linha);
+    margin: 12px -14px calc(-14px + env(safe-area-inset-bottom, 0px)) -14px;
+    padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0px));
+  }
+  @media (min-width: 560px) { .modal { border-radius: var(--raio); } }
+  .modal h3 {
+    margin: 0; padding: 12px 14px; font-size: 13px; font-weight: 500; color: var(--verde);
+    background: var(--verde-fundo); display: flex; align-items: center; gap: 8px;
+  }
+  .modal h3 .fechar { margin-left: auto; background: none; border: 0; color: var(--tinta-fraca); font-size: 20px; line-height: 1; padding: 0 4px; }
+  .modal .corpo { padding: 14px; }
+
+  .previa { border: 1px solid var(--linha); border-radius: var(--raio-p); margin: 10px 0; }
+  .previa .fila { padding: 8px 10px; }
+
+  .nota { background: var(--alerta-fundo); color: var(--alerta); border-radius: var(--raio-p); padding: 9px 11px; font-size: 12px; }
+</style>
+
+<div id="app">
+  <div id="portao" hidden>
+    <div class="card portao-card">
+      <h2>Lista da casa</h2>
+      <div class="corpo">
+        <p class="sub" id="portao-texto">A mesma senha para todo mundo da casa. Digite uma vez; este aparelho lembra.</p>
+        <label class="rotulo" for="senha">Senha</label>
+        <input class="campo" id="senha" type="password" autocomplete="current-password" enterkeyhint="go">
+        <div class="linha-btns" style="margin-top:12px">
+          <button class="btn principal larga" type="button" id="btn-entrar">Entrar</button>
+        </div>
+        <div id="portao-aviso"></div>
+      </div>
+    </div>
+  </div>
+
+  <header class="top">
+    <h1>Mercado de Sexta</h1>
+    <button class="quem" id="btn-quem" type="button">Quem sou eu</button>
+    <span class="semana" id="rot-semana"></span>
+  </header>
+
+  <main>
+    <section class="tela" id="tela-rodada"></section>
+    <section class="tela" id="tela-listas" hidden></section>
+    <section class="tela" id="tela-itens" hidden></section>
+  </main>
+</div>
+
+<nav class="abas" role="tablist">
+  <button class="aba" type="button" data-tela="rodada" aria-current="true">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l2 2 4-4"/><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4"/></svg>
+    Semana
+  </button>
+  <button class="aba" type="button" data-tela="listas">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+    Listas
+  </button>
+  <button class="aba" type="button" data-tela="itens">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18l-2 13H5L3 6z"/><path d="M8 6V4a4 4 0 018 0v2"/></svg>
+    Itens
+  </button>
+</nav>
+
+<div id="area-modal"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------------------------------------------------------------
+     Mercado de Sexta
+     - lista/itens        : a lista mestra, um mapa id -> item
+     - rodadas/atual      : a rodada da semana (o que foi perguntado)
+     - historico/rodadas   : data -> ids que precisaram (para a cadência)
+     Escrita sempre por chave (update com merge), nunca despejando o
+     mapa inteiro por cima: o Vinicius e a esposa mexem ao mesmo tempo.
+  --------------------------------------------------------------- */
+
+  var CAMINHOS = { itens: "lista/itens", rodada: "rodadas/atual", historico: "historico/rodadas" };
+
+  var S = {
+    itens: {},
+    rodada: null,
+    historico: {},
+    tela: "rodada",
+    modo: "um",
+    ordem: "lista",
+    idx: 0,
+    filtro: "todos",
+    filtroCasa: "tudo",
+    busca: "",
+    quem: localStorage.getItem("mercado:quem") || "",
+    pedido: null,
+    pronto: false
+  };
+
+  /* ---------------- utilidades ---------------- */
+
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function normalizar(s) {
+    return String(s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").trim();
+  }
+  function hoje() {
+    var d = new Date();
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  }
+  function dataCurta(iso) {
+    if (!iso) return "";
+    var p = iso.split("-");
+    return p[2] + "/" + p[1];
+  }
+  function diasEntre(a, b) {
+    return Math.round((new Date(b + "T12:00:00") - new Date(a + "T12:00:00")) / 86400000);
+  }
+  function novoId() {
+    return "i" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  }
+  function plural(n, um, muitos) { return n + " " + (n === 1 ? um : muitos); }
+
+  /* ---------------- guarda dos dados ---------------- */
+
+  var Store = (function () {
+    var db = null;      // banco do Artifact (dentro do Claude)
+    var fb = null;      // nó da casa no Firebase (página hospedada)
+    var ouvintes = {};
+    var local = {};
+
+    // O update do Firebase troca o filho inteiro quando recebe objeto aninhado.
+    // Achatando até a folha, ele passa a mesclar campo a campo — que é o que o
+    // app precisa: o Vinicius e a casa mexem na mesma semana ao mesmo tempo.
+    function achatar(obj, prefixo, saida) {
+      saida = saida || {}; prefixo = prefixo || "";
+      Object.keys(obj).forEach(function (k) {
+        var v = obj[k], caminho = prefixo ? prefixo + "/" + k : k;
+        if (v && typeof v === "object" && !Array.isArray(v)) achatar(v, caminho, saida);
+        else saida[caminho] = v;
+      });
+      return saida;
+    }
+
+    function chaveLocal(p) { return "mercado:" + p; }
+    function lerLocal(p) {
+      try { return JSON.parse(localStorage.getItem(chaveLocal(p)) || "null"); } catch (e) { return null; }
+    }
+    function gravarLocal(p, corpo) {
+      local[p] = corpo;
+      try { localStorage.setItem(chaveLocal(p), JSON.stringify(corpo)); } catch (e) {}
+      if (ouvintes[p]) ouvintes[p](corpo);
+    }
+    function mesclar(alvo, remendo) {
+      Object.keys(remendo).forEach(function (k) {
+        var v = remendo[k];
+        if (v && typeof v === "object" && !Array.isArray(v)) {
+          alvo[k] = mesclar(Object.assign({}, alvo[k] || {}), v);
+        } else { alvo[k] = v; }
+      });
+      return alvo;
+    }
+
+    return {
+      temBanco: function () { return !!db || !!fb; },
+      comoGuarda: function () { return db ? "claude" : fb ? "firebase" : "local"; },
+
+      async abrir() {
+        try {
+          db = (window.claude && typeof window.claude.use === "function") ? await window.claude.use("db") : null;
+        } catch (e) { db = null; }
+        return !!db;
+      },
+
+      // Página hospedada: a senha vira o nome do nó, e é só ele que as regras
+      // do Firebase deixam ler. Sem a senha não há caminho para adivinhar.
+      abrirFirebase(config, chave) {
+        if (!window.firebase || !config || !config.databaseURL) return false;
+        try {
+          if (!firebase.apps.length) firebase.initializeApp(config);
+          fb = firebase.database().ref("listas/" + chave);
+          return true;
+        } catch (e) { fb = null; return false; }
+      },
+
+      async existeNoFirebase(config, chave) {
+        if (!window.firebase || !config || !config.databaseURL) return null;
+        try {
+          if (!firebase.apps.length) firebase.initializeApp(config);
+          var snap = await firebase.database().ref("listas/" + chave + "/marca").get();
+          return snap.exists();
+        } catch (e) { return null; }
+      },
+
+      async marcarCasa(nome) {
+        if (fb) await fb.child("marca").set({ nome: nome || "casa", criada: new Date().toISOString() });
+      },
+
+      async garantir(p, inicial) {
+        if (db) {
+          try {
+            var snap = await db.doc(p).get();
+            if (!snap.exists) await db.doc(p).set(inicial);
+          } catch (e) { /* outro visualizador pode ter criado na mesma hora */ }
+          return;
+        }
+        if (fb) {
+          var s2 = await fb.child(p).get();
+          if (!s2.exists()) await fb.child(p).set(inicial);
+          return;
+        }
+        if (!lerLocal(p)) gravarLocal(p, inicial);
+      },
+
+      escutar(p, cb) {
+        ouvintes[p] = cb;
+        if (db) {
+          return db.doc(p).onSnapshot(function (snap) {
+            var corpo = snap.exists ? snap.data() : null;
+            local[p] = corpo ? Object.assign({}, corpo) : {};
+            cb(corpo);
+          }, function () { /* assinatura morreu; a tela segue com o que tem */ });
+        }
+        if (fb) {
+          var no = fb.child(p);
+          var fn = no.on("value", function (snap) {
+            var corpo = snap.val();
+            local[p] = corpo ? Object.assign({}, corpo) : {};
+            cb(corpo);
+          });
+          return function () { no.off("value", fn); };
+        }
+        cb(lerLocal(p));
+        return function () {};
+      },
+
+      async mesclarDoc(p, remendo) {
+        if (db) {
+          try { await db.doc(p).update(remendo); }
+          catch (e) { await db.doc(p).set(mesclar(Object.assign({}, local[p] || lerLocal(p) || {}), remendo)); }
+          return;
+        }
+        if (fb) { await fb.child(p).update(achatar(remendo)); return; }
+        gravarLocal(p, mesclar(Object.assign({}, lerLocal(p) || {}), remendo));
+      },
+
+      async gravarDoc(p, corpo) {
+        if (db) { await db.doc(p).set(corpo); return; }
+        if (fb) { await fb.child(p).set(corpo); return; }
+        gravarLocal(p, corpo);
+      },
+
+      async lerDoc(p) {
+        if (db) { var s = await db.doc(p).get(); return s.exists ? s.data() : null; }
+        if (fb) { var s3 = await fb.child(p).get(); return s3.exists() ? s3.val() : null; }
+        return lerLocal(p);
+      },
+
+      guardarCopia(p, corpo) { local[p] = corpo; }
+    };
+  })();
+
+  /* ---------------- classificação na importação ---------------- */
+
+  var HORTI = ("abacate abacaxi abobora abobrinha acelga agriao aipim alface alho alho-poro ameixa " +
+    "banana batata batata-doce berinjela beterraba brocolis cebola cebolinha cenoura cheiro-verde chuchu " +
+    "coco coentro couve couve-flor espinafre gengibre goiaba hortela inhame jilo kiwi laranja legumes " +
+    "limao macaxeira maca mamao manga manjericao maracuja melancia melao milho morango pepino pera " +
+    "pimentao pimenta-de-cheiro quiabo rabanete repolho rucula salsa salsinha tangerina tomate uva " +
+    "vagem verdura fruta salada mandioca maxixe umbu caju acerola pinha graviola caja tomate-cereja"
+  ).split(" ");
+
+  var GRUPOS = [
+    { cat: "Frutas e verduras", destino: "horti", palavras: ["hortifruti", "hortifrutti", "frutas", "verduras", "legumes", "feira", "hiperideal", "sacolao"] },
+    { cat: "Padaria", destino: "mercado", palavras: ["padaria", "paes", "pao"] },
+    { cat: "Carnes e frios", destino: "mercado", palavras: ["carne", "carnes", "acougue", "frios", "peixe", "aves", "friosaçougue"] },
+    { cat: "Laticínios e ovos", destino: "mercado", palavras: ["laticinios", "leite", "queijos", "ovos"] },
+    { cat: "Bebidas", destino: "mercado", palavras: ["bebida", "bebidas"] },
+    { cat: "Limpeza", destino: "mercado", palavras: ["limpeza", "produtos de limpeza"] },
+    { cat: "Higiene", destino: "mercado", palavras: ["higiene", "banheiro", "farmacia"] },
+    { cat: "Pet", destino: "mercado", palavras: ["pet", "cachorro", "gato", "racao"] },
+    { cat: "Mercearia", destino: "mercado", palavras: ["mercearia", "secos", "despensa", "armario", "atacadao", "assai", "ifood"] },
+    { cat: "Casa", destino: "mercado", palavras: ["casa", "utilidades", "diversos"] }
+  ];
+
+  var PALAVRAS_CAT = [
+    { cat: "Padaria", p: ["pao", "paes", "bisnaga", "broa", "torrada", "biscoito de polvilho", "bolo"] },
+    { cat: "Carnes e frios", p: ["carne", "picanha", "alcatra", "coxao", "patinho", "acem", "moida", "frango", "peito de frango", "coxa", "sobrecoxa", "linguica", "bacon", "presunto", "mortadela", "salsicha", "peixe", "tilapia", "camarao", "salmao", "file", "costela", "peru", "hamburguer", "salame", "charque", "carne seca"] },
+    { cat: "Laticínios e ovos", p: ["leite", "queijo", "mussarela", "requeijao", "iogurte", "manteiga", "margarina", "creme de leite", "leite condensado", "ovo", "ovos", "coalhada", "ricota", "nata"] },
+    { cat: "Bebidas", p: ["agua", "refrigerante", "coca", "guarana", "suco", "cerveja", "vinho", "cafe", "cha", "energetico", "isotonico", "agua de coco", "achocolatado", "toddy", "nescau"] },
+    { cat: "Limpeza", p: ["detergente", "sabao", "amaciante", "desinfetante", "agua sanitaria", "candida", "esponja", "alvejante", "multiuso", "veja", "limpador", "saco de lixo", "papel toalha", "lustra", "cloro", "bombril", "vassoura", "rodo", "pano de chao", "flanela"] },
+    { cat: "Higiene", p: ["papel higienico", "sabonete", "shampoo", "condicionador", "pasta de dente", "creme dental", "escova de dente", "desodorante", "absorvente", "fralda", "lenco", "algodao", "cotonete", "hidratante", "protetor solar", "aparelho de barbear", "fio dental", "enxaguante"] },
+    { cat: "Pet", p: ["racao", "areia sanitaria", "petisco", "sache", "tapete higienico"] },
+    { cat: "Casa", p: ["pilha", "lampada", "fosforo", "vela", "papel aluminio", "papel filme", "guardanapo", "isqueiro", "cola", "prendedor"] },
+    { cat: "Mercearia", p: ["arroz", "feijao", "macarrao", "farinha", "acucar", "sal", "oleo", "azeite", "vinagre", "molho", "extrato", "milho verde", "ervilha", "atum", "sardinha", "tempero", "colorau", "pimenta do reino", "cominho", "oregano", "canela", "fermento", "gelatina", "aveia", "granola", "cuscuz", "tapioca", "goma", "biscoito", "bolacha", "cereal", "geleia", "mel", "amendoim", "castanha", "nozes", "chocolate", "azeitona", "ketchup", "mostarda", "maionese", "shoyu", "leite de coco", "lentilha", "grao de bico", "sopa", "miojo", "pipoca", "polvilho", "leite em po", "achocolatado em po"] }
+  ];
+
+  function adivinhar(nome, grupoAtual) {
+    var n = normalizar(nome);
+    var palavras = n.split(/[ ,/()-]+/).filter(Boolean);
+    var ehHorti = HORTI.some(function (h) {
+      return palavras.indexOf(h) >= 0 || n.indexOf(h + " ") === 0 || n === h;
+    });
+    if (ehHorti) return { categoria: "Frutas e verduras", destino: "horti" };
+    for (var i = 0; i < PALAVRAS_CAT.length; i++) {
+      var g = PALAVRAS_CAT[i];
+      for (var j = 0; j < g.p.length; j++) {
+        var alvo = g.p[j];
+        if (n === alvo || n.indexOf(alvo + " ") === 0 || n.indexOf(" " + alvo) >= 0 || palavras.indexOf(alvo) >= 0) {
+          return { categoria: g.cat, destino: "mercado" };
+        }
+      }
+    }
+    if (grupoAtual) return { categoria: grupoAtual.cat, destino: grupoAtual.destino };
+    return { categoria: "Outros", destino: "mercado" };
+  }
+
+  function grupoDaLinha(linha) {
+    var n = normalizar(linha).replace(/:$/, "");
+    for (var i = 0; i < GRUPOS.length; i++) {
+      if (GRUPOS[i].palavras.indexOf(n) >= 0) return GRUPOS[i];
+    }
+    return null;
+  }
+
+  function analisarTexto(texto) {
+    var linhas = String(texto || "").split(/\r?\n/);
+
+    function limpar(bruta) {
+      return bruta
+        .replace(/^[\s\u2022\u25e6\u25aa\u00b7*\-\u2013\u2014+>]+/, "")
+        .replace(/^\[[\sxX\u2713\u2714]?\]\s*/, "")
+        .replace(/^\d+[.)]\s+/, "")
+        .replace(/[\u2705\u2611\u274c\u2714\ufe0f]/g, "")
+        .trim();
+    }
+
+    // Se a nota inteira está em maiúsculas, MAIÚSCULA não pode significar
+    // categoria — senão nada seria importado. Aí só os dois-pontos contam.
+    var uteis = linhas.map(limpar).filter(Boolean);
+    var caixaAlta = uteis.filter(function (l) { return l === l.toUpperCase() && /[A-ZÀ-Ú]/.test(l); }).length;
+    var maiusculaValeCategoria = uteis.length > 0 && caixaAlta / uteis.length < 0.6;
+
+    var grupo = null, saida = [], vistos = {};
+    linhas.forEach(function (bruta) {
+      var l = limpar(bruta);
+      if (!l) return;
+      var doisPontos = /:\s*$/.test(bruta);
+      var soMaiuscula = maiusculaValeCategoria && l === l.toUpperCase() && /[A-ZÀ-Ú]/.test(l) && l.length <= 28 && !/\d/.test(l);
+      if (doisPontos || soMaiuscula) {
+        var rotulo = l.replace(/:\s*$/, "").trim();
+        if (!rotulo) return;
+        var conhecido = grupoDaLinha(rotulo);
+        grupo = conhecido || {
+          cat: rotulo.charAt(0).toUpperCase() + rotulo.slice(1).toLowerCase(),
+          destino: adivinhar(rotulo, null).destino
+        };
+        return;
+      }
+      l = l.replace(/\s{2,}/g, " ");
+      var chave = normalizar(l);
+      if (!chave || vistos[chave]) return;
+      vistos[chave] = true;
+      var palpite = adivinhar(l, grupo);
+      saida.push({ nome: l, categoria: palpite.categoria, destino: palpite.destino });
+    });
+    return saida;
+  }
+
+  var LISTA_BASE = [
+    "Banana prata", "Maçã", "Mamão", "Melancia", "Laranja", "Limão", "Abacate",
+    "Tomate", "Cebola", "Alho", "Batata", "Batata-doce", "Cenoura", "Chuchu", "Abobrinha",
+    "Pimentão", "Alface", "Couve", "Cheiro-verde", "Coentro", "Brócolis", "Aipim",
+    "Pão francês", "Pão de forma", "Bolo",
+    "Carne moída", "Peito de frango", "Coxa e sobrecoxa", "Linguiça", "Bacon", "Presunto", "Peixe",
+    "Leite", "Queijo mussarela", "Requeijão", "Iogurte", "Manteiga", "Ovos", "Creme de leite",
+    "Arroz", "Feijão", "Macarrão", "Farinha de mandioca", "Açúcar", "Sal", "Óleo", "Azeite",
+    "Molho de tomate", "Café", "Achocolatado em pó", "Biscoito", "Aveia", "Tapioca", "Cuscuz",
+    "Água mineral", "Refrigerante", "Suco", "Cerveja",
+    "Detergente", "Sabão em pó", "Amaciante", "Água sanitária", "Desinfetante", "Esponja", "Saco de lixo", "Papel toalha",
+    "Papel higiênico", "Sabonete", "Shampoo", "Condicionador", "Creme dental", "Desodorante",
+    "Papel alumínio", "Fósforo", "Pilha"
+  ];
+
+  /* ---------------- cadência ---------------- */
+
+  function rodadasPassadas() {
+    var r = S.historico && S.historico.rodadas ? S.historico.rodadas : {};
+    return Object.keys(r).sort().reverse();
+  }
+
+  function estat(id) {
+    var datas = rodadasPassadas().filter(function (d) {
+      var arr = S.historico.rodadas[d];
+      return Array.isArray(arr) && arr.indexOf(id) >= 0;
+    });
+    var total = rodadasPassadas().length;
+    if (!datas.length) return { vezes: 0, total: total, ultima: null, dica: total ? "não precisou ainda" : "", quente: false };
+    var ultima = datas[0];
+    var freq = datas.length / Math.max(total, 1);
+    var intervalo;
+    if (datas.length >= 2) {
+      var somas = 0;
+      for (var i = 0; i < datas.length - 1; i++) somas += diasEntre(datas[i + 1], datas[i]);
+      intervalo = somas / (datas.length - 1);
+    } else {
+      intervalo = freq > 0 ? 7 / freq : 21;
+    }
+    var desde = diasEntre(ultima, hoje());
+    var ritmo = freq >= 0.75 ? "toda semana"
+      : freq >= 0.4 ? "a cada 2 semanas"
+      : freq >= 0.2 ? "a cada 3 ou 4 semanas"
+      : "de vez em quando";
+    var quente = desde >= intervalo * 0.9;
+    var quandoTxt = desde <= 1 ? "hoje" : desde < 14 ? "há " + desde + " dias" : "há " + Math.round(desde / 7) + " semanas";
+    return {
+      vezes: datas.length, total: total, ultima: ultima, quente: quente,
+      dica: ritmo + " · última " + quandoTxt
+    };
+  }
+
+  /* ---------------- listas derivadas ---------------- */
+
+  function itensArray() {
+    return Object.keys(S.itens).map(function (id) {
+      return Object.assign({ id: id }, S.itens[id]);
+    }).filter(function (it) { return it && it.nome; });
+  }
+
+  function ordemLista() {
+    var arr = itensArray();
+    var ordemCat = {};
+    arr.forEach(function (it) {
+      if (ordemCat[it.categoria] === undefined) ordemCat[it.categoria] = it.ordem == null ? 9999 : it.ordem;
+      else ordemCat[it.categoria] = Math.min(ordemCat[it.categoria], it.ordem == null ? 9999 : it.ordem);
+    });
+    arr.sort(function (a, b) {
+      var da = ordemCat[a.categoria] - ordemCat[b.categoria];
+      if (da) return da;
+      return (a.ordem == null ? 9999 : a.ordem) - (b.ordem == null ? 9999 : b.ordem);
+    });
+    if (S.ordem === "provavel") {
+      arr = arr.slice().sort(function (a, b) {
+        var qa = estat(a.id).quente ? 0 : 1, qb = estat(b.id).quente ? 0 : 1;
+        return qa - qb;
+      });
+    }
+    return arr;
+  }
+
+  function marcado(id) {
+    var m = S.rodada && S.rodada.marcados ? S.rodada.marcados[id] : null;
+    return m || null;
+  }
+  function precisa(id) {
+    var m = marcado(id);
+    return !!(m && m.precisa);
+  }
+  function decidido(id) {
+    return !!marcado(id);
+  }
+  function decididos() {
+    return itensArray().filter(function (it) { return decidido(it.id); }).length;
+  }
+  function daLista(destino) {
+    return ordemLista().filter(function (it) { return precisa(it.id) && it.destino === destino; });
+  }
+  function feito(id) {
+    return !!(S.rodada && S.rodada.feitos && S.rodada.feitos[id]);
+  }
+
+  function textoDaLista(destino) {
+    var itens = daLista(destino);
+    var cab = destino === "horti"
+      ? "Hiperideal · frutas e verduras · " + dataCurta(S.rodada && S.rodada.data ? S.rodada.data : hoje())
+      : "Atacadão/Assaí · " + dataCurta(S.rodada && S.rodada.data ? S.rodada.data : hoje());
+    var linhas = itens.map(function (it) {
+      var m = marcado(it.id) || {};
+      var q = m.qtd && m.qtd > 1 ? m.qtd : null;
+      var un = it.unidade ? String(it.unidade).trim() : "";
+      var sufixo = "";
+      if (un) sufixo = " — " + (q || 1) + " " + un;
+      else if (q) sufixo = " — " + q;
+      if (it.obs) sufixo += (sufixo ? " " : " — ") + "(" + it.obs + ")";
+      return it.nome + sufixo;
+    });
+    return cab + "\n\n" + (linhas.length ? linhas.join("\n") : "(nada nesta semana)");
+  }
+
+  /* ---------------- desenho das telas ---------------- */
+
+  var CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l6 6L20 6"/></svg>';
+
+  function pilula(acao, valor, ativo, rotulo, extra) {
+    return '<button class="pilula" type="button" data-acao="' + acao + '" data-valor="' + valor + '" aria-pressed="' + (ativo ? "true" : "false") + '"' + (extra || "") + '>' + esc(rotulo) + "</button>";
+  }
+
+  function desenhaRodada() {
+    var alvo = document.getElementById("tela-rodada");
+    var arr = ordemLista();
+
+    if (!arr.length) {
+      alvo.innerHTML =
+        '<div class="card"><h2>Comece pela lista</h2><div class="corpo">' +
+        '<p class="sub">Esta é a lista de tudo que costumam comprar — a mesma das Notas do iPhone. ' +
+        'Com ela no lugar, quem cuida da casa marca o que vai acabando durante a semana e, na sexta, ' +
+        'a compra já está montada: uma lista de frutas e verduras e uma do mercado.</p>' +
+        '<div class="linha-btns">' +
+        '<button class="btn principal" type="button" data-acao="importar">Colar a lista das Notas</button>' +
+        '<button class="btn" type="button" data-acao="base">Começar com uma lista base</button>' +
+        "</div></div></div>";
+      return;
+    }
+
+    var total = arr.length, feitosN = decididos(), precisaN = arr.filter(function (i) { return precisa(i.id); }).length;
+    var pct = total ? Math.round((feitosN / total) * 100) : 0;
+
+    var topo =
+      '<div class="card"><h2>Semana de ' + esc(dataCurta(S.rodada && S.rodada.data ? S.rodada.data : hoje())) +
+      '<span class="cont">' + precisaN + " marcados</span></h2><div class=\"corpo\">" +
+      '<div class="progresso"><i style="width:' + pct + '%"></i></div>' +
+      '<div class="progresso-txt"><span>' + feitosN + " de " + total + " perguntados</span><span>" + pct + "%</span></div>" +
+      '<div class="linha-btns" style="margin-top:12px">' +
+      '<div class="pilulas">' +
+      pilula("modo", "um", S.modo === "um", "Um por um") +
+      pilula("modo", "todos", S.modo === "todos", "Lista toda") +
+      "</div>" +
+      '<div class="pilulas">' +
+      pilula("ordem", "lista", S.ordem === "lista", "Ordem da lista") +
+      pilula("ordem", "provavel", S.ordem === "provavel", "Prováveis primeiro") +
+      "</div></div></div></div>";
+
+    var daCasa = arr.filter(function (it) {
+      var m = marcado(it.id);
+      return m && m.precisa && m.por === "casa";
+    });
+    var aviso = "";
+    if (daCasa.length) {
+      aviso = '<div class="card"><h2>Marcado durante a semana<span class="cont">' +
+        plural(daCasa.length, "item", "itens") + "</span></h2>";
+      daCasa.forEach(function (it) {
+        var m = marcado(it.id) || {};
+        aviso += '<div class="fila ' + it.destino + ' marcado"><span class="caixa">' + CHECK + "</span>" +
+          '<span class="nome">' + esc(it.nome) + "</span>" +
+          '<span class="meta">' + esc(dataCurta(m.quando || "")) + "</span></div>";
+      });
+      aviso += "</div>";
+    }
+
+    var meio = aviso + (S.modo === "um" ? desenhaFoco(arr) : desenhaTudo(arr));
+
+    var pe = "";
+    if (precisaN) {
+      pe = '<button class="btn principal larga" type="button" data-acao="fechar">' +
+        (S.rodada && S.rodada.fechada ? "Atualizar as listas" : "Gerar as listas") +
+        " (" + precisaN + ")</button>";
+    }
+    var nova = '<div style="text-align:center;margin-top:10px"><button class="link" type="button" data-acao="nova">Começar uma semana nova</button></div>';
+
+    alvo.innerHTML = topo + meio + pe + nova;
+  }
+
+  function desenhaFoco(arr) {
+    if (S.idx >= arr.length) {
+      var precisaN = arr.filter(function (i) { return precisa(i.id); }).length;
+      return '<div class="card"><h2>Fim da lista</h2><div class="corpo">' +
+        '<p class="sub">Passou pelos ' + arr.length + " itens. " + plural(precisaN, "item precisa", "itens precisam") + " ser comprado" + (precisaN === 1 ? "" : "s") + ".</p>" +
+        '<div class="linha-btns"><button class="btn" type="button" data-acao="voltar">Voltar um item</button>' +
+        '<button class="btn" type="button" data-acao="modo" data-valor="todos">Rever a lista toda</button></div>' +
+        "</div></div>";
+    }
+    var it = arr[S.idx];
+    var e = estat(it.id);
+    var m = marcado(it.id);
+    var dica = e.quente && e.vezes ? "provavelmente acabando · " + e.dica : e.dica;
+    return '<div class="card"><div class="corpo">' +
+      '<div class="foco">' +
+      '<div class="cat">' + esc(it.categoria || "") + (it.destino === "horti" ? " · Hiperideal" : "") + "</div>" +
+      '<div class="nome">' + esc(it.nome) + "</div>" +
+      '<div class="dica' + (e.quente && e.vezes ? " quente" : "") + '">' + esc(dica) + (it.obs ? " · " + esc(it.obs) : "") + "</div>" +
+      "</div>" +
+      '<div class="decisao">' +
+      '<button class="btn nao" type="button" data-acao="decidir" data-valor="0">Não precisa</button>' +
+      '<button class="btn sim" type="button" data-acao="decidir" data-valor="1">Precisa</button>' +
+      "</div>" +
+      '<div class="pe">' +
+      '<button class="link" type="button" data-acao="voltar"' + (S.idx === 0 ? " disabled" : "") + ">← Voltar</button>" +
+      (m ? '<span class="meta" style="font-size:11px;color:var(--tinta-fraquinha)">já respondido: ' + (m.precisa ? "precisa" : "não precisa") + "</span>" : "") +
+      '<button class="link" type="button" data-acao="pular">Pular →</button>' +
+      "</div></div></div>";
+  }
+
+  function desenhaTudo(arr) {
+    var html = '<div class="card"><h2>Lista toda<span class="cont">toque para marcar</span></h2>';
+    var catAtual = null;
+    arr.forEach(function (it) {
+      if (it.categoria !== catAtual && S.ordem === "lista") {
+        catAtual = it.categoria;
+        html += '<div class="grupo-titulo">' + esc(catAtual || "Outros") + "</div>";
+      }
+      var m = marcado(it.id);
+      var e = estat(it.id);
+      var estado = m ? (m.precisa ? "marcado" : "") : "";
+      var meta = m ? (m.precisa ? "precisa" : "não precisa") : (e.quente && e.vezes ? "deve estar acabando" : "");
+      html += '<button class="fila ' + it.destino + " " + estado + '" type="button" data-acao="alternar" data-id="' + it.id + '">' +
+        '<span class="caixa">' + CHECK + "</span>" +
+        '<span class="nome">' + esc(it.nome) + "</span>" +
+        '<span class="meta">' + esc(meta) + "</span>" +
+        "</button>";
+    });
+    return html + "</div>";
+  }
+
+  function desenhaCasa() {
+    var alvo = document.getElementById("tela-rodada");
+    var arr = ordemLista();
+    if (!arr.length) {
+      alvo.innerHTML = '<div class="card"><div class="vazio">A lista ainda não foi montada.</div></div>';
+      return;
+    }
+    var marcados = arr.filter(function (it) { return precisa(it.id); });
+
+    var html = '<div class="card"><h2>O que está acabando<span class="cont">' +
+      plural(marcados.length, "marcado", "marcados") + "</span></h2><div class=\"corpo\">" +
+      '<p class="sub">Toque no item assim que ele estiver acabando — não precisa esperar a sexta. ' +
+      "A compra da semana sai do que estiver marcado aqui.</p>" +
+      '<button class="btn larga" type="button" data-acao="faltou">+ Faltou uma coisa que não está na lista</button>' +
+      '<div class="pilulas" style="margin-top:12px">' +
+      pilula("filtro-casa", "tudo", S.filtroCasa !== "marcados", "A lista toda") +
+      pilula("filtro-casa", "marcados", S.filtroCasa === "marcados", "Só os marcados") +
+      "</div>" +
+      '<input class="campo" id="busca-casa" type="search" placeholder="Buscar item" value="' + esc(S.busca) + '" style="margin-top:10px">' +
+      "</div></div>";
+
+    var visiveis = S.filtroCasa === "marcados" ? marcados : arr;
+    if (!visiveis.length) {
+      html += '<div class="card"><div class="vazio">Nada marcado ainda.</div></div>';
+    } else {
+      html += '<div class="card">';
+      var catAtual = null;
+      visiveis.forEach(function (it) {
+        if (it.categoria !== catAtual) {
+          catAtual = it.categoria;
+          html += '<div class="grupo-titulo">' + esc(catAtual || "Outros") + "</div>";
+        }
+        html += '<button class="fila ' + it.destino + (precisa(it.id) ? " marcado" : "") +
+          '" type="button" data-acao="alternar" data-id="' + it.id +
+          '" data-busca="' + esc(normalizar(it.nome + " " + it.categoria)) + '">' +
+          '<span class="caixa">' + CHECK + "</span>" +
+          '<span class="nome">' + esc(it.nome) + "</span>" +
+          "</button>";
+      });
+      html += "</div>";
+    }
+
+    alvo.innerHTML = html;
+    aplicarBusca("tela-rodada");
+    var campo = document.getElementById("busca-casa");
+    if (campo) campo.addEventListener("input", function () { S.busca = campo.value; aplicarBusca("tela-rodada"); });
+  }
+
+  function cartaoLista(destino) {
+    var itens = daLista(destino);
+    var titulo = destino === "horti" ? "Frutas e verduras · Hiperideal" : "Mercado · iFood";
+    var quemFaz = destino === "horti" ? "pedido pela esposa" : "pedido por você";
+    var html = '<div class="card"><h2>' + esc(titulo) + '<span class="cont">' + itens.length + " itens</span></h2>";
+    if (!itens.length) {
+      html += '<div class="vazio">Nada marcado nesta rodada.</div>';
+    } else {
+      var cats = {};
+      itens.forEach(function (it) { cats[it.categoria || ""] = true; });
+      var mostrarGrupos = Object.keys(cats).length > 1;
+      var catAtual = null;
+      itens.forEach(function (it) {
+        if (mostrarGrupos && it.categoria !== catAtual) {
+          catAtual = it.categoria;
+          html += '<div class="grupo-titulo">' + esc(catAtual || "Outros") + "</div>";
+        }
+        var m = marcado(it.id) || {};
+        var q = m.qtd || 1;
+        var maisUm = '<button type="button" data-acao="qtd" data-id="' + it.id + '" data-valor="1" aria-label="aumentar a quantidade">+</button>';
+        var contador = (q > 1 || it.unidade)
+          ? '<button type="button" data-acao="qtd" data-id="' + it.id + '" data-valor="-1" aria-label="diminuir a quantidade">−</button>' +
+            "<span>" + q + (it.unidade ? " " + esc(it.unidade) : "") + "</span>" + maisUm
+          : maisUm;
+        html += '<div class="fila ' + destino + (feito(it.id) ? " feito" : "") + '">' +
+          '<button class="caixa" type="button" data-acao="feito" data-id="' + it.id + '" aria-label="marcar como pedido">' + CHECK + "</button>" +
+          '<span class="nome">' + esc(it.nome) + (it.obs ? ' <span class="meta">(' + esc(it.obs) + ")</span>" : "") + "</span>" +
+          '<span class="qtd">' + contador + "</span></div>";
+      });
+      var ondeFaz = destino === "horti" ? "no app do Hiperideal" : "no iFood";
+      html += '<div class="corpo">' +
+        '<button class="btn principal larga" type="button" data-acao="pedir" data-valor="' + destino + '">Fazer o pedido ' + ondeFaz + "</button>" +
+        '<div class="aviso-copia">Um item por vez, com o nome já copiado para colar na busca.</div>' +
+        '<div class="linha-btns" style="margin-top:12px"><button class="btn miuda" type="button" data-acao="copiar" data-valor="' + destino + '">Copiar a lista toda</button>' +
+        '<button class="btn miuda" type="button" data-acao="ver-texto" data-valor="' + destino + '">Ver o texto</button></div>' +
+        '<div class="aviso-copia">' + esc(quemFaz) + "</div>" +
+        '<div id="txt-' + destino + '" hidden><textarea class="texto-lista" readonly>' + esc(textoDaLista(destino)) + "</textarea>" +
+        '<div class="aviso-copia">Se o botão copiar não funcionar no seu navegador, selecione o texto aqui e copie.</div></div>' +
+        "</div>";
+    }
+    return html + "</div>";
+  }
+
+  function itemDoPedido(it) {
+    var m = marcado(it.id) || {};
+    var q = m.qtd || 1;
+    if (it.unidade) return it.nome + " — " + q + " " + it.unidade;
+    return q > 1 ? it.nome + " — " + q : it.nome;
+  }
+
+  function desenhaPedido() {
+    var alvo = document.getElementById("tela-listas");
+    var destino = S.pedido.destino;
+    var itens = daLista(destino);
+    var onde = destino === "horti" ? "Hiperideal" : "iFood · Atacadão ou Assaí";
+
+    if (!itens.length) { S.pedido = null; desenhaListas(); return; }
+
+    var prontos = itens.filter(function (it) { return feito(it.id); }).length;
+    var pct = Math.round((prontos / itens.length) * 100);
+    var topo = '<div class="card"><h2>Pedindo no ' + esc(onde) +
+      '<span class="cont">' + prontos + " de " + itens.length + "</span></h2><div class=\"corpo\">" +
+      '<div class="progresso"><i style="width:' + pct + '%"></i></div>' +
+      '<div class="progresso-txt"><span>' + plural(itens.length - prontos, "item faltando", "itens faltando") + "</span><span>" + pct + "%</span></div>" +
+      "</div></div>";
+
+    if (S.pedido.idx >= itens.length) {
+      alvo.innerHTML = topo +
+        '<div class="card"><h2>Fim da lista</h2><div class="corpo">' +
+        "<p class=\"sub\">" + (prontos === itens.length
+          ? "Todos os " + itens.length + " itens entraram no carrinho."
+          : plural(itens.length - prontos, "item ficou", "itens ficaram") + " sem marcar — dá para voltar e ver quais.") + "</p>" +
+        '<div class="linha-btns"><button class="btn principal" type="button" data-acao="pedido-sair">Ver a lista</button>' +
+        '<button class="btn" type="button" data-acao="pedido-voltar">Voltar um item</button></div>' +
+        "</div></div>";
+      return;
+    }
+
+    var it = itens[S.pedido.idx];
+    var m = marcado(it.id) || {};
+    var q = m.qtd || 1;
+    var ultimo = S.pedido.idx >= itens.length - 1;
+    alvo.innerHTML = topo +
+      '<div class="card"><div class="corpo">' +
+      '<div class="foco">' +
+      '<div class="cat">item ' + (S.pedido.idx + 1) + " de " + itens.length + "</div>" +
+      '<div class="nome">' + esc(it.nome) + "</div>" +
+      '<div class="qtd-grande">' + (it.unidade ? q + " " + esc(it.unidade) : q > 1 ? q + " unidades" : "1 unidade") +
+      (it.obs ? " · " + esc(it.obs) : "") + (feito(it.id) ? " · já no carrinho" : "") + "</div>" +
+      "</div>" +
+      '<div class="linha-btns" style="margin-top:16px">' +
+      '<button class="btn larga" type="button" data-acao="pedido-copiar">Copiar só o nome</button></div>' +
+      '<div class="linha-btns" style="margin-top:8px">' +
+      '<button class="btn principal larga" type="button" data-acao="pedido-feito">' +
+      (ultimo ? "Adicionei — terminar" : "Adicionei — copiar o próximo") + "</button></div>" +
+      '<div class="copiado" id="copiado"></div>' +
+      '<div class="pe">' +
+      '<button class="link" type="button" data-acao="pedido-voltar"' + (S.pedido.idx === 0 ? " disabled" : "") + ">← Voltar</button>" +
+      '<button class="link" type="button" data-acao="pedido-sair">Sair do pedido</button>' +
+      '<button class="link" type="button" data-acao="pedido-pular">Pular →</button>' +
+      "</div></div></div>";
+  }
+
+  function avisoCopia(texto) {
+    var el = document.getElementById("copiado");
+    if (el) el.textContent = texto;
+  }
+
+  function copiarNome(texto) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(texto).then(
+        function () { avisoCopia("copiado: " + texto); },
+        function () { avisoCopia("não deu para copiar — segure no nome acima"); }
+      );
+      return;
+    }
+    var ta = document.createElement("textarea");
+    ta.value = texto; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    var ok = false;
+    try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+    document.body.removeChild(ta);
+    avisoCopia(ok ? "copiado: " + texto : "não deu para copiar — segure no nome acima");
+  }
+
+  function desenhaListas() {
+    if (S.pedido) return desenhaPedido();
+    var alvo = document.getElementById("tela-listas");
+    var arr = ordemLista();
+    if (!arr.length) { alvo.innerHTML = '<div class="card"><div class="vazio">Sem lista ainda. Comece pela aba Itens.</div></div>'; return; }
+    var ordem = S.quem === "esposa" ? ["horti", "mercado"] : ["mercado", "horti"];
+    if (!daLista(ordem[0]).length && daLista(ordem[1]).length) ordem.reverse();
+    var cabecalho = "";
+    if (!decididos()) {
+      cabecalho = '<div class="card"><div class="corpo"><div class="nota">Nada marcado nesta semana ainda.</div></div></div>';
+    }
+    alvo.innerHTML = cabecalho + cartaoLista(ordem[0]) + cartaoLista(ordem[1]);
+  }
+
+  function desenhaItens() {
+    var alvo = document.getElementById("tela-itens");
+    var arr = ordemLista();
+    var cabecalho = '<div class="card"><h2>Lista mestra<span class="cont">' + arr.length + " itens</span></h2><div class=\"corpo\">" +
+      '<div class="linha-btns" style="margin-bottom:10px">' +
+      '<button class="btn" type="button" data-acao="novo">+ Item</button>' +
+      '<button class="btn" type="button" data-acao="importar">Colar das Notas</button>' +
+      (arr.length ? "" : '<button class="btn" type="button" data-acao="base">Lista base</button>') +
+      "</div>" +
+      '<input class="campo" id="busca" type="search" placeholder="Buscar item" value="' + esc(S.busca) + '">' +
+      '<div class="pilulas" style="margin-top:10px">' +
+      pilula("filtro", "todos", S.filtro === "todos", "Todos") +
+      pilula("filtro", "horti", S.filtro === "horti", "Frutas e verduras") +
+      pilula("filtro", "mercado", S.filtro === "mercado", "Mercado") +
+      "</div></div></div>";
+
+    if (!arr.length) {
+      alvo.innerHTML = cabecalho + '<div class="card"><div class="vazio">Nenhum item ainda.</div></div>';
+      return;
+    }
+
+    var html = '<div class="card">';
+    var catAtual = null;
+    var visiveis = arr.filter(function (it) { return S.filtro === "todos" || it.destino === S.filtro; });
+    visiveis.forEach(function (it) {
+      if (it.categoria !== catAtual) {
+        catAtual = it.categoria;
+        html += '<div class="grupo-titulo" data-grupo="' + esc(normalizar(catAtual)) + '">' + esc(catAtual || "Outros") + "</div>";
+      }
+      var e = estat(it.id);
+      html += '<button class="fila ' + it.destino + '" type="button" data-acao="editar" data-id="' + it.id + '" data-busca="' + esc(normalizar(it.nome + " " + it.categoria)) + '">' +
+        '<span class="nome">' + esc(it.nome) + (it.unidade ? ' <span class="meta">' + esc(it.unidade) + "</span>" : "") + "</span>" +
+        '<span class="tag ' + it.destino + '">' + (it.destino === "horti" ? "Hiperideal" : "Mercado") + "</span>" +
+        '<span class="meta">' + esc(e.vezes ? e.vezes + "x" : "") + "</span>" +
+        "</button>";
+    });
+    alvo.innerHTML = cabecalho + html + "</div>";
+    aplicarBusca();
+    var campo = document.getElementById("busca");
+    if (campo) {
+      campo.addEventListener("input", function () { S.busca = campo.value; aplicarBusca(); });
+    }
+  }
+
+  function aplicarBusca(ondeId) {
+    var termo = normalizar(S.busca);
+    var alvo = document.getElementById(ondeId || "tela-itens");
+    if (!alvo) return;
+    alvo.querySelectorAll(".fila[data-busca]").forEach(function (el) {
+      el.hidden = !!termo && el.getAttribute("data-busca").indexOf(termo) < 0;
+    });
+    alvo.querySelectorAll(".grupo-titulo").forEach(function (t) {
+      var algum = false, n = t.nextElementSibling;
+      while (n && n.classList.contains("fila")) { if (!n.hidden) algum = true; n = n.nextElementSibling; }
+      t.hidden = !algum;
+    });
+  }
+
+  function desenhar() {
+    var y = window.scrollY;
+    document.getElementById("rot-semana").textContent = S.pronto ? (Store.temBanco() ? "compartilhado" : "só neste aparelho") : "carregando…";
+    
+    var q = document.getElementById("btn-quem");
+    q.textContent = S.quem === "esposa" ? "Esposa" : S.quem === "casa" ? "Casa" : S.quem === "vini" ? "Vinicius" : "Quem sou eu";
+    var soCasa = S.quem === "casa";
+    document.querySelector(".abas").hidden = soCasa;
+    if (soCasa) S.tela = "rodada";
+    ["rodada", "listas", "itens"].forEach(function (t) {
+      document.getElementById("tela-" + t).hidden = S.tela !== t;
+    });
+    document.querySelectorAll(".abas .aba").forEach(function (b) {
+      b.setAttribute("aria-current", b.getAttribute("data-tela") === S.tela ? "true" : "false");
+    });
+    if (soCasa) desenhaCasa();
+    else if (S.tela === "rodada") desenhaRodada();
+    else if (S.tela === "listas") desenhaListas();
+    else desenhaItens();
+    window.scrollTo(0, y);
+  }
+
+  /* ---------------- ações ---------------- */
+
+  async function garantirRodada() {
+    if (S.rodada && S.rodada.data) return;
+    var nova = { data: hoje(), marcados: {}, feitos: {}, fechada: false };
+    S.rodada = nova;
+    await Store.gravarDoc(CAMINHOS.rodada, nova);
+  }
+
+  async function marcar(id, quer) {
+    await garantirRodada();
+    var m = marcado(id) || {};
+    var corpo = { precisa: !!quer, qtd: m.qtd || 1, quando: hoje(), por: S.quem || "" };
+    S.rodada.marcados = S.rodada.marcados || {};
+    S.rodada.marcados[id] = Object.assign({}, m, corpo);
+    desenhar();
+    await Store.mesclarDoc(CAMINHOS.rodada, { marcados: (function (o) { o[id] = corpo; return o; })({}) });
+  }
+
+  async function mudarQtd(id, d) {
+    var m = marcado(id) || { precisa: true, qtd: 1 };
+    var q = Math.max(1, (m.qtd || 1) + d);
+    S.rodada.marcados[id] = Object.assign({}, m, { qtd: q });
+    desenhar();
+    await Store.mesclarDoc(CAMINHOS.rodada, { marcados: (function (o) { o[id] = { qtd: q }; return o; })({}) });
+  }
+
+  async function alternarFeito(id) { return definirFeito(id, !feito(id)); }
+
+  async function definirFeito(id, novo) {
+    await garantirRodada();
+    S.rodada.feitos = S.rodada.feitos || {};
+    S.rodada.feitos[id] = novo;
+    desenhar();
+    await Store.mesclarDoc(CAMINHOS.rodada, { feitos: (function (o) { o[id] = novo; return o; })({}) });
+  }
+
+  async function fecharRodada() {
+    await garantirRodada();
+    var ids = itensArray().filter(function (it) { return precisa(it.id); }).map(function (it) { return it.id; });
+    var data = S.rodada.data || hoje();
+    var rodadas = Object.assign({}, S.historico.rodadas || {});
+    rodadas[data] = ids;
+    var chaves = Object.keys(rodadas).sort();
+    while (chaves.length > 60) { delete rodadas[chaves.shift()]; }
+    S.historico.rodadas = rodadas;
+    S.rodada.fechada = true;
+    S.tela = "listas";
+    desenhar();
+    await Store.mesclarDoc(CAMINHOS.historico, { rodadas: (function (o) { o[data] = ids; return o; })({}) });
+    await Store.mesclarDoc(CAMINHOS.rodada, { fechada: true });
+  }
+
+  async function novaRodada() {
+    if (S.rodada && decididos() && !S.rodada.fechada) {
+      if (!confirm("A semana de " + dataCurta(S.rodada.data) + " ainda não virou lista. Começar uma nova mesmo assim?")) return;
+    }
+    var nova = { data: hoje(), marcados: {}, feitos: {}, fechada: false };
+    S.rodada = nova;
+    S.idx = 0;
+    S.tela = "rodada";
+    desenhar();
+    await Store.gravarDoc(CAMINHOS.rodada, nova);
+  }
+
+  async function gravarItem(id, dados) {
+    S.itens[id] = Object.assign({}, S.itens[id] || {}, dados);
+    desenhar();
+    await Store.mesclarDoc(CAMINHOS.itens, { itens: (function (o) { o[id] = dados; return o; })({}) });
+  }
+
+  async function excluirItem(id) {
+    var doc = (await Store.lerDoc(CAMINHOS.itens)) || { itens: {} };
+    var itens = Object.assign({}, doc.itens || {});
+    delete itens[id];
+    S.itens = itens;
+    desenhar();
+    await Store.gravarDoc(CAMINHOS.itens, { itens: itens });
+  }
+
+  async function adicionarVarios(lista, substituir) {
+    var base = substituir ? {} : Object.assign({}, S.itens);
+    var maiorOrdem = 0;
+    Object.keys(base).forEach(function (k) { maiorOrdem = Math.max(maiorOrdem, base[k].ordem || 0); });
+    var novos = {};
+    var existentes = {};
+    Object.keys(base).forEach(function (k) { existentes[normalizar(base[k].nome)] = true; });
+    lista.forEach(function (it, i) {
+      var chave = normalizar(it.nome);
+      if (existentes[chave]) return;
+      existentes[chave] = true;
+      novos[novoId()] = {
+        nome: it.nome, categoria: it.categoria, destino: it.destino,
+        unidade: it.unidade || "", obs: it.obs || "",
+        ordem: maiorOrdem + i + 1
+      };
+    });
+    if (substituir) {
+      S.itens = novos;
+      await Store.gravarDoc(CAMINHOS.itens, { itens: novos });
+      await novaRodada();
+    } else {
+      Object.assign(S.itens, novos);
+      await Store.mesclarDoc(CAMINHOS.itens, { itens: novos });
+    }
+    S.idx = 0;
+    desenhar();
+    return Object.keys(novos).length;
+  }
+
+  function copiar(texto, botao) {
+    function feedback(ok) {
+      if (!botao) return;
+      var antes = botao.textContent;
+      botao.textContent = ok ? "Copiado" : "Copie do texto abaixo";
+      setTimeout(function () { botao.textContent = antes; }, 1800);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(texto).then(function () { feedback(true); }, function () { manual(); });
+    } else { manual(); }
+    function manual() {
+      var ta = document.createElement("textarea");
+      ta.value = texto;
+      ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      var ok = false;
+      try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+      document.body.removeChild(ta);
+      feedback(ok);
+      if (!ok && botao) {
+        var caixa = document.getElementById("txt-" + botao.getAttribute("data-valor"));
+        if (caixa) caixa.hidden = false;
+      }
+    }
+  }
+
+  /* ---------------- modais ---------------- */
+
+  var previa = [];
+
+  function abrirModal(html) {
+    document.getElementById("area-modal").innerHTML =
+      '<div class="fundo-modal" data-acao="fundo">' + html + "</div>";
+  }
+  function fecharModal() { document.getElementById("area-modal").innerHTML = ""; previa = []; }
+
+  function modalQuem() {
+    abrirModal(
+      '<div class="modal"><h3>Quem está usando<button class="fechar" type="button" data-acao="fechar-modal">×</button></h3>' +
+      '<div class="corpo"><p class="sub">Só para a página abrir na lista certa. Dá para trocar depois no topo.</p>' +
+      '<div class="linha-btns"><button class="btn larga" type="button" data-acao="sou" data-valor="vini">Vinicius — mercado no iFood</button></div>' +
+      '<div class="linha-btns" style="margin-top:8px"><button class="btn larga" type="button" data-acao="sou" data-valor="esposa">Esposa — frutas e verduras no Hiperideal</button></div>' +
+      '<div class="linha-btns" style="margin-top:8px"><button class="btn larga" type="button" data-acao="sou" data-valor="casa">Quem cuida da casa — marca o que está acabando</button></div>' +
+      (Store.comoGuarda() === "firebase"
+        ? '<div style="text-align:center;margin-top:14px"><button class="link" type="button" data-acao="esquecer">Esquecer a senha neste aparelho</button></div>'
+        : "") +
+      "</div></div>"
+    );
+  }
+
+  function modalImportar() {
+    abrirModal(
+      '<div class="modal"><h3>Colar a lista das Notas<button class="fechar" type="button" data-acao="fechar-modal">×</button></h3>' +
+      '<div class="corpo"><p class="sub">Cole o texto inteiro da nota do iPhone. Um item por linha; marcadores, caixinhas e numeração são ignorados. ' +
+      'Linha em maiúsculas ou terminada em dois-pontos vira categoria.</p>' +
+      '<textarea class="campo" id="txt-importar" rows="6" placeholder="HORTIFRUTI&#10;- Banana&#10;- Tomate&#10;&#10;MERCEARIA&#10;- Arroz&#10;- Café"></textarea>' +
+      '<div id="previa-area"></div>' +
+      "</div></div>"
+    );
+    var t = document.getElementById("txt-importar");
+    var espera = null;
+    t.addEventListener("input", function () {
+      clearTimeout(espera);
+      espera = setTimeout(function () {
+        previa = analisarTexto(t.value);
+        desenhaPrevia();
+      }, 200);
+    });
+    setTimeout(function () { t.focus(); }, 40);
+  }
+
+  function desenhaPrevia() {
+    var area = document.getElementById("previa-area");
+    if (!area) return;
+    if (!previa.length) {
+      area.innerHTML = document.getElementById("txt-importar").value.trim()
+        ? '<div class="nota" style="margin-top:10px">Não achei nenhum item nesse texto.</div>' : "";
+      return;
+    }
+    var jaTem = {};
+    Object.keys(S.itens).forEach(function (k) { jaTem[normalizar(S.itens[k].nome)] = true; });
+    var novos = previa.filter(function (p) { return !jaTem[normalizar(p.nome)]; }).length;
+    var html = '<div class="linha-btns" style="margin-top:12px">' +
+      '<button class="btn principal" type="button" data-acao="importar-add"' + (novos ? "" : " disabled") + ">Adicionar " + plural(novos, "item", "itens") + "</button>" +
+      '<button class="btn" type="button" data-acao="importar-sub">Substituir a lista toda</button></div>' +
+      '<p class="sub" style="margin-top:10px">' + previa.length + " itens lidos" + (novos < previa.length ? " · " + (previa.length - novos) + " já estão na lista" : "") +
+      ". Confira embaixo; toque na etiqueta para trocar de lista.</p>" +
+      '<div class="previa">';
+    previa.forEach(function (p, i) {
+      html += '<div class="fila ' + p.destino + (jaTem[normalizar(p.nome)] ? " feito" : "") + '">' +
+        '<span class="nome">' + esc(p.nome) + '<span class="meta"> · ' + esc(p.categoria) + "</span></span>" +
+        '<button class="tag ' + p.destino + '" type="button" data-acao="virar" data-valor="' + i + '">' +
+        (p.destino === "horti" ? "Hiperideal" : "Mercado") + "</button></div>";
+    });
+    html += "</div>";
+    area.innerHTML = html;
+  }
+
+  function modalFaltou() {
+    abrirModal(
+      '<div class="modal"><h3>Faltou o quê?<button class="fechar" type="button" data-acao="fechar-modal">×</button></h3>' +
+      '<div class="corpo"><p class="sub">Entra na compra desta semana e passa a fazer parte da lista, para aparecer nas próximas.</p>' +
+      '<input class="campo" id="f-faltou" placeholder="Papel alumínio" autocomplete="off">' +
+      '<div class="acoes-fim"><div class="linha-btns">' +
+      '<button class="btn principal larga" type="button" data-acao="salvar-faltou">Adicionar à compra</button>' +
+      "</div></div></div></div>"
+    );
+    var c = document.getElementById("f-faltou");
+    setTimeout(function () { c.focus(); }, 40);
+    c.addEventListener("keydown", function (ev) {
+      if (ev.key === "Enter") { ev.preventDefault(); salvarFaltou(); }
+    });
+  }
+
+  async function salvarFaltou() {
+    var campo = document.getElementById("f-faltou");
+    var nome = campo.value.trim();
+    if (!nome) { campo.focus(); return; }
+    var existente = itensArray().filter(function (x) { return normalizar(x.nome) === normalizar(nome); })[0];
+    var id = existente ? existente.id : novoId();
+    if (!existente) {
+      var palpite = adivinhar(nome, null);
+      var maior = 0;
+      itensArray().forEach(function (x) { maior = Math.max(maior, x.ordem || 0); });
+      await gravarItem(id, {
+        nome: nome, categoria: palpite.categoria, destino: palpite.destino,
+        unidade: "", obs: "", ordem: maior + 1
+      });
+    }
+    await marcar(id, true);
+    fecharModal();
+  }
+
+  function modalItem(id) {
+    var it = id ? S.itens[id] : null;
+    var cats = {};
+    itensArray().forEach(function (x) { if (x.categoria) cats[x.categoria] = true; });
+    var opcoes = Object.keys(cats).sort().map(function (c) { return '<option value="' + esc(c) + '"></option>'; }).join("");
+    abrirModal(
+      '<div class="modal"><h3>' + (it ? "Editar item" : "Novo item") + '<button class="fechar" type="button" data-acao="fechar-modal">×</button></h3>' +
+      '<div class="corpo">' +
+      '<div class="campo-bloco"><label class="rotulo" for="f-nome">Nome</label>' +
+      '<input class="campo" id="f-nome" value="' + esc(it ? it.nome : "") + '" placeholder="Banana prata"></div>' +
+      '<div class="campo-bloco"><label class="rotulo" for="f-cat">Categoria</label>' +
+      '<input class="campo" id="f-cat" list="lista-cats" value="' + esc(it ? it.categoria : "") + '" placeholder="Mercearia">' +
+      '<datalist id="lista-cats">' + opcoes + "</datalist></div>" +
+      '<div class="campo-bloco"><span class="rotulo">Quem pede</span><div class="pilulas" id="f-destino">' +
+      pilula("destino", "horti", (it ? it.destino : "mercado") === "horti", "Hiperideal · esposa") +
+      pilula("destino", "mercado", (it ? it.destino : "mercado") !== "horti", "iFood · você") +
+      "</div></div>" +
+      '<div class="campo-bloco"><label class="rotulo" for="f-un">Unidade (opcional)</label>' +
+      '<input class="campo" id="f-un" value="' + esc(it ? it.unidade || "" : "") + '" placeholder="kg, pacote, dúzia"></div>' +
+      '<div class="campo-bloco"><label class="rotulo" for="f-obs">Observação fixa (opcional)</label>' +
+      '<input class="campo" id="f-obs" value="' + esc(it ? it.obs || "" : "") + '" placeholder="da marca X, bem verde"></div>' +
+      '<div class="acoes-fim"><div class="linha-btns"><button class="btn principal" type="button" data-acao="salvar-item" data-id="' + (id || "") + '">Salvar</button>' +
+      (id ? '<button class="btn" type="button" data-acao="excluir-item" data-id="' + id + '">Excluir</button>' : "") +
+      "</div></div></div></div>"
+    );
+    setTimeout(function () { var n = document.getElementById("f-nome"); if (n && !it) n.focus(); }, 40);
+  }
+
+  /* ---------------- eventos ---------------- */
+
+  function acaoDe(alvo) {
+    var el = alvo.closest("[data-acao]");
+    return el ? { el: el, acao: el.getAttribute("data-acao"), valor: el.getAttribute("data-valor"), id: el.getAttribute("data-id") } : null;
+  }
+
+  document.getElementById("app").addEventListener("click", function (ev) {
+    var a = acaoDe(ev.target);
+    if (!a) return;
+    var arr = ordemLista();
+    switch (a.acao) {
+      case "modo": S.modo = a.valor; if (S.modo === "um") S.idx = Math.min(S.idx, arr.length); desenhar(); break;
+      case "ordem": S.ordem = a.valor; S.idx = 0; desenhar(); break;
+      case "filtro": S.filtro = a.valor; desenhar(); break;
+      case "filtro-casa": S.filtroCasa = a.valor; desenhar(); break;
+      case "faltou": modalFaltou(); break;
+      case "decidir":
+        if (arr[S.idx]) { marcar(arr[S.idx].id, a.valor === "1"); S.idx++; desenhar(); }
+        break;
+      case "voltar": if (S.idx > 0) { S.idx--; desenhar(); } break;
+      case "pular": if (S.idx < arr.length) { S.idx++; desenhar(); } break;
+      case "alternar": marcar(a.id, !precisa(a.id)); break;
+      case "qtd": mudarQtd(a.id, Number(a.valor)); break;
+      case "feito": alternarFeito(a.id); break;
+      case "fechar": fecharRodada(); break;
+      case "nova": novaRodada(); break;
+      case "copiar": copiar(textoDaLista(a.valor), a.el); break;
+      case "pedir": {
+        var lista = daLista(a.valor);
+        var i0 = 0;
+        while (i0 < lista.length && feito(lista[i0].id)) i0++;
+        S.pedido = { destino: a.valor, idx: Math.min(i0, lista.length) };
+        S.tela = "listas";
+        desenhar();
+        if (lista[S.pedido.idx]) copiarNome(lista[S.pedido.idx].nome);
+        break;
+      }
+      case "pedido-feito": {
+        var lista2 = daLista(S.pedido.destino);
+        var atual = lista2[S.pedido.idx];
+        if (atual) definirFeito(atual.id, true);
+        S.pedido.idx++;
+        desenhar();
+        var prox = daLista(S.pedido.destino)[S.pedido.idx];
+        if (prox) copiarNome(prox.nome);
+        break;
+      }
+      case "pedido-pular": {
+        S.pedido.idx++;
+        desenhar();
+        var seguinte = daLista(S.pedido.destino)[S.pedido.idx];
+        if (seguinte) copiarNome(seguinte.nome);
+        break;
+      }
+      case "pedido-voltar":
+        if (S.pedido.idx > 0) {
+          S.pedido.idx--;
+          desenhar();
+          var anterior = daLista(S.pedido.destino)[S.pedido.idx];
+          if (anterior) copiarNome(anterior.nome);
+        }
+        break;
+      case "pedido-copiar": {
+        var agora = daLista(S.pedido.destino)[S.pedido.idx];
+        if (agora) copiarNome(agora.nome);
+        break;
+      }
+      case "pedido-sair": S.pedido = null; desenhar(); break;
+      case "ver-texto": var c = document.getElementById("txt-" + a.valor); if (c) c.hidden = !c.hidden; break;
+      case "editar": modalItem(a.id); break;
+      case "novo": modalItem(null); break;
+      case "importar": modalImportar(); break;
+      case "base":
+        adicionarVarios(analisarTexto(LISTA_BASE.join("\n")), false);
+        break;
+    }
+  });
+
+  document.getElementById("btn-quem").addEventListener("click", modalQuem);
+
+  document.querySelector(".abas").addEventListener("click", function (ev) {
+    var b = ev.target.closest(".aba");
+    if (!b) return;
+    S.tela = b.getAttribute("data-tela");
+    desenhar();
+  });
+
+  document.getElementById("area-modal").addEventListener("click", function (ev) {
+    var a = acaoDe(ev.target);
+    if (!a) {
+      if (ev.target.classList.contains("fundo-modal")) fecharModal();
+      return;
+    }
+    switch (a.acao) {
+      case "fechar-modal": fecharModal(); break;
+      case "salvar-faltou": salvarFaltou(); break;
+      case "esquecer":
+        if (confirm("Este aparelho vai pedir a senha de novo na próxima vez. Continuar?")) {
+          try { localStorage.removeItem("mercado:chave"); } catch (e) {}
+          location.reload();
+        }
+        break;
+      case "sou":
+        S.quem = a.valor;
+        localStorage.setItem("mercado:quem", a.valor);
+        fecharModal(); desenhar();
+        break;
+      case "virar":
+        var i = Number(a.valor);
+        previa[i].destino = previa[i].destino === "horti" ? "mercado" : "horti";
+        if (previa[i].destino === "horti" && previa[i].categoria === "Outros") previa[i].categoria = "Frutas e verduras";
+        desenhaPrevia();
+        break;
+      case "importar-add":
+        adicionarVarios(previa, false).then(function () { fecharModal(); });
+        break;
+      case "importar-sub":
+        if (confirm("Isso apaga a lista atual e põe estes " + previa.length + " itens no lugar. Continuar?")) {
+          adicionarVarios(previa, true).then(function () { fecharModal(); });
+        }
+        break;
+      case "destino":
+        document.querySelectorAll("#f-destino .pilula").forEach(function (p) {
+          p.setAttribute("aria-pressed", p === a.el ? "true" : "false");
+        });
+        break;
+      case "salvar-item":
+        var nome = document.getElementById("f-nome").value.trim();
+        if (!nome) { document.getElementById("f-nome").focus(); return; }
+        var escolhido = document.querySelector('#f-destino .pilula[aria-pressed="true"]');
+        var dest = escolhido ? escolhido.getAttribute("data-valor") : "mercado";
+        var cat = document.getElementById("f-cat").value.trim() || adivinhar(nome, null).categoria;
+        var dados = {
+          nome: nome, categoria: cat, destino: dest,
+          unidade: document.getElementById("f-un").value.trim(),
+          obs: document.getElementById("f-obs").value.trim()
+        };
+        if (!a.id) {
+          var maior = 0;
+          itensArray().forEach(function (x) { maior = Math.max(maior, x.ordem || 0); });
+          dados.ordem = maior + 1;
+        }
+        gravarItem(a.id || novoId(), dados);
+        fecharModal();
+        break;
+      case "excluir-item":
+        if (confirm("Tirar este item da lista mestra?")) { excluirItem(a.id); fecharModal(); }
+        break;
+    }
+  });
+
+  /* ---------------- partida ---------------- */
+
+  async function digerir(senha) {
+    var txt = "mercado:" + String(senha || "").trim().toLowerCase();
+    if (window.crypto && crypto.subtle && crypto.subtle.digest) {
+      var buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(txt));
+      return Array.prototype.map.call(new Uint8Array(buf), function (b) {
+        return ("0" + b.toString(16)).slice(-2);
+      }).join("");
+    }
+    var h = 0;
+    for (var i = 0; i < txt.length; i++) { h = (h * 31 + txt.charCodeAt(i)) >>> 0; }
+    return "sc" + h.toString(16);
+  }
+
+  function mostrarPortao(cfg) {
+    var portao = document.getElementById("portao");
+    var corpoApp = document.querySelector("main");
+    var topo = document.querySelector(".top");
+    portao.hidden = false;
+    corpoApp.hidden = true;
+    topo.hidden = true;
+    document.querySelector(".abas").hidden = true;
+
+    var campo = document.getElementById("senha");
+    var botao = document.getElementById("btn-entrar");
+    var aviso = document.getElementById("portao-aviso");
+    var chavePendente = null;
+
+    function dizer(html) { aviso.innerHTML = html; }
+
+    async function tentar() {
+      var senha = campo.value.trim();
+      if (senha.length < 4) { dizer('<div class="nota" style="margin-top:12px">A senha precisa de pelo menos 4 letras.</div>'); return; }
+      botao.disabled = true;
+      dizer('<p class="sub" style="margin-top:12px">Conferindo…</p>');
+      var chave = await digerir(senha);
+      var existe = await Store.existeNoFirebase(cfg, chave);
+      botao.disabled = false;
+      if (existe === null) {
+        dizer('<div class="nota" style="margin-top:12px">Não consegui falar com o banco de dados. Veja a conexão e tente de novo.</div>');
+        return;
+      }
+      if (existe) { entrar(cfg, chave, false); return; }
+      chavePendente = chave;
+      dizer('<div class="nota" style="margin-top:12px">Não existe lista com essa senha.</div>' +
+        '<div class="linha-btns" style="margin-top:10px">' +
+        '<button class="btn" type="button" id="btn-criar">Criar uma lista nova com ela</button></div>');
+      document.getElementById("btn-criar").addEventListener("click", function () {
+        entrar(cfg, chavePendente, true);
+      });
+    }
+
+    botao.addEventListener("click", tentar);
+    campo.addEventListener("keydown", function (ev) { if (ev.key === "Enter") tentar(); });
+    setTimeout(function () { campo.focus(); }, 60);
+  }
+
+  async function entrar(cfg, chave, criar) {
+    if (!Store.abrirFirebase(cfg, chave)) {
+      document.getElementById("portao-aviso").innerHTML =
+        '<div class="nota" style="margin-top:12px">Não consegui abrir o banco de dados.</div>';
+      return;
+    }
+    try { localStorage.setItem("mercado:chave", chave); } catch (e) {}
+    if (criar) await Store.marcarCasa();
+    document.getElementById("portao").hidden = true;
+    document.querySelector("main").hidden = false;
+    document.querySelector(".top").hidden = false;
+    await comecar();
+  }
+
+  (async function iniciar() {
+    var cfg = window.MERCADO_FIREBASE || null;
+    var temClaude = await Store.abrir();
+    if (!temClaude && cfg && cfg.databaseURL) {
+      var guardada = null;
+      try { guardada = localStorage.getItem("mercado:chave"); } catch (e) {}
+      if (guardada && Store.abrirFirebase(cfg, guardada)) { await comecar(); return; }
+      mostrarPortao(cfg);
+      return;
+    }
+    await comecar();
+  })();
+
+  async function comecar() {
+    await Store.garantir(CAMINHOS.itens, { itens: {} });
+    await Store.garantir(CAMINHOS.historico, { rodadas: {} });
+    await Store.garantir(CAMINHOS.rodada, { data: hoje(), marcados: {}, feitos: {}, fechada: false });
+
+    Store.escutar(CAMINHOS.itens, function (doc) {
+      S.itens = (doc && doc.itens) ? doc.itens : {};
+      if (S.pronto) desenhar();
+    });
+    Store.escutar(CAMINHOS.rodada, function (doc) {
+      S.rodada = doc || { data: hoje(), marcados: {}, feitos: {}, fechada: false };
+      if (S.pronto) desenhar();
+    });
+    Store.escutar(CAMINHOS.historico, function (doc) {
+      S.historico = doc || { rodadas: {} };
+      if (S.pronto) desenhar();
+    });
+
+    S.pronto = true;
+    var arr = ordemLista();
+    for (var i = 0; i < arr.length; i++) { if (!decidido(arr[i].id)) { S.idx = i; break; } }
+    desenhar();
+    if (!S.quem) modalQuem();
+  }
+})();
+</script>
+</body>
+</html>
