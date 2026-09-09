@@ -209,6 +209,8 @@
   .fila .nome { flex: 1; min-width: 0; overflow-wrap: anywhere; }
   .fila .meta { font-size: 11px; color: var(--tinta-fraquinha); }
   .fila .freq { display: block; font-size: 11px; font-weight: 400; color: var(--verde); margin-top: 1px; }
+  .fila .nome-btn { background: none; border: 0; padding: 0; font: inherit; color: inherit; text-align: left; }
+  .fila.marcado .nome-btn { font-weight: 500; }
   .fila.marcado { background: var(--verde-fundo-fraco); }
   .fila.marcado .nome { font-weight: 500; }
   .fila.feito .nome { color: var(--tinta-fraquinha); text-decoration: line-through; }
@@ -924,13 +926,26 @@
         html += '<div class="grupo-titulo">' + esc(catAtual || "Outros") + "</div>";
       }
       var aviso = avisoFrequencia(it.id);
-      html += '<button class="fila' + (precisa(it.id) ? " marcado" : "") +
-        '" type="button" data-acao="alternar" data-id="' + it.id +
+      var quer = precisa(it.id);
+      var m = marcado(it.id) || {};
+      var q = m.qtd || it.qtdPadrao || 1;
+      // A quantidade só aparece depois de marcado: antes disso a linha é para
+      // achar o item, não para dizer quanto. Marcou, os botões ficam à mão.
+      var contador = quer
+        ? '<span class="qtd">' +
+          (q > 1 || it.unidade
+            ? '<button type="button" data-acao="qtd" data-id="' + it.id + '" data-valor="-1" aria-label="diminuir a quantidade">−</button>' +
+              "<span>" + q + (it.unidade ? " " + esc(it.unidade) : "") + "</span>"
+            : "<span>" + q + "</span>") +
+          '<button type="button" data-acao="qtd" data-id="' + it.id + '" data-valor="1" aria-label="aumentar a quantidade">+</button>' +
+          "</span>"
+        : "";
+      html += '<div class="fila' + (quer ? " marcado" : "") +
         '" data-busca="' + esc(normalizar(it.nome + " " + it.categoria)) + '">' +
-        '<span class="caixa">' + CHECK + "</span>" +
-        '<span class="nome">' + esc(it.nome) +
+        '<button class="caixa" type="button" data-acao="alternar" data-id="' + it.id + '" aria-label="marcar ou desmarcar">' + CHECK + "</button>" +
+        '<button class="nome nome-btn" type="button" data-acao="alternar" data-id="' + it.id + '">' + esc(it.nome) +
         (aviso ? '<span class="freq">' + esc(aviso) + "</span>" : "") +
-        "</span></button>";
+        "</button>" + contador + "</div>";
     });
     return html + "</div>";
   }
