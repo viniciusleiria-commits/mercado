@@ -531,18 +531,21 @@
 
   /* ---------------- classificação na importação ---------------- */
 
-  var HORTI = ("abacate abacaxi abobora abobrinha acelga agriao aipim alface alho alho-poro ameixa " +
-    "banana batata batata-doce berinjela beterraba brocolis cebola cebolinha cenoura cheiro-verde chuchu " +
-    "coco coentro couve couve-flor espinafre gengibre goiaba hortela inhame jilo kiwi laranja legumes " +
+  var HORTI = ("abacate abacaxi abobora abobrinha acelga agriao aipim alface alho ameixa " +
+    "banana batata berinjela beterraba brocolis cebola cebolinha cenoura chuchu " +
+    "coco coentro couve espinafre gengibre goiaba hortela inhame jilo kiwi laranja legumes " +
     "limao macaxeira maca mamao manga manjericao maracuja melancia melao milho morango pepino pera " +
-    "pimentao pimenta-de-cheiro quiabo rabanete repolho rucula salsa salsinha tangerina tomate uva " +
-    "vagem verdura fruta salada mandioca maxixe umbu caju acerola pinha graviola caja tomate-cereja"
-  ).split(" ");
+    "pimentao quiabo rabanete repolho rucula salsa salsinha tangerina tomate uva " +
+    "vagem verdura fruta salada mandioca maxixe umbu caju acerola pinha graviola caja poro"
+  ).split(" ").concat([
+    "batata doce", "couve flor", "couve-flor", "milho espiga", "ervilha fresca",
+    "feijao verde", "tomate cereja", "cebola roxa", "banana da terra", "banana da prata"
+  ]);
 
   var GRUPOS = [
-    { cat: "Frutas e verduras", destino: "horti", palavras: ["hortifruti", "hortifrutti", "frutas", "verduras", "legumes", "feira", "hiperideal", "sacolao"] },
+    { cat: "Frutas e verduras", destino: "horti", palavras: ["hortifruti", "frutas", "verduras", "legumes", "feira", "hiperideal", "sacolao", "hortifruti e verduras"] },
     { cat: "Padaria", destino: "mercado", palavras: ["padaria", "paes", "pao"] },
-    { cat: "Carnes e frios", destino: "mercado", palavras: ["carne", "carnes", "acougue", "frios", "peixe", "aves", "friosaçougue"] },
+    { cat: "Carnes e frios", destino: "mercado", palavras: ["carne", "carnes", "acougue", "frios", "peixe", "aves"] },
     { cat: "Laticínios e ovos", destino: "mercado", palavras: ["laticinios", "leite", "queijos", "ovos"] },
     { cat: "Bebidas", destino: "mercado", palavras: ["bebida", "bebidas"] },
     { cat: "Limpeza", destino: "mercado", palavras: ["limpeza", "produtos de limpeza"] },
@@ -553,33 +556,38 @@
   ];
 
   var PALAVRAS_CAT = [
-    { cat: "Padaria", p: ["pao", "paes", "bisnaga", "broa", "torrada", "biscoito de polvilho", "bolo"] },
-    { cat: "Carnes e frios", p: ["carne", "picanha", "alcatra", "coxao", "patinho", "acem", "moida", "frango", "peito de frango", "coxa", "sobrecoxa", "linguica", "bacon", "presunto", "mortadela", "salsicha", "peixe", "tilapia", "camarao", "salmao", "file", "costela", "peru", "hamburguer", "salame", "charque", "carne seca"] },
-    { cat: "Laticínios e ovos", p: ["leite", "queijo", "mussarela", "requeijao", "iogurte", "manteiga", "margarina", "creme de leite", "leite condensado", "ovo", "ovos", "coalhada", "ricota", "nata"] },
-    { cat: "Bebidas", p: ["agua", "refrigerante", "coca", "guarana", "suco", "cerveja", "vinho", "cafe", "cha", "energetico", "isotonico", "agua de coco", "achocolatado", "toddy", "nescau"] },
-    { cat: "Limpeza", p: ["detergente", "sabao", "amaciante", "desinfetante", "agua sanitaria", "candida", "esponja", "alvejante", "multiuso", "veja", "limpador", "saco de lixo", "papel toalha", "lustra", "cloro", "bombril", "vassoura", "rodo", "pano de chao", "flanela"] },
-    { cat: "Higiene", p: ["papel higienico", "sabonete", "shampoo", "condicionador", "pasta de dente", "creme dental", "escova de dente", "desodorante", "absorvente", "fralda", "lenco", "algodao", "cotonete", "hidratante", "protetor solar", "aparelho de barbear", "fio dental", "enxaguante"] },
+    { cat: "Padaria", p: ["pao", "paes", "bisnaga", "broa", "torrada", "bolo", "pao de queijo"] },
+    { cat: "Carnes e frios", p: ["carne", "picanha", "alcatra", "coxao", "coxao duro", "coxao mole", "patinho", "acem", "moida", "frango", "peito de frango", "coxa", "sobrecoxa", "linguica", "bacon", "presunto", "mortadela", "salsicha", "peixe", "tilapia", "camarao", "salmao", "file", "filezinho", "costela", "peru", "hamburguer", "salame", "charque", "carne seca", "carne do sol", "bacalhau", "cha de dentro", "cha de fora", "maminha", "fraldinha", "pernil", "suina", "suino"] },
+    { cat: "Laticínios e ovos", p: ["leite", "queijo", "mussarela", "requeijao", "iogurte", "manteiga", "margarina", "creme de leite", "leite condensado", "ovo", "ovos", "coalhada", "ricota", "nata", "cottage", "cream cheese"] },
+    { cat: "Bebidas", p: ["agua", "refrigerante", "coca", "guarana", "suco", "cerveja", "heineken", "vinho", "cafe", "cha", "energetico", "isotonico", "agua de coco", "achocolatado", "toddy", "nescau", "tonica", "gin", "vodka", "whisky", "agua com gas"] },
+    { cat: "Limpeza", p: ["detergente", "sabao", "amaciante", "desinfetante", "agua sanitaria", "candida", "esponja", "bucha", "alvejante", "multiuso", "veja", "cif", "omo", "vanish", "tixan", "limpador", "limpa vidro", "brilux", "tira limo", "azulim", "higienizador", "saco de lixo", "papel toalha", "lustra", "cloro", "bombril", "perfex", "vassoura", "rodo", "pano de chao", "flanela", "alcool", "desengordurante"] },
+    { cat: "Higiene", p: ["papel higienico", "sabonete", "shampoo", "condicionador", "pasta de dente", "creme dental", "escova de dente", "desodorante", "absorvente", "fralda", "lenco", "algodao", "cotonete", "hidratante", "protetor solar", "aparelho de barbear", "gilete", "fio dental", "fita dental", "enxaguante", "band aid", "curativo", "acetona", "higi", "hastes"] },
     { cat: "Pet", p: ["racao", "areia sanitaria", "petisco", "sache", "tapete higienico"] },
-    { cat: "Casa", p: ["pilha", "lampada", "fosforo", "vela", "papel aluminio", "papel filme", "guardanapo", "isqueiro", "cola", "prendedor"] },
-    { cat: "Mercearia", p: ["arroz", "feijao", "macarrao", "farinha", "acucar", "sal", "oleo", "azeite", "vinagre", "molho", "extrato", "milho verde", "ervilha", "atum", "sardinha", "tempero", "colorau", "pimenta do reino", "cominho", "oregano", "canela", "fermento", "gelatina", "aveia", "granola", "cuscuz", "tapioca", "goma", "biscoito", "bolacha", "cereal", "geleia", "mel", "amendoim", "castanha", "nozes", "chocolate", "azeitona", "ketchup", "mostarda", "maionese", "shoyu", "leite de coco", "lentilha", "grao de bico", "sopa", "miojo", "pipoca", "polvilho", "leite em po", "achocolatado em po"] }
+    { cat: "Casa", p: ["pilha", "lampada", "fosforo", "vela", "papel aluminio", "papel filme", "guardanapo", "isqueiro", "cola", "prendedor", "palito", "saco plastico", "papel manteiga"] },
+    { cat: "Mercearia", p: ["arroz", "feijao", "macarrao", "massa", "massinha", "penne", "spaguetti", "espaguete", "talharim", "farinha", "farinha de mandioca", "acucar", "sal", "oleo", "azeite", "vinagre", "molho", "extrato", "milho verde", "ervilha", "atum", "sardinha", "tempero", "colorau", "pimenta", "pimenta do reino", "cominho", "oregano", "paprica", "louro", "folha de louro", "curcuma", "acafrao", "canela", "fermento", "gelatina", "aveia", "granola", "cuscuz", "tapioca", "goma", "flocao", "biscoito", "bolacha", "cracker", "cream cracker", "beiju", "cereal", "geleia", "mel", "amendoim", "castanha", "nozes", "chia", "linhaca", "uva passa", "chocolate", "chiclete", "bala", "azeitona", "ketchup", "mostarda", "maionese", "shoyu", "leite de coco", "leite em po", "lentilha", "grao de bico", "sopa", "miojo", "pipoca", "polvilho", "bicarbonato", "batata palha", "banana chips", "bananada", "achocolatado em po"] }
   ];
 
+  // Ganha a palavra mais específica, não a primeira encontrada: "Sabão de coco"
+  // é sabão e não coco, "Extrato tomate" é extrato e não tomate, "Chã de dentro"
+  // é carne e não chá. Sem isso, a ordem das listas decidia, e decidia errado.
   function adivinhar(nome, grupoAtual) {
-    var n = normalizar(nome);
-    var palavras = n.split(/[ ,/()-]+/).filter(Boolean);
-    var ehHorti = HORTI.some(function (h) {
-      return palavras.indexOf(h) >= 0 || n.indexOf(h + " ") === 0 || n === h;
-    });
-    if (ehHorti) return { categoria: "Frutas e verduras", destino: "horti" };
-    for (var i = 0; i < PALAVRAS_CAT.length; i++) {
-      var g = PALAVRAS_CAT[i];
-      for (var j = 0; j < g.p.length; j++) {
-        var alvo = g.p[j];
-        if (n === alvo || n.indexOf(alvo + " ") === 0 || n.indexOf(" " + alvo) >= 0 || palavras.indexOf(alvo) >= 0) {
-          return { categoria: g.cat, destino: "mercado" };
-        }
+    var palavras = normalizar(nome).split(/[ ,/()\-]+/).filter(Boolean);
+    var seco = " " + palavras.join(" ") + " ";
+    var melhor = null;
+
+    function considerar(cat, destino, alvo) {
+      if (seco.indexOf(" " + alvo + " ") < 0) return;
+      if (!melhor || alvo.length > melhor.tamanho) {
+        melhor = { categoria: cat, destino: destino, tamanho: alvo.length };
       }
     }
+
+    HORTI.forEach(function (h) { considerar("Frutas e verduras", "horti", h); });
+    PALAVRAS_CAT.forEach(function (g) {
+      g.p.forEach(function (alvo) { considerar(g.cat, "mercado", alvo); });
+    });
+
+    if (melhor) return { categoria: melhor.categoria, destino: melhor.destino };
     if (grupoAtual) return { categoria: grupoAtual.cat, destino: grupoAtual.destino };
     return { categoria: "Outros", destino: "mercado" };
   }
@@ -605,7 +613,7 @@
       // Número solto no fim é a conta da semana passada, não o nome do item.
       // "Arroz 2" vira "Arroz"; "Arroz 5kg" e "Leite 1L" ficam como estão,
       // porque aí o número tem unidade colada e faz parte do nome.
-      var semConta = l.replace(/[\s\-\u2013\u2014:=xX\u00d7]*[([]?\s*\d+(?:[.,]\d+)?\s*[)\]]?\s*$/, "").trim();
+      var semConta = l.replace(/\s+[-\u2013\u2014:=xX\u00d7]?\s*[([]?\s*\d+(?:[.,]\d+)?\s*[)\]]?\s*$/, "").trim();
       return semConta || l;
     }
 
@@ -635,7 +643,10 @@
       var chave = normalizar(l);
       if (!chave || vistos[chave]) return;
       vistos[chave] = true;
+      // Categoria escrita à mão vale mais que palpite: é o que o texto que sai
+      // da bancada de edição usa para trazer as correções de volta.
       var palpite = adivinhar(l, grupo);
+      if (grupo) palpite = { categoria: grupo.cat, destino: grupo.destino };
       saida.push({ nome: l, categoria: palpite.categoria, destino: palpite.destino });
     });
     return saida;
