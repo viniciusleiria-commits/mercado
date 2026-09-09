@@ -208,6 +208,7 @@
   .fila.mercado { border-left-color: var(--mercado); }
   .fila .nome { flex: 1; min-width: 0; overflow-wrap: anywhere; }
   .fila .meta { font-size: 11px; color: var(--tinta-fraquinha); }
+  .fila .freq { display: block; font-size: 11px; font-weight: 400; color: var(--verde); margin-top: 1px; }
   .fila.marcado { background: var(--verde-fundo-fraco); }
   .fila.marcado .nome { font-weight: 500; }
   .fila.feito .nome { color: var(--tinta-fraquinha); text-decoration: line-through; }
@@ -357,10 +358,7 @@
     rodada: null,
     historico: {},
     tela: "rodada",
-    modo: "um",
-    ordem: "lista",
-    idx: 0,
-    filtroCasa: "tudo",
+    soMarcados: false,
     busca: "",
     quem: localStorage.getItem("mercado:quem") || "",
     travado: localStorage.getItem("mercado:travado") === "1",
@@ -719,30 +717,39 @@
     return !S.travado && S.quem === "vini";
   }
 
+  // Item comprado quase sempre merece um aviso embaixo do nome: é o que faz
+  // alguém parar e conferir se ainda tem em casa. Só aparece com histórico —
+  // antes de três semanas o app não sabe o que é frequente.
+  function avisoFrequencia(id) {
+    var e = estat(id);
+    if (e.total < 3 || !e.vezes) return "";
+    var freq = e.vezes / e.total;
+    if (freq >= 0.7) return "comprado toda semana";
+    if (freq >= 0.35) return "comprado quase toda semana";
+    return "";
+  }
+
   function itensArray() {
     return Object.keys(S.itens).map(function (id) {
       return Object.assign({ id: id }, S.itens[id]);
     }).filter(function (it) { return it && it.nome; });
   }
 
+  // A gaveta segue a ordem em que apareceu na lista mestra; dentro dela, A-Z,
+  // para achar o item sem varrer a tela inteira.
   function ordemLista() {
     var arr = itensArray();
     var ordemCat = {};
     arr.forEach(function (it) {
-      if (ordemCat[it.categoria] === undefined) ordemCat[it.categoria] = it.ordem == null ? 9999 : it.ordem;
-      else ordemCat[it.categoria] = Math.min(ordemCat[it.categoria], it.ordem == null ? 9999 : it.ordem);
+      var o = it.ordem == null ? 9999 : it.ordem;
+      if (ordemCat[it.categoria] === undefined) ordemCat[it.categoria] = o;
+      else ordemCat[it.categoria] = Math.min(ordemCat[it.categoria], o);
     });
     arr.sort(function (a, b) {
       var da = ordemCat[a.categoria] - ordemCat[b.categoria];
       if (da) return da;
-      return (a.ordem == null ? 9999 : a.ordem) - (b.ordem == null ? 9999 : b.ordem);
+      return normalizar(a.nome).localeCompare(normalizar(b.nome), "pt-BR");
     });
-    if (S.ordem === "provavel") {
-      arr = arr.slice().sort(function (a, b) {
-        var qa = estat(a.id).quente ? 0 : 1, qb = estat(b.id).quente ? 0 : 1;
-        return qa - qb;
-      });
-    }
     return arr;
   }
 
@@ -828,23 +835,13 @@
       return;
     }
 
-    var total = arr.length, feitosN = decididos(), precisaN = arr.filter(function (i) { return precisa(i.id); }).length;
-    var pct = total ? Math.round((feitosN / total) * 100) : 0;
-
+    var marcados = arr.filter(function (it) { return precisa(it.id); });
     var topo =
       '<div class="card"><h2>Semana de ' + esc(dataCurta(S.rodada && S.rodada.data ? S.rodada.data : hoje())) +
-      '<span class="cont">' + precisaN + " marcados</span></h2><div class=\"corpo\">" +
-      '<div class="progresso"><i style="width:' + pct + '%"></i></div>' +
-      '<div class="progresso-txt"><span>' + feitosN + " de " + total + " perguntados</span><span>" + pct + "%</span></div>" +
-      '<div class="linha-btns" style="margin-top:12px">' +
-      '<div class="pilulas">' +
-      pilula("modo", "um", S.modo === "um", "Um por um") +
-      pilula("modo", "todos", S.modo === "todos", "Lista toda") +
-      "</div>" +
-      '<div class="pilulas">' +
-      pilula("ordem", "lista", S.ordem === "lista", "Ordem da lista") +
-      pilula("ordem", "provavel", S.ordem === "provavel", "Prováveis primeiro") +
-      "</div></div></div></div>";
+      '<span class="cont">' + plural(marcados.length, "marcado", "marcados") + "</span></h2><div class=\"corpo\">" +
+      pilulasDaLista(marcados.length) +
+      '<input class="campo" id="busca-lista" type="search" placeholder="Buscar item" value="' + esc(S.busca) + '" style="margin-top:10px">' +
+      "</div></div>";
 
     var daCasa = arr.filter(function (it) {
       var m = marcado(it.id);
@@ -863,73 +860,54 @@
       aviso += "</div>";
     }
 
-    var meio = aviso + (S.modo === "um" ? desenhaFoco(arr) : desenhaTudo(arr));
-
     var pe = "";
-    if (precisaN) {
+    if (marcados.length) {
       pe = '<button class="btn principal larga" type="button" data-acao="fechar">' +
         (S.rodada && S.rodada.fechada ? "Atualizar as listas" : "Gerar as listas") +
-        " (" + precisaN + ")</button>";
+        " (" + marcados.length + ")</button>";
     }
     var extras = '<div style="text-align:center;margin-top:10px">' +
-      '<button class="btn miuda" type="button" data-acao="faltou">+ Faltou uma coisa que não está na lista</button></div>';
-    var nova = podeEditar()
-      ? '<div style="text-align:center;margin-top:10px"><button class="link" type="button" data-acao="nova">Começar uma semana nova</button></div>'
-      : "";
-    nova = extras + nova;
+      '<button class="btn miuda" type="button" data-acao="faltou">+ Faltou uma coisa que não está na lista</button></div>' +
+      (podeEditar()
+        ? '<div style="text-align:center;margin-top:10px"><button class="link" type="button" data-acao="nova">Começar uma semana nova</button></div>'
+        : "");
 
-    alvo.innerHTML = topo + meio + pe + nova;
+    alvo.innerHTML = topo + aviso + listaMarcavel(S.soMarcados ? marcados : arr) + pe + extras;
+    ligarBusca("busca-lista", "tela-rodada");
   }
 
-  function desenhaFoco(arr) {
-    if (S.idx >= arr.length) {
-      var precisaN = arr.filter(function (i) { return precisa(i.id); }).length;
-      return '<div class="card"><h2>Fim da lista</h2><div class="corpo">' +
-        '<p class="sub">Passou pelos ' + arr.length + " itens. " + plural(precisaN, "item precisa", "itens precisam") + " ser comprado" + (precisaN === 1 ? "" : "s") + ".</p>" +
-        '<div class="linha-btns"><button class="btn" type="button" data-acao="voltar">Voltar um item</button>' +
-        '<button class="btn" type="button" data-acao="modo" data-valor="todos">Rever a lista toda</button></div>' +
-        "</div></div>";
-    }
-    var it = arr[S.idx];
-    var e = estat(it.id);
-    var m = marcado(it.id);
-    var dica = e.quente && e.vezes ? "provavelmente acabando · " + e.dica : e.dica;
-    return '<div class="card"><div class="corpo">' +
-      '<div class="foco">' +
-      '<div class="cat">' + esc(it.categoria || "") + "</div>" +
-      '<div class="nome">' + esc(it.nome) + "</div>" +
-      '<div class="dica' + (e.quente && e.vezes ? " quente" : "") + '">' + esc(dica) + (it.obs ? " · " + esc(it.obs) : "") + "</div>" +
-      "</div>" +
-      '<div class="decisao">' +
-      '<button class="btn nao" type="button" data-acao="decidir" data-valor="0">Não precisa</button>' +
-      '<button class="btn sim" type="button" data-acao="decidir" data-valor="1">Precisa</button>' +
-      "</div>" +
-      '<div class="pe">' +
-      '<button class="link" type="button" data-acao="voltar"' + (S.idx === 0 ? " disabled" : "") + ">← Voltar</button>" +
-      (m ? '<span class="meta" style="font-size:11px;color:var(--tinta-fraquinha)">já respondido: ' + (m.precisa ? "precisa" : "não precisa") + "</span>" : "") +
-      '<button class="link" type="button" data-acao="pular">Pular →</button>' +
-      "</div></div></div>";
+  function ligarBusca(idCampo, idTela) {
+    aplicarBusca(idTela);
+    var campo = document.getElementById(idCampo);
+    if (campo) campo.addEventListener("input", function () { S.busca = campo.value; aplicarBusca(idTela); });
   }
 
-  function desenhaTudo(arr) {
-    var html = '<div class="card"><h2>Lista toda<span class="cont">toque para marcar</span></h2>';
+  function listaMarcavel(arr) {
+    if (!arr.length) return '<div class="card"><div class="vazio">Nada marcado ainda.</div></div>';
+    var html = '<div class="card">';
     var catAtual = null;
     arr.forEach(function (it) {
-      if (it.categoria !== catAtual && S.ordem === "lista") {
+      if (it.categoria !== catAtual) {
         catAtual = it.categoria;
         html += '<div class="grupo-titulo">' + esc(catAtual || "Outros") + "</div>";
       }
-      var m = marcado(it.id);
-      var e = estat(it.id);
-      var estado = m ? (m.precisa ? "marcado" : "") : "";
-      var meta = m ? (m.precisa ? "precisa" : "não precisa") : (e.quente && e.vezes ? "deve estar acabando" : "");
-      html += '<button class="fila ' + estado + '" type="button" data-acao="alternar" data-id="' + it.id + '">' +
+      var aviso = avisoFrequencia(it.id);
+      html += '<button class="fila' + (precisa(it.id) ? " marcado" : "") +
+        '" type="button" data-acao="alternar" data-id="' + it.id +
+        '" data-busca="' + esc(normalizar(it.nome + " " + it.categoria)) + '">' +
         '<span class="caixa">' + CHECK + "</span>" +
-        '<span class="nome">' + esc(it.nome) + "</span>" +
-        '<span class="meta">' + esc(meta) + "</span>" +
-        "</button>";
+        '<span class="nome">' + esc(it.nome) +
+        (aviso ? '<span class="freq">' + esc(aviso) + "</span>" : "") +
+        "</span></button>";
     });
     return html + "</div>";
+  }
+
+  function pilulasDaLista(marcados) {
+    return '<div class="pilulas">' +
+      pilula("so-marcados", "tudo", !S.soMarcados, "A lista toda") +
+      pilula("so-marcados", "marcados", S.soMarcados, "Só os marcados (" + marcados + ")") +
+      "</div>";
   }
 
   function desenhaCasa() {
@@ -946,59 +924,14 @@
       '<p class="sub">Toque no item assim que ele estiver acabando — não precisa esperar a sexta. ' +
       "A compra da semana sai do que estiver marcado aqui.</p>" +
       '<button class="btn larga" type="button" data-acao="faltou">+ Faltou uma coisa que não está na lista</button>' +
-      '<div class="pilulas" style="margin-top:12px">' +
-      pilula("modo-casa", "um", S.modo === "um", "Um por um") +
-      pilula("modo-casa", "tudo", S.modo !== "um" && S.filtroCasa !== "marcados", "A lista toda") +
-      pilula("modo-casa", "marcados", S.modo !== "um" && S.filtroCasa === "marcados", "Só os marcados") +
-      "</div>" +
-      (S.modo === "um" ? "" :
-        '<input class="campo" id="busca-casa" type="search" placeholder="Buscar item" value="' + esc(S.busca) + '" style="margin-top:10px">') +
+      '<div style="margin-top:12px">' + pilulasDaLista(marcados.length) + "</div>" +
+      '<input class="campo" id="busca-casa" type="search" placeholder="Buscar item" value="' + esc(S.busca) + '" style="margin-top:10px">' +
       "</div></div>";
 
-    // Um por um também para ela: quem lembra de uma coisa por vez prefere ir
-    // sendo perguntada a rolar a lista atrás do item.
-    if (S.modo === "um") {
-      var passados = arr.filter(function (it) { return decidido(it.id); }).length;
-      var pct = arr.length ? Math.round((passados / arr.length) * 100) : 0;
-      alvo.innerHTML = html +
-        '<div class="card"><div class="corpo">' +
-        '<div class="progresso"><i style="width:' + pct + '%"></i></div>' +
-        '<div class="progresso-txt"><span>' + passados + " de " + arr.length + " vistos</span><span>" +
-        plural(marcados.length, "marcado", "marcados") + "</span></div></div></div>" +
-        desenhaFoco(arr);
-      return;
-    }
-
-    var visiveis = S.filtroCasa === "marcados" ? marcados : arr;
-    if (!visiveis.length) {
-      html += '<div class="card"><div class="vazio">Nada marcado ainda.</div></div>';
-    } else {
-      html += '<div class="card">';
-      var catAtual = null;
-      visiveis.forEach(function (it) {
-        if (it.categoria !== catAtual) {
-          catAtual = it.categoria;
-          html += '<div class="grupo-titulo">' + esc(catAtual || "Outros") + "</div>";
-        }
-        html += '<button class="fila' + (precisa(it.id) ? " marcado" : "") +
-          '" type="button" data-acao="alternar" data-id="' + it.id +
-          '" data-busca="' + esc(normalizar(it.nome + " " + it.categoria)) + '">' +
-          '<span class="caixa">' + CHECK + "</span>" +
-          '<span class="nome">' + esc(it.nome) + "</span>" +
-          "</button>";
-      });
-      html += "</div>";
-    }
-
-    alvo.innerHTML = html;
-    aplicarBusca("tela-rodada");
-    var campo = document.getElementById("busca-casa");
-    if (campo) campo.addEventListener("input", function () { S.busca = campo.value; aplicarBusca("tela-rodada"); });
+    alvo.innerHTML = html + listaMarcavel(S.soMarcados ? marcados : arr);
+    ligarBusca("busca-casa", "tela-rodada");
   }
 
-  // Uma compra só. Quem compra o quê é decisão da importação, não da semana:
-  // durante a semana ninguém quer saber de quem é o quiabo, só que ele acabou.
-  // A divisão volta a existir na hora de exportar, que é quando ela serve.
   function cartaoSemana() {
     var itens = daLista("tudo");
     var html = '<div class="card"><h2>Compra desta semana<span class="cont">' +
@@ -1279,7 +1212,6 @@
     }
     var nova = { data: hoje(), marcados: {}, feitos: {}, fechada: false };
     S.rodada = nova;
-    S.idx = 0;
     S.tela = "rodada";
     desenhar();
     await Store.gravarDoc(CAMINHOS.rodada, nova);
@@ -1325,7 +1257,6 @@
       Object.assign(S.itens, novos);
       await Store.mesclarDoc(CAMINHOS.itens, { itens: novos });
     }
-    S.idx = 0;
     desenhar();
     return Object.keys(novos).length;
   }
@@ -1468,6 +1399,23 @@
     area.innerHTML = html;
   }
 
+  // Desmarcar apaga o item da compra da semana para todo mundo, e ninguém
+  // repara na falta até o mercado chegar sem ele. Toque em item marcado
+  // pergunta antes; marcar continua sendo um toque só.
+  function modalDesmarcar(id) {
+    var it = S.itens[id];
+    if (!it) return;
+    abrirModal(
+      '<div class="modal"><h3>Tirar da compra?<button class="fechar" type="button" data-acao="fechar-modal">×</button></h3>' +
+      '<div class="corpo"><p class="sub" style="margin-bottom:0"><b>' + esc(it.nome) + "</b> está marcado como " +
+      "necessário nesta semana. Tirando, ele sai da compra.</p>" +
+      '<div class="acoes-fim"><div class="linha-btns">' +
+      '<button class="btn principal" type="button" data-acao="desmarcar" data-id="' + id + '">Tirar da compra</button>' +
+      '<button class="btn" type="button" data-acao="fechar-modal">Deixar marcado</button>' +
+      "</div></div></div></div>"
+    );
+  }
+
   function modalFaltou() {
     abrirModal(
       '<div class="modal"><h3>Faltou o quê?<button class="fechar" type="button" data-acao="fechar-modal">×</button></h3>' +
@@ -1543,27 +1491,10 @@
     if (!a) return;
     var arr = ordemLista();
     switch (a.acao) {
-      case "modo": S.modo = a.valor; if (S.modo === "um") S.idx = Math.min(S.idx, arr.length); desenhar(); break;
-      case "ordem": S.ordem = a.valor; S.idx = 0; desenhar(); break;
-      case "modo-casa":
-        S.modo = a.valor === "um" ? "um" : "todos";
-        S.filtroCasa = a.valor === "marcados" ? "marcados" : "tudo";
-        if (S.modo === "um") {
-          S.idx = 0;
-          var todosCasa = ordemLista();
-          for (var iC = 0; iC < todosCasa.length; iC++) {
-            if (!decidido(todosCasa[iC].id)) { S.idx = iC; break; }
-          }
-        }
-        desenhar();
+      case "so-marcados": S.soMarcados = a.valor === "marcados"; desenhar(); break;
+      case "alternar":
+        if (precisa(a.id)) modalDesmarcar(a.id); else marcar(a.id, true);
         break;
-      case "faltou": modalFaltou(); break;
-      case "decidir":
-        if (arr[S.idx]) { marcar(arr[S.idx].id, a.valor === "1"); S.idx++; desenhar(); }
-        break;
-      case "voltar": if (S.idx > 0) { S.idx--; desenhar(); } break;
-      case "pular": if (S.idx < arr.length) { S.idx++; desenhar(); } break;
-      case "alternar": marcar(a.id, !precisa(a.id)); break;
       case "qtd": mudarQtd(a.id, Number(a.valor)); break;
       case "feito": alternarFeito(a.id); break;
       case "fechar": fecharRodada(); break;
@@ -1640,6 +1571,7 @@
     switch (a.acao) {
       case "fechar-modal": fecharModal(); break;
       case "salvar-faltou": salvarFaltou(); break;
+      case "desmarcar": marcar(a.id, false); fecharModal(); break;
       case "destravar": destravar(); break;
       case "convidar": {
         var senhaGuardada = "";
@@ -1859,8 +1791,6 @@
     });
 
     S.pronto = true;
-    var arr = ordemLista();
-    for (var i = 0; i < arr.length; i++) { if (!decidido(arr[i].id)) { S.idx = i; break; } }
     desenhar();
     if (!S.quem && !S.travado) modalQuem();
   }
