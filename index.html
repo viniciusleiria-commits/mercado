@@ -18,6 +18,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <script src="config.js"></script>
+<script>window.MERCADO_VERSAO = "09/09 18:47";</script>
 </head>
 <body>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -209,8 +210,6 @@
   .fila .nome { flex: 1; min-width: 0; overflow-wrap: anywhere; }
   .fila .meta { font-size: 11px; color: var(--tinta-fraquinha); }
   .fila .freq { display: block; font-size: 11px; font-weight: 400; color: var(--verde); margin-top: 1px; }
-  .fila .nome-btn { background: none; border: 0; padding: 0; font: inherit; color: inherit; text-align: left; }
-  .fila.marcado .nome-btn { font-weight: 500; }
   .fila.marcado { background: var(--verde-fundo-fraco); }
   .fila.marcado .nome { font-weight: 500; }
   .fila.feito .nome { color: var(--tinta-fraquinha); text-decoration: line-through; }
@@ -221,9 +220,6 @@
   .caixa svg { width: 13px; height: 13px; opacity: 0; }
   .fila.marcado .caixa, .fila.feito .caixa { background: var(--verde); border-color: var(--verde); }
   .fila.marcado .caixa svg, .fila.feito .caixa svg { opacity: 1; }
-  .qtd { display: flex; align-items: center; gap: 6px; flex: none; }
-  .qtd button { width: 26px; height: 26px; border-radius: 6px; border: 1px solid var(--linha-forte); background: var(--folha); font-size: 15px; line-height: 1; display: grid; place-items: center; color: var(--tinta-fraca); }
-  .qtd span { min-width: 34px; text-align: center; font-size: 12px; font-variant-numeric: tabular-nums; color: var(--tinta-fraca); }
 
   .exp { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 14px; border-bottom: 1px solid var(--linha); }
   .exp-nome { flex: 1; min-width: 150px; font-weight: 500; }
@@ -291,6 +287,7 @@
   .previa { border: 1px solid var(--linha); border-radius: var(--raio-p); margin: 10px 0; }
   .previa .fila { padding: 8px 10px; }
 
+  .versao { text-align: center; font-size: 11px; color: var(--tinta-fraquinha); padding: 6px 0 2px; }
   .nota { background: var(--alerta-fundo); color: var(--alerta); border-radius: var(--raio-p); padding: 9px 11px; font-size: 12px; }
 </style>
 
@@ -615,23 +612,11 @@
         .trim();
     }
 
-    // Depois do travessão vem a quantidade de costume, que é o formato que a
-    // bancada e as listas do próprio app escrevem: "Alho — 4", "Batata — 2 kg".
-    function separarQuanto(l) {
-      var m = /^(.*\S)\s+[\u2014\u2013]\s*(\d+(?:[.,]\d+)?)\s*([^\d]*)$/.exec(l);
-      if (!m) return null;
-      return {
-        nome: m[1].trim(),
-        qtd: Number(String(m[2]).replace(",", ".")),
-        unidade: (m[3] || "").replace(/[()]/g, "").trim()
-      };
-    }
-
-    // Número solto no fim, sem travessão, é a conta da semana passada e não o
-    // nome do item: "Arroz 2" vira "Arroz". "Arroz 5kg" e "Papel alumínio
-    // 30x4" ficam como estão, porque ali o número está colado ao que vem antes.
+    // Número no fim do nome é a conta da semana passada, não o nome do item:
+    // "Arroz 2" vira "Arroz". "Arroz 5kg" e "Papel alumínio 30x4" ficam como
+    // estão, porque ali o número está colado ao que vem antes.
     function tirarConta(l) {
-      var semConta = l.replace(/\s+[-:=xX\u00d7]?\s*[([]?\s*\d+(?:[.,]\d+)?\s*[)\]]?\s*$/, "").trim();
+      var semConta = l.replace(/\s+[-\u2013\u2014:=xX\u00d7]?\s*[([]?\s*\d+(?:[.,]\d+)?\s*[)\]]?\s*$/, "").trim();
       return semConta || l;
     }
 
@@ -672,8 +657,7 @@
         return;
       }
       l = l.replace(/\s{2,}/g, " ");
-      var quanto = separarQuanto(l);
-      if (quanto) l = quanto.nome; else l = tirarConta(l);
+      l = tirarConta(l);
       var chave = normalizar(l);
       if (!chave || vistos[chave]) return;
       vistos[chave] = true;
@@ -681,11 +665,7 @@
       // da bancada de edição usa para trazer as correções de volta.
       var palpite = adivinhar(l, grupo);
       if (grupo) palpite = { categoria: grupo.cat, destino: grupo.destino };
-      saida.push({
-        nome: l, categoria: palpite.categoria, destino: palpite.destino,
-        qtdPadrao: quanto ? quanto.qtd : null,
-        unidade: quanto ? quanto.unidade : ""
-      });
+      saida.push({ nome: l, categoria: palpite.categoria, destino: palpite.destino });
     });
     return saida;
   }
@@ -829,16 +809,7 @@
   }
 
   function linhaDoTexto(it) {
-    return (function () {
-      var m = marcado(it.id) || {};
-      var q = m.qtd && m.qtd > 1 ? m.qtd : null;
-      var un = it.unidade ? String(it.unidade).trim() : "";
-      var sufixo = "";
-      if (un) sufixo = " — " + (q || 1) + " " + un;
-      else if (q) sufixo = " — " + q;
-      if (it.obs) sufixo += (sufixo ? " " : " — ") + "(" + it.obs + ")";
-      return it.nome + sufixo;
-    })();
+    return it.obs ? it.nome + " — " + it.obs : it.nome;
   }
 
   /* ---------------- desenho das telas ---------------- */
@@ -926,26 +897,13 @@
         html += '<div class="grupo-titulo">' + esc(catAtual || "Outros") + "</div>";
       }
       var aviso = avisoFrequencia(it.id);
-      var quer = precisa(it.id);
-      var m = marcado(it.id) || {};
-      var q = m.qtd || it.qtdPadrao || 1;
-      // A quantidade só aparece depois de marcado: antes disso a linha é para
-      // achar o item, não para dizer quanto. Marcou, os botões ficam à mão.
-      var contador = quer
-        ? '<span class="qtd">' +
-          (q > 1 || it.unidade
-            ? '<button type="button" data-acao="qtd" data-id="' + it.id + '" data-valor="-1" aria-label="diminuir a quantidade">−</button>' +
-              "<span>" + q + (it.unidade ? " " + esc(it.unidade) : "") + "</span>"
-            : "<span>" + q + "</span>") +
-          '<button type="button" data-acao="qtd" data-id="' + it.id + '" data-valor="1" aria-label="aumentar a quantidade">+</button>' +
-          "</span>"
-        : "";
-      html += '<div class="fila' + (quer ? " marcado" : "") +
+      html += '<button class="fila' + (precisa(it.id) ? " marcado" : "") +
+        '" type="button" data-acao="alternar" data-id="' + it.id +
         '" data-busca="' + esc(normalizar(it.nome + " " + it.categoria)) + '">' +
-        '<button class="caixa" type="button" data-acao="alternar" data-id="' + it.id + '" aria-label="marcar ou desmarcar">' + CHECK + "</button>" +
-        '<button class="nome nome-btn" type="button" data-acao="alternar" data-id="' + it.id + '">' + esc(it.nome) +
+        '<span class="caixa">' + CHECK + "</span>" +
+        '<span class="nome">' + esc(it.nome) +
         (aviso ? '<span class="freq">' + esc(aviso) + "</span>" : "") +
-        "</button>" + contador + "</div>";
+        "</span></button>";
     });
     return html + "</div>";
   }
@@ -992,17 +950,10 @@
         catAtual = it.categoria;
         html += '<div class="grupo-titulo">' + esc(catAtual || "Outros") + "</div>";
       }
-      var m = marcado(it.id) || {};
-      var q = m.qtd || 1;
-      var maisUm = '<button type="button" data-acao="qtd" data-id="' + it.id + '" data-valor="1" aria-label="aumentar a quantidade">+</button>';
-      var contador = (q > 1 || it.unidade)
-        ? '<button type="button" data-acao="qtd" data-id="' + it.id + '" data-valor="-1" aria-label="diminuir a quantidade">−</button>' +
-          "<span>" + q + (it.unidade ? " " + esc(it.unidade) : "") + "</span>" + maisUm
-        : maisUm;
       html += '<div class="fila' + (feito(it.id) ? " feito" : "") + '">' +
         '<button class="caixa" type="button" data-acao="feito" data-id="' + it.id + '" aria-label="marcar como pedido">' + CHECK + "</button>" +
         '<span class="nome">' + esc(it.nome) + (it.obs ? ' <span class="meta">(' + esc(it.obs) + ")</span>" : "") + "</span>" +
-        '<span class="qtd">' + contador + "</span></div>";
+        "</div>";
     });
     return html + "</div>";
   }
@@ -1065,16 +1016,14 @@
     }
 
     var it = itens[S.pedido.idx];
-    var m = marcado(it.id) || {};
-    var q = m.qtd || 1;
     var ultimo = S.pedido.idx >= itens.length - 1;
     alvo.innerHTML = topo +
       '<div class="card"><div class="corpo">' +
       '<div class="foco">' +
       '<div class="cat">item ' + (S.pedido.idx + 1) + " de " + itens.length + "</div>" +
       '<div class="nome">' + esc(it.nome) + "</div>" +
-      '<div class="qtd-grande">' + (it.unidade ? q + " " + esc(it.unidade) : q > 1 ? q + " unidades" : "1 unidade") +
-      (it.obs ? " · " + esc(it.obs) : "") + (feito(it.id) ? " · já no carrinho" : "") + "</div>" +
+      '<div class="qtd-grande">' + esc(it.obs || "") +
+      (feito(it.id) ? (it.obs ? " · " : "") + "já no carrinho" : "") + "</div>" +
       "</div>" +
       '<div class="linha-btns" style="margin-top:16px">' +
       '<button class="btn larga" type="button" data-acao="pedido-copiar">Copiar só o nome</button></div>' +
@@ -1152,14 +1101,17 @@
       html += "<" + (edita ? "button" : "div") + ' class="fila"' +
         (edita ? ' type="button" data-acao="editar" data-id="' + it.id + '"' : "") +
         ' data-busca="' + esc(normalizar(it.nome + " " + it.categoria)) + '">' +
-        '<span class="nome">' + esc(it.nome) +
-        (it.qtdPadrao || it.unidade
-          ? ' <span class="meta">' + esc(((it.qtdPadrao || "") + " " + (it.unidade || "")).trim()) + "</span>"
-          : "") + "</span>" +
+        '<span class="nome">' + esc(it.nome) + "</span>" +
         '<span class="meta">' + esc(e.vezes ? e.vezes + "x" : "") + "</span>" +
         "</" + (edita ? "button" : "div") + ">";
     });
-    alvo.innerHTML = cabecalho + html + "</div>";
+    // Carimbo da versão: quando algo parecer "código antigo fazendo o app
+    // mudar as coisas", esta linha diz se o celular está com a página de agora
+    // ou com uma cópia guardada pelo navegador.
+    var carimbo = window.MERCADO_VERSAO
+      ? '<div class="versao">versão de ' + esc(window.MERCADO_VERSAO) + "</div>"
+      : "";
+    alvo.innerHTML = cabecalho + html + "</div>" + carimbo;
     aplicarBusca();
     var campo = document.getElementById("busca");
     if (campo) {
@@ -1215,24 +1167,11 @@
   async function marcar(id, quer) {
     await garantirRodada();
     var m = marcado(id) || {};
-    var it = S.itens[id] || {};
-    var corpo = {
-      precisa: !!quer,
-      qtd: m.qtd || it.qtdPadrao || 1,
-      quando: hoje(), por: S.quem || ""
-    };
+    var corpo = { precisa: !!quer, quando: hoje(), por: S.quem || "" };
     S.rodada.marcados = S.rodada.marcados || {};
     S.rodada.marcados[id] = Object.assign({}, m, corpo);
     desenhar();
     await Store.mesclarDoc(CAMINHOS.rodada, { marcados: (function (o) { o[id] = corpo; return o; })({}) });
-  }
-
-  async function mudarQtd(id, d) {
-    var m = marcado(id) || { precisa: true, qtd: 1 };
-    var q = Math.max(1, (m.qtd || 1) + d);
-    S.rodada.marcados[id] = Object.assign({}, m, { qtd: q });
-    desenhar();
-    await Store.mesclarDoc(CAMINHOS.rodada, { marcados: (function (o) { o[id] = { qtd: q }; return o; })({}) });
   }
 
   async function alternarFeito(id) { return definirFeito(id, !feito(id)); }
@@ -1300,9 +1239,7 @@
       existentes[chave] = true;
       novos[novoId()] = {
         nome: it.nome, categoria: it.categoria, destino: it.destino,
-        qtdPadrao: it.qtdPadrao || null,
-        unidade: it.unidade || "", obs: it.obs || "",
-        ordem: maiorOrdem + i + 1
+        obs: it.obs || "", ordem: maiorOrdem + i + 1
       };
     });
     if (substituir) {
@@ -1503,7 +1440,7 @@
       itensArray().forEach(function (x) { maior = Math.max(maior, x.ordem || 0); });
       await gravarItem(id, {
         nome: nome, categoria: palpite.categoria, destino: palpite.destino,
-        unidade: "", obs: "", ordem: maior + 1
+        obs: "", ordem: maior + 1
       });
     }
     await marcar(id, true);
@@ -1527,10 +1464,7 @@
       pilula("destino", "horti", (it ? it.destino : "mercado") === "horti", "Hiperideal · esposa") +
       pilula("destino", "mercado", (it ? it.destino : "mercado") !== "horti", "iFood · você") +
       "</div></div>" +
-      '<div class="campo-bloco"><label class="rotulo" for="f-qtd">Quantidade de costume (opcional)</label>' +
-      '<input class="campo" id="f-qtd" inputmode="decimal" value="' + esc(it && it.qtdPadrao ? it.qtdPadrao : "") + '" placeholder="4"></div>' +
-      '<div class="campo-bloco"><label class="rotulo" for="f-un">Unidade (opcional)</label>' +
-      '<input class="campo" id="f-un" value="' + esc(it ? it.unidade || "" : "") + '" placeholder="kg, pacote, dúzia"></div>' +
+
       '<div class="campo-bloco"><label class="rotulo" for="f-obs">Observação fixa (opcional)</label>' +
       '<input class="campo" id="f-obs" value="' + esc(it ? it.obs || "" : "") + '" placeholder="da marca X, bem verde"></div>' +
       '<div class="acoes-fim"><div class="linha-btns"><button class="btn principal" type="button" data-acao="salvar-item" data-id="' + (id || "") + '">Salvar</button>' +
@@ -1557,7 +1491,6 @@
       case "alternar":
         if (precisa(a.id)) modalDesmarcar(a.id); else marcar(a.id, true);
         break;
-      case "qtd": mudarQtd(a.id, Number(a.valor)); break;
       case "feito": alternarFeito(a.id); break;
       case "fechar": fecharRodada(); break;
       case "nova": novaRodada(); break;
@@ -1688,11 +1621,8 @@
         var escolhido = document.querySelector('#f-destino .pilula[aria-pressed="true"]');
         var dest = escolhido ? escolhido.getAttribute("data-valor") : "mercado";
         var cat = document.getElementById("f-cat").value.trim() || adivinhar(nome, null).categoria;
-        var qtdBruta = parseFloat(String(document.getElementById("f-qtd").value).replace(",", "."));
         var dados = {
           nome: nome, categoria: cat, destino: dest,
-          qtdPadrao: isNaN(qtdBruta) || qtdBruta <= 0 ? null : qtdBruta,
-          unidade: document.getElementById("f-un").value.trim(),
           obs: document.getElementById("f-obs").value.trim()
         };
         if (!a.id) {
