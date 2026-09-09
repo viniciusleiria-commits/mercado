@@ -1301,7 +1301,9 @@
       '<div class="linha-btns" style="margin-top:8px"><button class="btn larga" type="button" data-acao="sou" data-valor="esposa">Esposa — frutas e verduras no Hiperideal</button></div>' +
       '<div class="linha-btns" style="margin-top:8px"><button class="btn larga" type="button" data-acao="sou" data-valor="casa">Quem cuida da casa — marca o que está acabando</button></div>' +
       (Store.comoGuarda() === "firebase"
-        ? '<div style="text-align:center;margin-top:14px"><button class="link" type="button" data-acao="esquecer">Esquecer a senha neste aparelho</button></div>'
+        ? '<div class="linha-btns" style="margin-top:14px"><button class="btn miuda larga" type="button" data-acao="convidar">Copiar o link de convite</button></div>' +
+          '<div class="aviso-copia" id="convite-aviso">Manda esse link por mensagem: quem abrir entra sem digitar senha nenhuma.</div>' +
+          '<div style="text-align:center;margin-top:14px"><button class="link" type="button" data-acao="esquecer">Esquecer a senha neste aparelho</button></div>'
         : "") +
       "</div></div>"
     );
@@ -1515,9 +1517,22 @@
     switch (a.acao) {
       case "fechar-modal": fecharModal(); break;
       case "salvar-faltou": salvarFaltou(); break;
+      case "convidar": {
+        var senhaGuardada = "";
+        try { senhaGuardada = localStorage.getItem("mercado:senha") || ""; } catch (e) {}
+        var caixa = document.getElementById("convite-aviso");
+        if (!senhaGuardada) {
+          caixa.textContent = "Este aparelho entrou antes de eu guardar a senha. Toque em \u201cEsquecer a senha neste aparelho\u201d, entre de novo e o link fica pronto.";
+          break;
+        }
+        var convite = location.origin + location.pathname + "#casa=" + encodeURIComponent(senhaGuardada);
+        copiar(convite, a.el);
+        caixa.textContent = "Link copiado. Ele carrega a senha: mande só para quem pode mexer na lista.";
+        break;
+      }
       case "esquecer":
         if (confirm("Este aparelho vai pedir a senha de novo na próxima vez. Continuar?")) {
-          try { localStorage.removeItem("mercado:chave"); } catch (e) {}
+          try { localStorage.removeItem("mercado:chave"); localStorage.removeItem("mercado:senha"); } catch (e) {}
           location.reload();
         }
         break;
@@ -1585,7 +1600,20 @@
     return "sc" + h.toString(16);
   }
 
-  function mostrarPortao(cfg) {
+  function senhaDoEndereco() {
+    var bruto = (location.hash || "").replace(/^#/, "") + "&" + (location.search || "").replace(/^\?/, "");
+    var achado = /(?:^|&)casa=([^&]+)/.exec(bruto);
+    if (!achado) return "";
+    try { return decodeURIComponent(achado[1]); } catch (e) { return achado[1]; }
+  }
+
+  function limparEndereco() {
+    if (window.history && history.replaceState) {
+      try { history.replaceState(null, "", location.pathname); } catch (e) {}
+    }
+  }
+
+  function mostrarPortao(cfg, senhaInicial) {
     var portao = document.getElementById("portao");
     var corpoApp = document.querySelector("main");
     var topo = document.querySelector(".top");
@@ -1613,28 +1641,41 @@
         dizer('<div class="nota" style="margin-top:12px">Não consegui falar com o banco de dados. Veja a conexão e tente de novo.</div>');
         return;
       }
-      if (existe) { entrar(cfg, chave, false); return; }
+      if (existe) { entrar(cfg, chave, false, senha); return; }
       chavePendente = chave;
       dizer('<div class="nota" style="margin-top:12px">Não existe lista com essa senha.</div>' +
         '<div class="linha-btns" style="margin-top:10px">' +
         '<button class="btn" type="button" id="btn-criar">Criar uma lista nova com ela</button></div>');
       document.getElementById("btn-criar").addEventListener("click", function () {
-        entrar(cfg, chavePendente, true);
+        entrar(cfg, chavePendente, true, senha);
       });
     }
 
     botao.addEventListener("click", tentar);
     campo.addEventListener("keydown", function (ev) { if (ev.key === "Enter") tentar(); });
+
+    // Link de convite: a senha vem no endereço, ninguém digita nada. Sai da
+    // barra assim que é lida, para não ficar em foto de tela nem no histórico.
+    if (senhaInicial) {
+      campo.value = senhaInicial;
+      limparEndereco();
+      document.getElementById("portao-texto").textContent = "Entrando com a senha do link…";
+      tentar();
+      return;
+    }
     setTimeout(function () { campo.focus(); }, 60);
   }
 
-  async function entrar(cfg, chave, criar) {
+  async function entrar(cfg, chave, criar, senha) {
     if (!Store.abrirFirebase(cfg, chave)) {
       document.getElementById("portao-aviso").innerHTML =
         '<div class="nota" style="margin-top:12px">Não consegui abrir o banco de dados.</div>';
       return;
     }
-    try { localStorage.setItem("mercado:chave", chave); } catch (e) {}
+    try {
+      localStorage.setItem("mercado:chave", chave);
+      if (senha) localStorage.setItem("mercado:senha", senha);
+    } catch (e) {}
     if (criar) await Store.marcarCasa();
     document.getElementById("portao").hidden = true;
     document.querySelector("main").hidden = false;
@@ -1646,6 +1687,8 @@
     var cfg = window.MERCADO_FIREBASE || null;
     var temClaude = await Store.abrir();
     if (!temClaude && cfg && cfg.databaseURL) {
+      var doLink = senhaDoEndereco();
+      if (doLink) { mostrarPortao(cfg, doLink); return; }
       var guardada = null;
       try { guardada = localStorage.getItem("mercado:chave"); } catch (e) {}
       if (guardada && Store.abrirFirebase(cfg, guardada)) { await comecar(); return; }
