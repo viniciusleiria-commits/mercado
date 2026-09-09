@@ -531,60 +531,47 @@
 
   /* ---------------- classificação na importação ---------------- */
 
-  var HORTI = ("abacate abacaxi abobora abobrinha acelga agriao aipim alface alho ameixa " +
-    "banana batata berinjela beterraba brocolis cebola cebolinha cenoura chuchu " +
-    "coco coentro couve espinafre gengibre goiaba hortela inhame jilo kiwi laranja legumes " +
-    "limao macaxeira maca mamao manga manjericao maracuja melancia melao milho morango pepino pera " +
-    "pimentao quiabo rabanete repolho rucula salsa salsinha tangerina tomate uva " +
-    "vagem verdura fruta salada mandioca maxixe umbu caju acerola pinha graviola caja poro"
-  ).split(" ").concat([
-    "batata doce", "couve flor", "couve-flor", "milho espiga", "ervilha fresca",
-    "feijao verde", "tomate cereja", "cebola roxa", "banana da terra", "banana da prata"
-  ]);
-
-  var GRUPOS = [
-    { cat: "Frutas e verduras", destino: "horti", palavras: ["hortifruti", "frutas", "verduras", "legumes", "feira", "hiperideal", "sacolao", "hortifruti e verduras"] },
-    { cat: "Padaria", destino: "mercado", palavras: ["padaria", "paes", "pao"] },
-    { cat: "Carnes e frios", destino: "mercado", palavras: ["carne", "carnes", "acougue", "frios", "peixe", "aves"] },
-    { cat: "Laticínios e ovos", destino: "mercado", palavras: ["laticinios", "leite", "queijos", "ovos"] },
-    { cat: "Bebidas", destino: "mercado", palavras: ["bebida", "bebidas"] },
-    { cat: "Limpeza", destino: "mercado", palavras: ["limpeza", "produtos de limpeza"] },
-    { cat: "Higiene", destino: "mercado", palavras: ["higiene", "banheiro", "farmacia"] },
-    { cat: "Pet", destino: "mercado", palavras: ["pet", "cachorro", "gato", "racao"] },
-    { cat: "Mercearia", destino: "mercado", palavras: ["mercearia", "secos", "despensa", "armario", "atacadao", "assai", "ifood"] },
-    { cat: "Casa", destino: "mercado", palavras: ["casa", "utilidades", "diversos"] }
+  // As categorias são as que a casa usa (o Vinicius as ditou em 09/09/2026),
+  // não uma taxonomia de supermercado. "Temperos" atravessa as duas listas:
+  // cheiro-verde vem do Hiperideal, cominho vem do mercado.
+  var CATEGORIAS = [
+    { cat: "Verduras e legumes", destino: "horti", p: ["abobora", "abobrinha", "acelga", "agriao", "aipim", "alface", "alho", "batata", "batata doce", "berinjela", "beterraba", "brocolis", "cebola", "cebola roxa", "cenoura", "chuchu", "couve", "couve flor", "espinafre", "inhame", "jilo", "mandioca", "macaxeira", "maxixe", "milho", "milho espiga", "pepino", "pimentao", "quiabo", "rabanete", "repolho", "rucula", "vagem", "ervilha fresca", "feijao verde", "tomate", "tomate cereja", "verdura", "legume", "salada", "banana da terra"] },
+    { cat: "Frutas", destino: "horti", p: ["abacate", "abacaxi", "ameixa", "banana", "banana da prata", "caju", "caja", "acerola", "coco", "goiaba", "graviola", "kiwi", "laranja", "lima", "limao", "maca", "mamao", "manga", "manga palmer", "maracuja", "melancia", "melao", "morango", "pera", "pinha", "tangerina", "umbu", "uva", "uva verde", "fruta"] },
+    { cat: "Temperos", destino: "horti", p: ["cebolinha", "salsinha", "salsa", "coentro", "cheiro verde", "hortela", "manjericao", "gengibre", "alecrim"] },
+    { cat: "Temperos", destino: "mercado", p: ["sal", "pimenta", "pimenta do reino", "paprica", "cominho", "oregano", "louro", "folha de louro", "canela", "curcuma", "acafrao", "colorau", "tempero", "noz moscada", "cravo"] },
+    { cat: "Geladeira", destino: "mercado", p: ["leite", "queijo", "mussarela", "requeijao", "iogurte", "manteiga", "margarina", "creme de leite", "ovo", "ovos", "coalhada", "ricota", "nata", "cottage", "cream cheese", "presunto", "mortadela", "salame", "molho ingles", "shoyu", "mostarda", "ketchup", "maionese"] },
+    { cat: "Freezer", destino: "mercado", p: ["carne", "picanha", "alcatra", "coxao", "coxao duro", "patinho", "acem", "moida", "frango", "peito de frango", "coxa", "sobrecoxa", "linguica", "bacon", "salsicha", "peixe", "tilapia", "camarao", "salmao", "file", "filezinho", "costela", "peru", "hamburguer", "charque", "carne seca", "carne do sol", "bacalhau", "cha de dentro", "cha de fora", "maminha", "fraldinha", "pernil", "suina", "suino", "polpa"] },
+    { cat: "Materiais de limpeza", destino: "mercado", p: ["detergente", "sabao", "amaciante", "desinfetante", "agua sanitaria", "candida", "esponja", "bucha", "alvejante", "multiuso", "veja", "cif", "omo", "vanish", "tixan", "limpador", "limpa vidro", "brilux", "tira limo", "azulim", "higienizador", "saco de lixo", "papel toalha", "lustra", "cloro", "bombril", "perfex", "vassoura", "rodo", "pano de chao", "flanela", "alcool", "desengordurante", "bicarbonato", "papel aluminio", "papel filme", "papel manteiga", "saco plastico", "guardanapo", "fosforo", "vela", "palito", "pilha", "lampada", "isqueiro"] },
+    { cat: "Banheiro", destino: "mercado", p: ["papel higienico", "sabonete", "shampoo", "condicionador", "pasta de dente", "creme dental", "escova de dente", "desodorante", "absorvente", "fralda", "lenco", "algodao", "cotonete", "hidratante", "protetor solar", "aparelho de barbear", "gilete", "fio dental", "fita dental", "enxaguante", "band aid", "curativo", "acetona", "higi", "hastes"] },
+    { cat: "Alimentação (dispensa)", destino: "mercado", p: ["arroz", "feijao", "macarrao", "massa", "massinha", "penne", "spaguetti", "espaguete", "talharim", "farinha", "farinha de mandioca", "acucar", "oleo", "azeite", "vinagre", "molho", "extrato", "milho verde", "ervilha", "atum", "sardinha", "fermento", "gelatina", "aveia", "granola", "cuscuz", "tapioca", "goma", "flocao", "biscoito", "bolacha", "cracker", "cream cracker", "beiju", "cereal", "geleia", "mel", "amendoim", "castanha", "nozes", "chia", "linhaca", "uva passa", "chocolate", "chiclete", "bala", "azeitona", "leite de coco", "leite em po", "lentilha", "grao de bico", "sopa", "miojo", "pipoca", "polvilho", "batata palha", "banana chips", "bananada", "achocolatado em po", "pao", "paes", "bisnaga", "broa", "torrada", "bolo", "pao de queijo", "agua", "refrigerante", "coca", "guarana", "suco", "cerveja", "heineken", "vinho", "cafe", "filtro cafe", "cha", "energetico", "isotonico", "agua de coco", "agua com gas", "achocolatado", "toddy", "nescau", "tonica", "gin", "vodka", "whisky", "racao"] }
   ];
 
-  var PALAVRAS_CAT = [
-    { cat: "Padaria", p: ["pao", "paes", "bisnaga", "broa", "torrada", "bolo", "pao de queijo"] },
-    { cat: "Carnes e frios", p: ["carne", "picanha", "alcatra", "coxao", "coxao duro", "coxao mole", "patinho", "acem", "moida", "frango", "peito de frango", "coxa", "sobrecoxa", "linguica", "bacon", "presunto", "mortadela", "salsicha", "peixe", "tilapia", "camarao", "salmao", "file", "filezinho", "costela", "peru", "hamburguer", "salame", "charque", "carne seca", "carne do sol", "bacalhau", "cha de dentro", "cha de fora", "maminha", "fraldinha", "pernil", "suina", "suino"] },
-    { cat: "Laticínios e ovos", p: ["leite", "queijo", "mussarela", "requeijao", "iogurte", "manteiga", "margarina", "creme de leite", "leite condensado", "ovo", "ovos", "coalhada", "ricota", "nata", "cottage", "cream cheese"] },
-    { cat: "Bebidas", p: ["agua", "refrigerante", "coca", "guarana", "suco", "cerveja", "heineken", "vinho", "cafe", "cha", "energetico", "isotonico", "agua de coco", "achocolatado", "toddy", "nescau", "tonica", "gin", "vodka", "whisky", "agua com gas"] },
-    { cat: "Limpeza", p: ["detergente", "sabao", "amaciante", "desinfetante", "agua sanitaria", "candida", "esponja", "bucha", "alvejante", "multiuso", "veja", "cif", "omo", "vanish", "tixan", "limpador", "limpa vidro", "brilux", "tira limo", "azulim", "higienizador", "saco de lixo", "papel toalha", "lustra", "cloro", "bombril", "perfex", "vassoura", "rodo", "pano de chao", "flanela", "alcool", "desengordurante"] },
-    { cat: "Higiene", p: ["papel higienico", "sabonete", "shampoo", "condicionador", "pasta de dente", "creme dental", "escova de dente", "desodorante", "absorvente", "fralda", "lenco", "algodao", "cotonete", "hidratante", "protetor solar", "aparelho de barbear", "gilete", "fio dental", "fita dental", "enxaguante", "band aid", "curativo", "acetona", "higi", "hastes"] },
-    { cat: "Pet", p: ["racao", "areia sanitaria", "petisco", "sache", "tapete higienico"] },
-    { cat: "Casa", p: ["pilha", "lampada", "fosforo", "vela", "papel aluminio", "papel filme", "guardanapo", "isqueiro", "cola", "prendedor", "palito", "saco plastico", "papel manteiga"] },
-    { cat: "Mercearia", p: ["arroz", "feijao", "macarrao", "massa", "massinha", "penne", "spaguetti", "espaguete", "talharim", "farinha", "farinha de mandioca", "acucar", "sal", "oleo", "azeite", "vinagre", "molho", "extrato", "milho verde", "ervilha", "atum", "sardinha", "tempero", "colorau", "pimenta", "pimenta do reino", "cominho", "oregano", "paprica", "louro", "folha de louro", "curcuma", "acafrao", "canela", "fermento", "gelatina", "aveia", "granola", "cuscuz", "tapioca", "goma", "flocao", "biscoito", "bolacha", "cracker", "cream cracker", "beiju", "cereal", "geleia", "mel", "amendoim", "castanha", "nozes", "chia", "linhaca", "uva passa", "chocolate", "chiclete", "bala", "azeitona", "ketchup", "mostarda", "maionese", "shoyu", "leite de coco", "leite em po", "lentilha", "grao de bico", "sopa", "miojo", "pipoca", "polvilho", "bicarbonato", "batata palha", "banana chips", "bananada", "achocolatado em po"] }
+  var GRUPOS = [
+    { cat: "Verduras e legumes", destino: "horti", palavras: ["verduras", "legumes", "verduras e legumes", "hortifruti", "feira", "hiperideal", "sacolao"] },
+    { cat: "Frutas", destino: "horti", palavras: ["frutas", "fruta"] },
+    { cat: "Temperos", destino: "horti", palavras: ["temperos", "tempero", "cheiro verde"] },
+    { cat: "Geladeira", destino: "mercado", palavras: ["geladeira", "laticinios", "frios"] },
+    { cat: "Freezer", destino: "mercado", palavras: ["freezer", "congelados", "carnes", "carne", "acougue"] },
+    { cat: "Materiais de limpeza", destino: "mercado", palavras: ["limpeza", "materiais de limpeza", "produtos de limpeza"] },
+    { cat: "Banheiro", destino: "mercado", palavras: ["banheiro", "higiene", "farmacia"] },
+    { cat: "Alimentação (dispensa)", destino: "mercado", palavras: ["dispensa", "despensa", "alimentacao", "mercearia", "secos", "bebidas", "padaria", "atacadao", "assai", "ifood"] }
   ];
 
   // Ganha a palavra mais específica, não a primeira encontrada: "Sabão de coco"
-  // é sabão e não coco, "Extrato tomate" é extrato e não tomate, "Chã de dentro"
-  // é carne e não chá. Sem isso, a ordem das listas decidia, e decidia errado.
+  // é sabão e não coco, "Extrato tomate" é extrato e não tomate, "Chã de
+  // dentro" é carne e não chá. Sem isso a ordem das listas decidia, e errado.
   function adivinhar(nome, grupoAtual) {
     var palavras = normalizar(nome).split(/[ ,/()\-]+/).filter(Boolean);
     var seco = " " + palavras.join(" ") + " ";
     var melhor = null;
 
-    function considerar(cat, destino, alvo) {
-      if (seco.indexOf(" " + alvo + " ") < 0) return;
-      if (!melhor || alvo.length > melhor.tamanho) {
-        melhor = { categoria: cat, destino: destino, tamanho: alvo.length };
-      }
-    }
-
-    HORTI.forEach(function (h) { considerar("Frutas e verduras", "horti", h); });
-    PALAVRAS_CAT.forEach(function (g) {
-      g.p.forEach(function (alvo) { considerar(g.cat, "mercado", alvo); });
+    CATEGORIAS.forEach(function (g) {
+      g.p.forEach(function (alvo) {
+        if (seco.indexOf(" " + alvo + " ") < 0) return;
+        if (!melhor || alvo.length > melhor.tamanho) {
+          melhor = { categoria: g.cat, destino: g.destino, tamanho: alvo.length };
+        }
+      });
     });
 
     if (melhor) return { categoria: melhor.categoria, destino: melhor.destino };
@@ -632,10 +619,24 @@
       if (doisPontos || soMaiuscula) {
         var rotulo = l.replace(/:\s*$/, "").trim();
         if (!rotulo) return;
+        // "(Hiperideal)" / "(Mercado)" no fim do cabeçalho diz quem compra —
+        // é assim que a bancada devolve as correções sem o app readivinhar.
+        var forcado = "";
+        var marca = /\(([^)]*)\)\s*$/.exec(rotulo);
+        if (marca) {
+          var m = normalizar(marca[1]);
+          if (m === "hiperideal" || m === "esposa" || m === "horti") forcado = "horti";
+          else if (m === "mercado" || m === "ifood" || m === "voce") forcado = "mercado";
+          if (forcado) rotulo = rotulo.replace(/\s*\([^)]*\)\s*$/, "").trim();
+        }
+        if (!rotulo) return;
         var conhecido = grupoDaLinha(rotulo);
-        grupo = conhecido || {
-          cat: rotulo.charAt(0).toUpperCase() + rotulo.slice(1).toLowerCase(),
-          destino: adivinhar(rotulo, null).destino
+        var arrumado = rotulo === rotulo.toUpperCase()
+          ? rotulo.charAt(0).toUpperCase() + rotulo.slice(1).toLowerCase()
+          : rotulo;
+        grupo = {
+          cat: conhecido && !forcado ? conhecido.cat : arrumado,
+          destino: forcado || (conhecido ? conhecido.destino : adivinhar(rotulo, null).destino)
         };
         return;
       }
