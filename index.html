@@ -358,6 +358,7 @@
     filtroCasa: "tudo",
     busca: "",
     quem: localStorage.getItem("mercado:quem") || "",
+    travado: localStorage.getItem("mercado:travado") === "1",
     pedido: null,
     pronto: false
   };
@@ -595,12 +596,17 @@
     var linhas = String(texto || "").split(/\r?\n/);
 
     function limpar(bruta) {
-      return bruta
+      var l = bruta
         .replace(/^[\s\u2022\u25e6\u25aa\u00b7*\-\u2013\u2014+>]+/, "")
         .replace(/^\[[\sxX\u2713\u2714]?\]\s*/, "")
         .replace(/^\d+[.)]\s+/, "")
         .replace(/[\u2705\u2611\u274c\u2714\ufe0f]/g, "")
         .trim();
+      // Número solto no fim é a conta da semana passada, não o nome do item.
+      // "Arroz 2" vira "Arroz"; "Arroz 5kg" e "Leite 1L" ficam como estão,
+      // porque aí o número tem unidade colada e faz parte do nome.
+      var semConta = l.replace(/[\s\-\u2013\u2014:=xX\u00d7]*[([]?\s*\d+(?:[.,]\d+)?\s*[)\]]?\s*$/, "").trim();
+      return semConta || l;
     }
 
     // Se a nota inteira está em maiúsculas, MAIÚSCULA não pode significar
@@ -689,6 +695,13 @@
 
   /* ---------------- listas derivadas ---------------- */
 
+  // A lista mestra é a memória da casa: um toque errado tira o item de todo
+  // mundo. Aparelho que entrou por link de convite fica travado no seu papel e
+  // só marca e acrescenta; editar é de quem entrou digitando a senha.
+  function podeEditar() {
+    return !S.travado && S.quem === "vini";
+  }
+
   function itensArray() {
     return Object.keys(S.itens).map(function (id) {
       return Object.assign({ id: id }, S.itens[id]);
@@ -773,10 +786,13 @@
         '<p class="sub">Esta é a lista de tudo que costumam comprar — a mesma das Notas do iPhone. ' +
         'Com ela no lugar, quem cuida da casa marca o que vai acabando durante a semana e, na sexta, ' +
         'a compra já está montada: uma lista de frutas e verduras e uma do mercado.</p>' +
-        '<div class="linha-btns">' +
-        '<button class="btn principal" type="button" data-acao="importar">Colar a lista das Notas</button>' +
-        '<button class="btn" type="button" data-acao="base">Começar com uma lista base</button>' +
-        "</div></div></div>";
+        (podeEditar()
+          ? '<div class="linha-btns">' +
+            '<button class="btn principal" type="button" data-acao="importar">Colar a lista das Notas</button>' +
+            '<button class="btn" type="button" data-acao="base">Começar com uma lista base</button>' +
+            "</div>"
+          : '<div class="nota">A lista ainda não foi montada.</div>') +
+        "</div></div>";
       return;
     }
 
@@ -823,7 +839,12 @@
         (S.rodada && S.rodada.fechada ? "Atualizar as listas" : "Gerar as listas") +
         " (" + precisaN + ")</button>";
     }
-    var nova = '<div style="text-align:center;margin-top:10px"><button class="link" type="button" data-acao="nova">Começar uma semana nova</button></div>';
+    var extras = '<div style="text-align:center;margin-top:10px">' +
+      '<button class="btn miuda" type="button" data-acao="faltou">+ Faltou uma coisa que não está na lista</button></div>';
+    var nova = podeEditar()
+      ? '<div style="text-align:center;margin-top:10px"><button class="link" type="button" data-acao="nova">Começar uma semana nova</button></div>'
+      : "";
+    nova = extras + nova;
 
     alvo.innerHTML = topo + meio + pe + nova;
   }
@@ -1070,11 +1091,14 @@
     var alvo = document.getElementById("tela-itens");
     var arr = ordemLista();
     var cabecalho = '<div class="card"><h2>Lista mestra<span class="cont">' + arr.length + " itens</span></h2><div class=\"corpo\">" +
-      '<div class="linha-btns" style="margin-bottom:10px">' +
-      '<button class="btn" type="button" data-acao="novo">+ Item</button>' +
-      '<button class="btn" type="button" data-acao="importar">Colar das Notas</button>' +
-      (arr.length ? "" : '<button class="btn" type="button" data-acao="base">Lista base</button>') +
-      "</div>" +
+      (podeEditar()
+        ? '<div class="linha-btns" style="margin-bottom:10px">' +
+          '<button class="btn" type="button" data-acao="novo">+ Item</button>' +
+          '<button class="btn" type="button" data-acao="importar">Colar das Notas</button>' +
+          (arr.length ? "" : '<button class="btn" type="button" data-acao="base">Lista base</button>') +
+          "</div>"
+        : '<p class="sub">Esta é a lista fixa da casa, e ela não se mexe por aqui. ' +
+          'Para pedir uma coisa que não está nela, use “+ Faltou uma coisa” na aba Semana.</p>') +
       '<input class="campo" id="busca" type="search" placeholder="Buscar item" value="' + esc(S.busca) + '">' +
       '<div class="pilulas" style="margin-top:10px">' +
       pilula("filtro", "todos", S.filtro === "todos", "Todos") +
@@ -1096,11 +1120,14 @@
         html += '<div class="grupo-titulo" data-grupo="' + esc(normalizar(catAtual)) + '">' + esc(catAtual || "Outros") + "</div>";
       }
       var e = estat(it.id);
-      html += '<button class="fila ' + it.destino + '" type="button" data-acao="editar" data-id="' + it.id + '" data-busca="' + esc(normalizar(it.nome + " " + it.categoria)) + '">' +
+      var edita = podeEditar();
+      html += "<" + (edita ? "button" : "div") + ' class="fila ' + it.destino + '"' +
+        (edita ? ' type="button" data-acao="editar" data-id="' + it.id + '"' : "") +
+        ' data-busca="' + esc(normalizar(it.nome + " " + it.categoria)) + '">' +
         '<span class="nome">' + esc(it.nome) + (it.unidade ? ' <span class="meta">' + esc(it.unidade) + "</span>" : "") + "</span>" +
         '<span class="tag ' + it.destino + '">' + (it.destino === "horti" ? "Hiperideal" : "Mercado") + "</span>" +
         '<span class="meta">' + esc(e.vezes ? e.vezes + "x" : "") + "</span>" +
-        "</button>";
+        "</" + (edita ? "button" : "div") + ">";
     });
     alvo.innerHTML = cabecalho + html + "</div>";
     aplicarBusca();
@@ -1293,6 +1320,41 @@
   }
   function fecharModal() { document.getElementById("area-modal").innerHTML = ""; previa = []; }
 
+  function modalDestravar() {
+    abrirModal(
+      '<div class="modal"><h3>Trocar de pessoa<button class="fechar" type="button" data-acao="fechar-modal">×</button></h3>' +
+      '<div class="corpo"><p class="sub">Este aparelho entrou pelo link de convite, então fica no papel que o link trouxe. ' +
+      "Para trocar, é preciso a senha da casa.</p>" +
+      '<input class="campo" id="f-destravar" type="password" autocomplete="current-password" placeholder="Senha da casa">' +
+      '<div id="destravar-aviso"></div>' +
+      '<div class="acoes-fim"><button class="btn principal larga" type="button" data-acao="destravar">Destravar</button></div>' +
+      "</div></div>"
+    );
+    var c = document.getElementById("f-destravar");
+    setTimeout(function () { c.focus(); }, 40);
+    c.addEventListener("keydown", function (ev) { if (ev.key === "Enter") { ev.preventDefault(); destravar(); } });
+  }
+
+  async function destravar() {
+    var campo = document.getElementById("f-destravar");
+    var aviso = document.getElementById("destravar-aviso");
+    var guardada = "";
+    try { guardada = localStorage.getItem("mercado:chave") || ""; } catch (e) {}
+    var tentativa = await digerir(campo.value);
+    if (!guardada || tentativa !== guardada) {
+      aviso.innerHTML = '<div class="nota" style="margin-top:10px">Senha errada.</div>';
+      campo.select();
+      return;
+    }
+    S.travado = false;
+    try {
+      localStorage.removeItem("mercado:travado");
+      localStorage.setItem("mercado:senha", campo.value.trim());
+    } catch (e) {}
+    fecharModal();
+    modalQuem();
+  }
+
   function modalQuem() {
     abrirModal(
       '<div class="modal"><h3>Quem está usando<button class="fechar" type="button" data-acao="fechar-modal">×</button></h3>' +
@@ -1301,8 +1363,10 @@
       '<div class="linha-btns" style="margin-top:8px"><button class="btn larga" type="button" data-acao="sou" data-valor="esposa">Esposa — frutas e verduras no Hiperideal</button></div>' +
       '<div class="linha-btns" style="margin-top:8px"><button class="btn larga" type="button" data-acao="sou" data-valor="casa">Quem cuida da casa — marca o que está acabando</button></div>' +
       (Store.comoGuarda() === "firebase"
-        ? '<div class="linha-btns" style="margin-top:14px"><button class="btn miuda larga" type="button" data-acao="convidar">Copiar o link de convite</button></div>' +
-          '<div class="aviso-copia" id="convite-aviso">Manda esse link por mensagem: quem abrir entra sem digitar senha nenhuma.</div>' +
+        ? '<div class="rotulo" style="margin-top:18px">Convidar</div>' +
+          '<div class="linha-btns"><button class="btn miuda" type="button" data-acao="convidar" data-valor="esposa">Link para a esposa</button>' +
+          '<button class="btn miuda" type="button" data-acao="convidar" data-valor="casa">Link para quem cuida da casa</button></div>' +
+          '<div class="aviso-copia" id="convite-aviso">Quem abre o link entra sem digitar nada, já no papel certo, e não consegue mexer na lista fixa.</div>' +
           '<div style="text-align:center;margin-top:14px"><button class="link" type="button" data-acao="esquecer">Esquecer a senha neste aparelho</button></div>'
         : "") +
       "</div></div>"
@@ -1499,7 +1563,9 @@
     }
   });
 
-  document.getElementById("btn-quem").addEventListener("click", modalQuem);
+  document.getElementById("btn-quem").addEventListener("click", function () {
+    if (S.travado) modalDestravar(); else modalQuem();
+  });
 
   document.querySelector(".abas").addEventListener("click", function (ev) {
     var b = ev.target.closest(".aba");
@@ -1517,6 +1583,7 @@
     switch (a.acao) {
       case "fechar-modal": fecharModal(); break;
       case "salvar-faltou": salvarFaltou(); break;
+      case "destravar": destravar(); break;
       case "convidar": {
         var senhaGuardada = "";
         try { senhaGuardada = localStorage.getItem("mercado:senha") || ""; } catch (e) {}
@@ -1525,9 +1592,13 @@
           caixa.textContent = "Este aparelho entrou antes de eu guardar a senha. Toque em \u201cEsquecer a senha neste aparelho\u201d, entre de novo e o link fica pronto.";
           break;
         }
-        var convite = location.origin + location.pathname + "#casa=" + encodeURIComponent(senhaGuardada);
+        var papel = a.valor === "casa" ? "casa" : "esposa";
+        var convite = location.origin + location.pathname +
+          "#casa=" + encodeURIComponent(senhaGuardada) + "&papel=" + papel;
         copiar(convite, a.el);
-        caixa.textContent = "Link copiado. Ele carrega a senha: mande só para quem pode mexer na lista.";
+        caixa.textContent = "Link copiado, já no papel de " +
+          (papel === "casa" ? "quem cuida da casa" : "esposa") +
+          ". Ele carrega a senha: mande só para essa pessoa.";
         break;
       }
       case "esquecer":
@@ -1607,13 +1678,19 @@
     try { return decodeURIComponent(achado[1]); } catch (e) { return achado[1]; }
   }
 
+  function papelDoEndereco() {
+    var bruto = (location.hash || "").replace(/^#/, "") + "&" + (location.search || "").replace(/^\?/, "");
+    var achado = /(?:^|&)papel=(vini|esposa|casa)(?:&|$)/.exec(bruto);
+    return achado ? achado[1] : "";
+  }
+
   function limparEndereco() {
     if (window.history && history.replaceState) {
       try { history.replaceState(null, "", location.pathname); } catch (e) {}
     }
   }
 
-  function mostrarPortao(cfg, senhaInicial) {
+  function mostrarPortao(cfg, senhaInicial, papelInicial) {
     var portao = document.getElementById("portao");
     var corpoApp = document.querySelector("main");
     var topo = document.querySelector(".top");
@@ -1641,14 +1718,14 @@
         dizer('<div class="nota" style="margin-top:12px">Não consegui falar com o banco de dados. Veja a conexão e tente de novo.</div>');
         return;
       }
-      if (existe) { entrar(cfg, chave, false, senha); return; }
+      if (existe) { entrar(cfg, chave, false, senha, papelInicial); return; }
       chavePendente = chave;
       dizer('<p class="sub" style="margin-top:12px">Ninguém entrou com essa senha ainda. Se é a primeira vez da casa, ' +
         'crie a lista agora — esta senha passa a ser a de todo mundo. Se já existe lista, confira se digitou certo.</p>' +
         '<div class="linha-btns">' +
         '<button class="btn principal larga" type="button" id="btn-criar">Criar a lista com esta senha</button></div>');
       document.getElementById("btn-criar").addEventListener("click", function () {
-        entrar(cfg, chavePendente, true, senha);
+        entrar(cfg, chavePendente, true, senha, papelInicial);
       });
     }
 
@@ -1667,7 +1744,7 @@
     setTimeout(function () { campo.focus(); }, 60);
   }
 
-  async function entrar(cfg, chave, criar, senha) {
+  async function entrar(cfg, chave, criar, senha, papel) {
     if (!Store.abrirFirebase(cfg, chave)) {
       document.getElementById("portao-aviso").innerHTML =
         '<div class="nota" style="margin-top:12px">Não consegui abrir o banco de dados.</div>';
@@ -1676,6 +1753,13 @@
     try {
       localStorage.setItem("mercado:chave", chave);
       if (senha) localStorage.setItem("mercado:senha", senha);
+      if (papel) {
+        localStorage.setItem("mercado:quem", papel);
+        localStorage.setItem("mercado:travado", "1");
+        localStorage.removeItem("mercado:senha");
+        S.quem = papel;
+        S.travado = true;
+      }
     } catch (e) {}
     if (criar) await Store.marcarCasa();
     document.getElementById("portao").hidden = true;
@@ -1689,7 +1773,7 @@
     var temClaude = await Store.abrir();
     if (!temClaude && cfg && cfg.databaseURL) {
       var doLink = senhaDoEndereco();
-      if (doLink) { mostrarPortao(cfg, doLink); return; }
+      if (doLink) { mostrarPortao(cfg, doLink, papelDoEndereco()); return; }
       var guardada = null;
       try { guardada = localStorage.getItem("mercado:chave"); } catch (e) {}
       if (guardada && Store.abrirFirebase(cfg, guardada)) { await comecar(); return; }
@@ -1721,7 +1805,7 @@
     var arr = ordemLista();
     for (var i = 0; i < arr.length; i++) { if (!decidido(arr[i].id)) { S.idx = i; break; } }
     desenhar();
-    if (!S.quem) modalQuem();
+    if (!S.quem && !S.travado) modalQuem();
   }
 })();
 </script>
