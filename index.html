@@ -896,7 +896,7 @@
     var dica = e.quente && e.vezes ? "provavelmente acabando · " + e.dica : e.dica;
     return '<div class="card"><div class="corpo">' +
       '<div class="foco">' +
-      '<div class="cat">' + esc(it.categoria || "") + (it.destino === "horti" ? " · Hiperideal" : "") + "</div>" +
+      '<div class="cat">' + esc(it.categoria || "") + "</div>" +
       '<div class="nome">' + esc(it.nome) + "</div>" +
       '<div class="dica' + (e.quente && e.vezes ? " quente" : "") + '">' + esc(dica) + (it.obs ? " · " + esc(it.obs) : "") + "</div>" +
       "</div>" +
@@ -947,11 +947,27 @@
       "A compra da semana sai do que estiver marcado aqui.</p>" +
       '<button class="btn larga" type="button" data-acao="faltou">+ Faltou uma coisa que não está na lista</button>' +
       '<div class="pilulas" style="margin-top:12px">' +
-      pilula("filtro-casa", "tudo", S.filtroCasa !== "marcados", "A lista toda") +
-      pilula("filtro-casa", "marcados", S.filtroCasa === "marcados", "Só os marcados") +
+      pilula("modo-casa", "um", S.modo === "um", "Um por um") +
+      pilula("modo-casa", "tudo", S.modo !== "um" && S.filtroCasa !== "marcados", "A lista toda") +
+      pilula("modo-casa", "marcados", S.modo !== "um" && S.filtroCasa === "marcados", "Só os marcados") +
       "</div>" +
-      '<input class="campo" id="busca-casa" type="search" placeholder="Buscar item" value="' + esc(S.busca) + '" style="margin-top:10px">' +
+      (S.modo === "um" ? "" :
+        '<input class="campo" id="busca-casa" type="search" placeholder="Buscar item" value="' + esc(S.busca) + '" style="margin-top:10px">') +
       "</div></div>";
+
+    // Um por um também para ela: quem lembra de uma coisa por vez prefere ir
+    // sendo perguntada a rolar a lista atrás do item.
+    if (S.modo === "um") {
+      var passados = arr.filter(function (it) { return decidido(it.id); }).length;
+      var pct = arr.length ? Math.round((passados / arr.length) * 100) : 0;
+      alvo.innerHTML = html +
+        '<div class="card"><div class="corpo">' +
+        '<div class="progresso"><i style="width:' + pct + '%"></i></div>' +
+        '<div class="progresso-txt"><span>' + passados + " de " + arr.length + " vistos</span><span>" +
+        plural(marcados.length, "marcado", "marcados") + "</span></div></div></div>" +
+        desenhaFoco(arr);
+      return;
+    }
 
     var visiveis = S.filtroCasa === "marcados" ? marcados : arr;
     if (!visiveis.length) {
@@ -1529,7 +1545,18 @@
     switch (a.acao) {
       case "modo": S.modo = a.valor; if (S.modo === "um") S.idx = Math.min(S.idx, arr.length); desenhar(); break;
       case "ordem": S.ordem = a.valor; S.idx = 0; desenhar(); break;
-      case "filtro-casa": S.filtroCasa = a.valor; desenhar(); break;
+      case "modo-casa":
+        S.modo = a.valor === "um" ? "um" : "todos";
+        S.filtroCasa = a.valor === "marcados" ? "marcados" : "tudo";
+        if (S.modo === "um") {
+          S.idx = 0;
+          var todosCasa = ordemLista();
+          for (var iC = 0; iC < todosCasa.length; iC++) {
+            if (!decidido(todosCasa[iC].id)) { S.idx = iC; break; }
+          }
+        }
+        desenhar();
+        break;
       case "faltou": modalFaltou(); break;
       case "decidir":
         if (arr[S.idx]) { marcar(arr[S.idx].id, a.valor === "1"); S.idx++; desenhar(); }
