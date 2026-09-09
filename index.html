@@ -222,6 +222,12 @@
   .qtd button { width: 26px; height: 26px; border-radius: 6px; border: 1px solid var(--linha-forte); background: var(--folha); font-size: 15px; line-height: 1; display: grid; place-items: center; color: var(--tinta-fraca); }
   .qtd span { min-width: 34px; text-align: center; font-size: 12px; font-variant-numeric: tabular-nums; color: var(--tinta-fraca); }
 
+  .exp { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 14px; border-bottom: 1px solid var(--linha); }
+  .exp-nome { flex: 1; min-width: 150px; font-weight: 500; }
+  .exp-nome .meta { font-weight: 400; font-size: 11px; color: var(--tinta-fraquinha); }
+  .exp-botoes { display: flex; gap: 6px; flex: none; }
+  .exp-texto { flex-basis: 100%; }
+
   /* ---- texto para copiar ---- */
   .texto-lista {
     width: 100%; min-height: 120px; resize: vertical; margin-top: 10px;
@@ -354,7 +360,6 @@
     modo: "um",
     ordem: "lista",
     idx: 0,
-    filtro: "todos",
     filtroCasa: "tudo",
     busca: "",
     quem: localStorage.getItem("mercado:quem") || "",
@@ -756,7 +761,9 @@
     return itensArray().filter(function (it) { return decidido(it.id); }).length;
   }
   function daLista(destino) {
-    return ordemLista().filter(function (it) { return precisa(it.id) && it.destino === destino; });
+    return ordemLista().filter(function (it) {
+      return precisa(it.id) && (!destino || destino === "tudo" || it.destino === destino);
+    });
   }
   function feito(id) {
     return !!(S.rodada && S.rodada.feitos && S.rodada.feitos[id]);
@@ -764,10 +771,24 @@
 
   function textoDaLista(destino) {
     var itens = daLista(destino);
-    var cab = destino === "horti"
-      ? "Hiperideal · frutas e verduras · " + dataCurta(S.rodada && S.rodada.data ? S.rodada.data : hoje())
-      : "Atacadão/Assaí · " + dataCurta(S.rodada && S.rodada.data ? S.rodada.data : hoje());
-    var linhas = itens.map(function (it) {
+    var quando = dataCurta(S.rodada && S.rodada.data ? S.rodada.data : hoje());
+    var cab = destino === "horti" ? "Hiperideal · " + quando
+      : destino === "mercado" ? "iFood · " + quando
+      : "Compra da semana · " + quando;
+    var catAtual = null;
+    var linhas = [];
+    itens.forEach(function (it) {
+      if (it.categoria !== catAtual) {
+        catAtual = it.categoria;
+        linhas.push((linhas.length ? "\n" : "") + catAtual + ":");
+      }
+      linhas.push(linhaDoTexto(it));
+    });
+    return cab + "\n\n" + (linhas.length ? linhas.join("\n") : "(nada nesta semana)");
+  }
+
+  function linhaDoTexto(it) {
+    return (function () {
       var m = marcado(it.id) || {};
       var q = m.qtd && m.qtd > 1 ? m.qtd : null;
       var un = it.unidade ? String(it.unidade).trim() : "";
@@ -776,8 +797,7 @@
       else if (q) sufixo = " — " + q;
       if (it.obs) sufixo += (sufixo ? " " : " — ") + "(" + it.obs + ")";
       return it.nome + sufixo;
-    });
-    return cab + "\n\n" + (linhas.length ? linhas.join("\n") : "(nada nesta semana)");
+    })();
   }
 
   /* ---------------- desenho das telas ---------------- */
@@ -836,7 +856,7 @@
         plural(daCasa.length, "item", "itens") + "</span></h2>";
       daCasa.forEach(function (it) {
         var m = marcado(it.id) || {};
-        aviso += '<div class="fila ' + it.destino + ' marcado"><span class="caixa">' + CHECK + "</span>" +
+        aviso += '<div class="fila marcado"><span class="caixa">' + CHECK + "</span>" +
           '<span class="nome">' + esc(it.nome) + "</span>" +
           '<span class="meta">' + esc(dataCurta(m.quando || "")) + "</span></div>";
       });
@@ -903,7 +923,7 @@
       var e = estat(it.id);
       var estado = m ? (m.precisa ? "marcado" : "") : "";
       var meta = m ? (m.precisa ? "precisa" : "não precisa") : (e.quente && e.vezes ? "deve estar acabando" : "");
-      html += '<button class="fila ' + it.destino + " " + estado + '" type="button" data-acao="alternar" data-id="' + it.id + '">' +
+      html += '<button class="fila ' + estado + '" type="button" data-acao="alternar" data-id="' + it.id + '">' +
         '<span class="caixa">' + CHECK + "</span>" +
         '<span class="nome">' + esc(it.nome) + "</span>" +
         '<span class="meta">' + esc(meta) + "</span>" +
@@ -944,7 +964,7 @@
           catAtual = it.categoria;
           html += '<div class="grupo-titulo">' + esc(catAtual || "Outros") + "</div>";
         }
-        html += '<button class="fila ' + it.destino + (precisa(it.id) ? " marcado" : "") +
+        html += '<button class="fila' + (precisa(it.id) ? " marcado" : "") +
           '" type="button" data-acao="alternar" data-id="' + it.id +
           '" data-busca="' + esc(normalizar(it.nome + " " + it.categoria)) + '">' +
           '<span class="caixa">' + CHECK + "</span>" +
@@ -960,54 +980,64 @@
     if (campo) campo.addEventListener("input", function () { S.busca = campo.value; aplicarBusca("tela-rodada"); });
   }
 
-  function cartaoLista(destino) {
-    var itens = daLista(destino);
-    var titulo = destino === "horti" ? "Frutas e verduras · Hiperideal" : "Mercado · iFood";
-    var quemFaz = destino === "horti" ? "pedido pela esposa" : "pedido por você";
-    var html = '<div class="card"><h2>' + esc(titulo) + '<span class="cont">' + itens.length + " itens</span></h2>";
+  // Uma compra só. Quem compra o quê é decisão da importação, não da semana:
+  // durante a semana ninguém quer saber de quem é o quiabo, só que ele acabou.
+  // A divisão volta a existir na hora de exportar, que é quando ela serve.
+  function cartaoSemana() {
+    var itens = daLista("tudo");
+    var html = '<div class="card"><h2>Compra desta semana<span class="cont">' +
+      plural(itens.length, "item", "itens") + "</span></h2>";
     if (!itens.length) {
-      html += '<div class="vazio">Nada marcado nesta rodada.</div>';
-    } else {
-      var cats = {};
-      itens.forEach(function (it) { cats[it.categoria || ""] = true; });
-      var mostrarGrupos = Object.keys(cats).length > 1;
-      var catAtual = null;
-      itens.forEach(function (it) {
-        if (mostrarGrupos && it.categoria !== catAtual) {
-          catAtual = it.categoria;
-          html += '<div class="grupo-titulo">' + esc(catAtual || "Outros") + "</div>";
-        }
-        var m = marcado(it.id) || {};
-        var q = m.qtd || 1;
-        var maisUm = '<button type="button" data-acao="qtd" data-id="' + it.id + '" data-valor="1" aria-label="aumentar a quantidade">+</button>';
-        var contador = (q > 1 || it.unidade)
-          ? '<button type="button" data-acao="qtd" data-id="' + it.id + '" data-valor="-1" aria-label="diminuir a quantidade">−</button>' +
-            "<span>" + q + (it.unidade ? " " + esc(it.unidade) : "") + "</span>" + maisUm
-          : maisUm;
-        html += '<div class="fila ' + destino + (feito(it.id) ? " feito" : "") + '">' +
-          '<button class="caixa" type="button" data-acao="feito" data-id="' + it.id + '" aria-label="marcar como pedido">' + CHECK + "</button>" +
-          '<span class="nome">' + esc(it.nome) + (it.obs ? ' <span class="meta">(' + esc(it.obs) + ")</span>" : "") + "</span>" +
-          '<span class="qtd">' + contador + "</span></div>";
-      });
-      var ondeFaz = destino === "horti" ? "no app do Hiperideal" : "no iFood";
-      html += '<div class="corpo">' +
-        '<button class="btn principal larga" type="button" data-acao="pedir" data-valor="' + destino + '">Fazer o pedido ' + ondeFaz + "</button>" +
-        '<div class="aviso-copia">Um item por vez, com o nome já copiado para colar na busca.</div>' +
-        '<div class="linha-btns" style="margin-top:12px"><button class="btn miuda" type="button" data-acao="copiar" data-valor="' + destino + '">Copiar a lista toda</button>' +
-        '<button class="btn miuda" type="button" data-acao="ver-texto" data-valor="' + destino + '">Ver o texto</button></div>' +
-        '<div class="aviso-copia">' + esc(quemFaz) + "</div>" +
-        '<div id="txt-' + destino + '" hidden><textarea class="texto-lista" readonly>' + esc(textoDaLista(destino)) + "</textarea>" +
-        '<div class="aviso-copia">Se o botão copiar não funcionar no seu navegador, selecione o texto aqui e copie.</div></div>' +
-        "</div>";
+      return html + '<div class="vazio">Nada marcado nesta semana.</div></div>';
     }
+    var catAtual = null;
+    itens.forEach(function (it) {
+      if (it.categoria !== catAtual) {
+        catAtual = it.categoria;
+        html += '<div class="grupo-titulo">' + esc(catAtual || "Outros") + "</div>";
+      }
+      var m = marcado(it.id) || {};
+      var q = m.qtd || 1;
+      var maisUm = '<button type="button" data-acao="qtd" data-id="' + it.id + '" data-valor="1" aria-label="aumentar a quantidade">+</button>';
+      var contador = (q > 1 || it.unidade)
+        ? '<button type="button" data-acao="qtd" data-id="' + it.id + '" data-valor="-1" aria-label="diminuir a quantidade">−</button>' +
+          "<span>" + q + (it.unidade ? " " + esc(it.unidade) : "") + "</span>" + maisUm
+        : maisUm;
+      html += '<div class="fila' + (feito(it.id) ? " feito" : "") + '">' +
+        '<button class="caixa" type="button" data-acao="feito" data-id="' + it.id + '" aria-label="marcar como pedido">' + CHECK + "</button>" +
+        '<span class="nome">' + esc(it.nome) + (it.obs ? ' <span class="meta">(' + esc(it.obs) + ")</span>" : "") + "</span>" +
+        '<span class="qtd">' + contador + "</span></div>";
+    });
     return html + "</div>";
   }
 
-  function itemDoPedido(it) {
-    var m = marcado(it.id) || {};
-    var q = m.qtd || 1;
-    if (it.unidade) return it.nome + " — " + q + " " + it.unidade;
-    return q > 1 ? it.nome + " — " + q : it.nome;
+  var EXPORTACOES = [
+    { chave: "tudo", nome: "Lista toda", onde: "para conferir ou mandar por mensagem", pede: false },
+    { chave: "horti", nome: "Hiperideal", onde: "frutas, verduras e cheiro-verde", pede: true },
+    { chave: "mercado", nome: "iFood", onde: "Atacadão ou Assaí", pede: true }
+  ];
+
+  function cartaoExportar() {
+    var html = '<div class="card"><h2>Exportar</h2>';
+    EXPORTACOES.forEach(function (e) {
+      var quantos = daLista(e.chave).length;
+      html += '<div class="exp">' +
+        '<div class="exp-nome">' + esc(e.nome) +
+        '<span class="meta"> · ' + plural(quantos, "item", "itens") + "</span>" +
+        '<div class="meta">' + esc(e.onde) + "</div></div>" +
+        '<div class="exp-botoes">' +
+        '<button class="btn miuda" type="button" data-acao="copiar" data-valor="' + e.chave + '"' +
+        (quantos ? "" : " disabled") + ">Copiar</button>" +
+        (e.pede
+          ? '<button class="btn miuda principal" type="button" data-acao="pedir" data-valor="' + e.chave + '"' +
+            (quantos ? "" : " disabled") + ">Pedir</button>"
+          : "") +
+        "</div>" +
+        '<div class="exp-texto" id="txt-' + e.chave + '" hidden><textarea class="texto-lista" readonly>' +
+        esc(textoDaLista(e.chave)) + "</textarea></div>" +
+        "</div>";
+    });
+    return html + '<div class="corpo"><div class="aviso-copia">"Pedir" abre um item por vez, com o nome já copiado para colar na busca do app.</div></div></div>';
   }
 
   function desenhaPedido() {
@@ -1090,13 +1120,7 @@
     var alvo = document.getElementById("tela-listas");
     var arr = ordemLista();
     if (!arr.length) { alvo.innerHTML = '<div class="card"><div class="vazio">Sem lista ainda. Comece pela aba Itens.</div></div>'; return; }
-    var ordem = S.quem === "esposa" ? ["horti", "mercado"] : ["mercado", "horti"];
-    if (!daLista(ordem[0]).length && daLista(ordem[1]).length) ordem.reverse();
-    var cabecalho = "";
-    if (!decididos()) {
-      cabecalho = '<div class="card"><div class="corpo"><div class="nota">Nada marcado nesta semana ainda.</div></div></div>';
-    }
-    alvo.innerHTML = cabecalho + cartaoLista(ordem[0]) + cartaoLista(ordem[1]);
+    alvo.innerHTML = cartaoSemana() + cartaoExportar();
   }
 
   function desenhaItens() {
@@ -1112,11 +1136,7 @@
         : '<p class="sub">Esta é a lista fixa da casa, e ela não se mexe por aqui. ' +
           'Para pedir uma coisa que não está nela, use “+ Faltou uma coisa” na aba Semana.</p>') +
       '<input class="campo" id="busca" type="search" placeholder="Buscar item" value="' + esc(S.busca) + '">' +
-      '<div class="pilulas" style="margin-top:10px">' +
-      pilula("filtro", "todos", S.filtro === "todos", "Todos") +
-      pilula("filtro", "horti", S.filtro === "horti", "Frutas e verduras") +
-      pilula("filtro", "mercado", S.filtro === "mercado", "Mercado") +
-      "</div></div></div>";
+      "</div></div>";
 
     if (!arr.length) {
       alvo.innerHTML = cabecalho + '<div class="card"><div class="vazio">Nenhum item ainda.</div></div>';
@@ -1125,7 +1145,7 @@
 
     var html = '<div class="card">';
     var catAtual = null;
-    var visiveis = arr.filter(function (it) { return S.filtro === "todos" || it.destino === S.filtro; });
+    var visiveis = arr;
     visiveis.forEach(function (it) {
       if (it.categoria !== catAtual) {
         catAtual = it.categoria;
@@ -1133,11 +1153,10 @@
       }
       var e = estat(it.id);
       var edita = podeEditar();
-      html += "<" + (edita ? "button" : "div") + ' class="fila ' + it.destino + '"' +
+      html += "<" + (edita ? "button" : "div") + ' class="fila"' +
         (edita ? ' type="button" data-acao="editar" data-id="' + it.id + '"' : "") +
         ' data-busca="' + esc(normalizar(it.nome + " " + it.categoria)) + '">' +
         '<span class="nome">' + esc(it.nome) + (it.unidade ? ' <span class="meta">' + esc(it.unidade) + "</span>" : "") + "</span>" +
-        '<span class="tag ' + it.destino + '">' + (it.destino === "horti" ? "Hiperideal" : "Mercado") + "</span>" +
         '<span class="meta">' + esc(e.vezes ? e.vezes + "x" : "") + "</span>" +
         "</" + (edita ? "button" : "div") + ">";
     });
@@ -1315,9 +1334,9 @@
       try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
       document.body.removeChild(ta);
       feedback(ok);
-      if (!ok && botao) {
+      if (botao) {
         var caixa = document.getElementById("txt-" + botao.getAttribute("data-valor"));
-        if (caixa) caixa.hidden = false;
+        if (caixa && !ok) caixa.hidden = false;
       }
     }
   }
@@ -1510,7 +1529,6 @@
     switch (a.acao) {
       case "modo": S.modo = a.valor; if (S.modo === "um") S.idx = Math.min(S.idx, arr.length); desenhar(); break;
       case "ordem": S.ordem = a.valor; S.idx = 0; desenhar(); break;
-      case "filtro": S.filtro = a.valor; desenhar(); break;
       case "filtro-casa": S.filtroCasa = a.valor; desenhar(); break;
       case "faltou": modalFaltou(); break;
       case "decidir":
