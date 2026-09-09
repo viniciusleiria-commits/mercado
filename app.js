@@ -1,0 +1,1462 @@
+// Gerado por site/gerar.py a partir de mercado.html. Não editar aqui.
+window.MERCADO_VERSAO = "09/09 19:03";
+(function () {
+  var st = document.createElement('style');
+  st.textContent = "\n  :root {\n    --verde: #2A5E5E;\n    --verde-fundo: rgba(42,94,94,.09);\n    --verde-fundo-fraco: rgba(42,94,94,.04);\n    --horti: #3F7D52;\n    --horti-fundo: rgba(63,125,82,.10);\n    --mercado: #B4691F;\n    --mercado-fundo: rgba(180,105,31,.10);\n    --chao: #F6F7F5;\n    --folha: #FFFFFF;\n    --folha-2: #FBFCFB;\n    --linha: #E3E7E3;\n    --linha-forte: #CFD6D1;\n    --tinta: #1C2320;\n    --tinta-fraca: #5D6B64;\n    --tinta-fraquinha: #8A968F;\n    --alerta: #9B6B12;\n    --alerta-fundo: rgba(155,107,18,.10);\n    --sombra: 0 1px 2px rgba(28,35,32,.05);\n    --raio: 12px;\n    --raio-p: 8px;\n    --fonte: \"Sora\", -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif;\n  }\n  @media (prefers-color-scheme: dark) {\n    :root:not([data-theme=\"light\"]) {\n      --verde: #7FBDB4;\n      --verde-fundo: rgba(127,189,180,.12);\n      --verde-fundo-fraco: rgba(127,189,180,.06);\n      --horti: #83C193;\n      --horti-fundo: rgba(131,193,147,.13);\n      --mercado: #E0A45E;\n      --mercado-fundo: rgba(224,164,94,.13);\n      --chao: #111614;\n      --folha: #1A211E;\n      --folha-2: #1E2622;\n      --linha: #2B3531;\n      --linha-forte: #3C4842;\n      --tinta: #E7EDE9;\n      --tinta-fraca: #9BA9A1;\n      --tinta-fraquinha: #74827A;\n      --alerta: #E4B75F;\n      --alerta-fundo: rgba(228,183,95,.13);\n      --sombra: 0 1px 2px rgba(0,0,0,.3);\n    }\n  }\n  :root[data-theme=\"dark\"] {\n    --verde: #7FBDB4;\n    --verde-fundo: rgba(127,189,180,.12);\n    --verde-fundo-fraco: rgba(127,189,180,.06);\n    --horti: #83C193;\n    --horti-fundo: rgba(131,193,147,.13);\n    --mercado: #E0A45E;\n    --mercado-fundo: rgba(224,164,94,.13);\n    --chao: #111614;\n    --folha: #1A211E;\n    --folha-2: #1E2622;\n    --linha: #2B3531;\n    --linha-forte: #3C4842;\n    --tinta: #E7EDE9;\n    --tinta-fraca: #9BA9A1;\n    --tinta-fraquinha: #74827A;\n    --alerta: #E4B75F;\n    --alerta-fundo: rgba(228,183,95,.13);\n    --sombra: 0 1px 2px rgba(0,0,0,.3);\n  }\n\n  * { box-sizing: border-box; }\n  [hidden] { display: none !important; }\n  body {\n    margin: 0;\n    background: var(--chao);\n    color: var(--tinta);\n    font-family: var(--fonte);\n    font-size: 14px;\n    font-weight: 400;\n    line-height: 1.45;\n    -webkit-text-size-adjust: 100%;\n  }\n  button, input, select, textarea { font: inherit; color: inherit; }\n  button { cursor: pointer; }\n  :focus-visible { outline: 2px solid var(--verde); outline-offset: 2px; }\n  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }\n\n  #app { max-width: 620px; margin: 0 auto; padding: 0 12px 92px; }\n  #portao { padding-top: 18vh; }\n  .portao-card { max-width: 380px; margin: 0 auto; }\n\n  /* ---- topo ---- */\n  .top {\n    position: sticky; top: 0; z-index: 20;\n    background: var(--chao);\n    padding: 14px 0 10px;\n    display: flex; align-items: baseline; gap: 10px;\n    border-bottom: 1px solid var(--linha);\n    margin-bottom: 14px;\n  }\n  .top h1 { margin: 0; font-size: 17px; font-weight: 500; letter-spacing: -.2px; color: var(--verde); }\n  .top .semana { font-size: 12px; color: var(--tinta-fraca); margin-left: auto; white-space: nowrap; }\n  .quem {\n    border: 1px solid var(--linha-forte); background: var(--folha);\n    border-radius: 999px; padding: 3px 10px; font-size: 11px; color: var(--tinta-fraca);\n  }\n\n  /* ---- cart\u00f5es ---- */\n  .card {\n    background: var(--folha); border: 1px solid var(--linha);\n    border-radius: var(--raio); box-shadow: var(--sombra);\n    margin-bottom: 12px; overflow: hidden;\n  }\n  .card > h2 {\n    margin: 0; padding: 9px 14px;\n    font-size: 12px; font-weight: 500; letter-spacing: .3px; text-transform: uppercase;\n    color: var(--verde); background: var(--verde-fundo);\n    display: flex; align-items: center; gap: 8px;\n  }\n  .card > h2 .cont { margin-left: auto; font-size: 11px; letter-spacing: 0; text-transform: none; color: var(--tinta-fraca); font-variant-numeric: tabular-nums; }\n  .corpo { padding: 14px; }\n  .corpo.sem-topo { padding-top: 12px; }\n\n  .sub { font-size: 12px; color: var(--tinta-fraca); margin: 0 0 10px; }\n  .vazio { padding: 22px 14px; text-align: center; color: var(--tinta-fraca); font-size: 13px; }\n\n  /* ---- bot\u00f5es ---- */\n  .btn {\n    border: 1px solid var(--linha-forte); background: var(--folha);\n    border-radius: var(--raio-p); padding: 9px 14px; font-size: 13px; font-weight: 500;\n    color: var(--tinta); display: inline-flex; align-items: center; gap: 7px; justify-content: center;\n  }\n  .btn:active { background: var(--folha-2); }\n  .btn.principal { background: var(--verde); border-color: var(--verde); color: #fff; }\n  :root[data-theme=\"dark\"] .btn.principal, :root:not([data-theme=\"light\"]) .btn.principal { color: #10201E; }\n  @media (prefers-color-scheme: light) { :root:not([data-theme=\"dark\"]) .btn.principal { color: #fff; } }\n  .btn.larga { width: 100%; }\n  .btn.miuda { padding: 6px 10px; font-size: 12px; }\n  .btn[disabled] { opacity: .45; pointer-events: none; }\n  .linha-btns { display: flex; gap: 8px; flex-wrap: wrap; }\n\n  /* ---- p\u00edlulas / chips ---- */\n  .pilulas { display: flex; gap: 6px; flex-wrap: wrap; }\n  .pilula {\n    border: 1px solid var(--linha-forte); background: var(--folha);\n    border-radius: 999px; padding: 5px 12px; font-size: 12px; color: var(--tinta-fraca);\n  }\n  .pilula[aria-pressed=\"true\"] { background: var(--verde); border-color: var(--verde); color: #fff; font-weight: 500; }\n  :root[data-theme=\"dark\"] .pilula[aria-pressed=\"true\"] { color: #10201E; }\n  @media (prefers-color-scheme: dark) { :root:not([data-theme=\"light\"]) .pilula[aria-pressed=\"true\"] { color: #10201E; } }\n\n  .tag { font-size: 10px; letter-spacing: .3px; text-transform: uppercase; padding: 2px 7px; border-radius: 999px; font-weight: 500; white-space: nowrap; }\n  .tag.horti { background: var(--horti-fundo); color: var(--horti); }\n  .tag.mercado { background: var(--mercado-fundo); color: var(--mercado); }\n\n  /* ---- rodada: um por um ---- */\n  .progresso { height: 4px; background: var(--linha); border-radius: 999px; overflow: hidden; margin: 0 0 4px; }\n  .progresso i { display: block; height: 100%; background: var(--verde); border-radius: 999px; transition: width .18s ease; }\n  .progresso-txt { font-size: 11px; color: var(--tinta-fraquinha); font-variant-numeric: tabular-nums; display: flex; justify-content: space-between; }\n\n  .foco { text-align: center; padding: 6px 0 2px; }\n  .foco .cat { font-size: 11px; letter-spacing: .4px; text-transform: uppercase; color: var(--tinta-fraquinha); }\n  .foco .nome { font-size: 26px; font-weight: 500; letter-spacing: -.4px; margin: 4px 0 6px; text-wrap: balance; line-height: 1.2; user-select: text; -webkit-user-select: text; }\n  .foco .qtd-grande { font-size: 13px; color: var(--tinta-fraca); }\n  .copiado { font-size: 12px; color: var(--verde); text-align: center; margin-top: 8px; min-height: 17px; }\n  .foco .dica { font-size: 12px; color: var(--tinta-fraca); min-height: 16px; }\n  .foco .dica.quente { color: var(--alerta); }\n  .decisao { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }\n  .decisao .btn { padding: 16px 10px; font-size: 15px; }\n  .btn.sim { background: var(--verde); border-color: var(--verde); color: #fff; }\n  :root[data-theme=\"dark\"] .btn.sim { color: #10201E; }\n  @media (prefers-color-scheme: dark) { :root:not([data-theme=\"light\"]) .btn.sim { color: #10201E; } }\n  .btn.nao { background: var(--folha-2); }\n  .pe { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; }\n  .link { background: none; border: 0; color: var(--tinta-fraca); font-size: 12px; text-decoration: underline; text-underline-offset: 3px; padding: 4px 2px; }\n  .link.forte { color: var(--verde); }\n\n  /* ---- listas de itens ---- */\n  .grupo-titulo {\n    font-size: 11px; letter-spacing: .4px; text-transform: uppercase; color: var(--tinta-fraca);\n    background: var(--verde-fundo-fraco); padding: 5px 14px; border-top: 1px solid var(--linha); border-bottom: 1px solid var(--linha);\n  }\n  .fila { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid var(--linha); border-left: 3px solid transparent; width: 100%; text-align: left; background: none; border-top: 0; border-right: 0; }\n  .fila:last-child { border-bottom: 0; }\n  .fila.horti { border-left-color: var(--horti); }\n  .fila.mercado { border-left-color: var(--mercado); }\n  .fila .nome { flex: 1; min-width: 0; overflow-wrap: anywhere; }\n  .fila .meta { font-size: 11px; color: var(--tinta-fraquinha); }\n  .fila .freq { display: block; font-size: 11px; font-weight: 400; color: var(--verde); margin-top: 1px; }\n  .fila.marcado { background: var(--verde-fundo-fraco); }\n  .fila.marcado .nome { font-weight: 500; }\n  .fila.feito .nome { color: var(--tinta-fraquinha); text-decoration: line-through; }\n  .caixa {\n    width: 22px; height: 22px; flex: none; border: 1.5px solid var(--linha-forte); border-radius: 6px;\n    display: grid; place-items: center; background: var(--folha);\n  }\n  .caixa svg { width: 13px; height: 13px; opacity: 0; }\n  .fila.marcado .caixa, .fila.feito .caixa { background: var(--verde); border-color: var(--verde); }\n  .fila.marcado .caixa svg, .fila.feito .caixa svg { opacity: 1; }\n\n  .exp { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 14px; border-bottom: 1px solid var(--linha); }\n  .exp-nome { flex: 1; min-width: 150px; font-weight: 500; }\n  .exp-nome .meta { font-weight: 400; font-size: 11px; color: var(--tinta-fraquinha); }\n  .exp-botoes { display: flex; gap: 6px; flex: none; }\n  .exp-texto { flex-basis: 100%; }\n\n  /* ---- texto para copiar ---- */\n  .texto-lista {\n    width: 100%; min-height: 120px; resize: vertical; margin-top: 10px;\n    border: 1px solid var(--linha); border-radius: var(--raio-p); padding: 10px;\n    background: var(--folha-2); color: var(--tinta); font-size: 13px; line-height: 1.6;\n  }\n  .aviso-copia { font-size: 11px; color: var(--tinta-fraca); margin-top: 6px; }\n\n  /* ---- busca e campos ---- */\n  .campo, .selec {\n    width: 100%; border: 1px solid var(--linha-forte); border-radius: var(--raio-p);\n    padding: 9px 11px; background: var(--folha); font-size: 14px;\n  }\n  .rotulo { display: block; font-size: 11px; letter-spacing: .3px; text-transform: uppercase; color: var(--tinta-fraca); margin: 0 0 4px; }\n  .campo-bloco { margin-bottom: 12px; }\n\n  /* ---- abas de baixo ---- */\n  .abas {\n    position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;\n    background: var(--folha); border-top: 1px solid var(--linha);\n    display: flex; padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0px));\n  }\n  .abas .aba {\n    flex: 1; background: none; border: 0; padding: 6px 2px; border-radius: var(--raio-p);\n    display: flex; flex-direction: column; align-items: center; gap: 3px;\n    font-size: 11px; color: var(--tinta-fraca);\n  }\n  .abas .aba svg { width: 18px; height: 18px; }\n  .abas .aba[aria-current=\"true\"] { color: var(--verde); font-weight: 500; background: var(--verde-fundo); }\n\n  /* ---- modal ---- */\n  .fundo-modal {\n    position: fixed; top: 0; left: 0; right: 0; height: 100vh; height: 100dvh;\n    z-index: 50; background: rgba(16,22,20,.5);\n    display: flex; align-items: flex-end; justify-content: center; padding: 0;\n  }\n  @media (min-width: 560px) { .fundo-modal { align-items: center; padding: 20px; } }\n  .modal {\n    background: var(--folha); width: 100%; max-width: 560px; overflow: auto;\n    max-height: 86vh; max-height: 86dvh;\n    border-radius: var(--raio) var(--raio) 0 0; border: 1px solid var(--linha);\n  }\n  /* o rodap\u00e9 acompanha a rolagem: no iPhone a barra do Safari come o p\u00e9 da folha */\n  .acoes-fim {\n    position: sticky; bottom: -1px; z-index: 2;\n    background: var(--folha); border-top: 1px solid var(--linha);\n    margin: 12px -14px calc(-14px + env(safe-area-inset-bottom, 0px)) -14px;\n    padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0px));\n  }\n  @media (min-width: 560px) { .modal { border-radius: var(--raio); } }\n  .modal h3 {\n    margin: 0; padding: 12px 14px; font-size: 13px; font-weight: 500; color: var(--verde);\n    background: var(--verde-fundo); display: flex; align-items: center; gap: 8px;\n  }\n  .modal h3 .fechar { margin-left: auto; background: none; border: 0; color: var(--tinta-fraca); font-size: 20px; line-height: 1; padding: 0 4px; }\n  .modal .corpo { padding: 14px; }\n\n  .previa { border: 1px solid var(--linha); border-radius: var(--raio-p); margin: 10px 0; }\n  .previa .fila { padding: 8px 10px; }\n\n  .versao { text-align: center; font-size: 11px; color: var(--tinta-fraquinha); padding: 6px 0 2px; }\n  .nota { background: var(--alerta-fundo); color: var(--alerta); border-radius: var(--raio-p); padding: 9px 11px; font-size: 12px; }\n";
+  document.head.appendChild(st);
+  var caixa = document.createElement('div');
+  caixa.innerHTML = "<div id=\"app\">\n  <div id=\"portao\" hidden>\n    <div class=\"card portao-card\">\n      <h2>Lista da casa</h2>\n      <div class=\"corpo\">\n        <p class=\"sub\" id=\"portao-texto\">A mesma senha para todo mundo da casa. Se ningu\u00e9m entrou ainda, a que voc\u00ea digitar agora vira a senha. Digita uma vez; este aparelho lembra.</p>\n        <label class=\"rotulo\" for=\"senha\">Senha</label>\n        <input class=\"campo\" id=\"senha\" type=\"password\" autocomplete=\"current-password\" enterkeyhint=\"go\">\n        <div class=\"linha-btns\" style=\"margin-top:12px\">\n          <button class=\"btn principal larga\" type=\"button\" id=\"btn-entrar\">Entrar</button>\n        </div>\n        <div id=\"portao-aviso\"></div>\n      </div>\n    </div>\n  </div>\n\n  <header class=\"top\">\n    <h1>Mercado de Sexta</h1>\n    <button class=\"quem\" id=\"btn-quem\" type=\"button\">Quem sou eu</button>\n    <span class=\"semana\" id=\"rot-semana\"></span>\n  </header>\n\n  <main>\n    <section class=\"tela\" id=\"tela-rodada\"></section>\n    <section class=\"tela\" id=\"tela-listas\" hidden></section>\n    <section class=\"tela\" id=\"tela-itens\" hidden></section>\n  </main>\n</div>\n\n<nav class=\"abas\" role=\"tablist\">\n  <button class=\"aba\" type=\"button\" data-tela=\"rodada\" aria-current=\"true\">\n    <svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M9 11l2 2 4-4\"/><rect x=\"3\" y=\"4\" width=\"18\" height=\"17\" rx=\"2\"/><path d=\"M8 2v4M16 2v4\"/></svg>\n    Semana\n  </button>\n  <button class=\"aba\" type=\"button\" data-tela=\"listas\">\n    <svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01\"/></svg>\n    Listas\n  </button>\n  <button class=\"aba\" type=\"button\" data-tela=\"itens\">\n    <svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M3 6h18l-2 13H5L3 6z\"/><path d=\"M8 6V4a4 4 0 018 0v2\"/></svg>\n    Itens\n  </button>\n</nav>\n\n<div id=\"area-modal\"></div>";
+  while (caixa.firstChild) document.body.appendChild(caixa.firstChild);
+})();
+
+(function () {
+  "use strict";
+
+  /* ---------------------------------------------------------------
+     Mercado de Sexta
+     - lista/itens        : a lista mestra, um mapa id -> item
+     - rodadas/atual      : a rodada da semana (o que foi perguntado)
+     - historico/rodadas   : data -> ids que precisaram (para a cadência)
+     Escrita sempre por chave (update com merge), nunca despejando o
+     mapa inteiro por cima: o Vinicius e a esposa mexem ao mesmo tempo.
+  --------------------------------------------------------------- */
+
+  var CAMINHOS = { itens: "lista/itens", rodada: "rodadas/atual", historico: "historico/rodadas" };
+
+  var S = {
+    itens: {},
+    rodada: null,
+    historico: {},
+    tela: "rodada",
+    soMarcados: false,
+    busca: "",
+    quem: localStorage.getItem("mercado:quem") || "",
+    travado: localStorage.getItem("mercado:travado") === "1",
+    pedido: null,
+    pronto: false
+  };
+
+  /* ---------------- utilidades ---------------- */
+
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function normalizar(s) {
+    return String(s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").trim();
+  }
+  function hoje() {
+    var d = new Date();
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  }
+  function dataCurta(iso) {
+    if (!iso) return "";
+    var p = iso.split("-");
+    return p[2] + "/" + p[1];
+  }
+  function diasEntre(a, b) {
+    return Math.round((new Date(b + "T12:00:00") - new Date(a + "T12:00:00")) / 86400000);
+  }
+  function novoId() {
+    return "i" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  }
+  function plural(n, um, muitos) { return n + " " + (n === 1 ? um : muitos); }
+
+  /* ---------------- guarda dos dados ---------------- */
+
+  var Store = (function () {
+    var db = null;      // banco do Artifact (dentro do Claude)
+    var fb = null;      // nó da casa no Firebase (página hospedada)
+    var ouvintes = {};
+    var local = {};
+
+    // O update do Firebase troca o filho inteiro quando recebe objeto aninhado.
+    // Achatando até a folha, ele passa a mesclar campo a campo — que é o que o
+    // app precisa: o Vinicius e a casa mexem na mesma semana ao mesmo tempo.
+    function achatar(obj, prefixo, saida) {
+      saida = saida || {}; prefixo = prefixo || "";
+      Object.keys(obj).forEach(function (k) {
+        var v = obj[k], caminho = prefixo ? prefixo + "/" + k : k;
+        if (v && typeof v === "object" && !Array.isArray(v)) achatar(v, caminho, saida);
+        else saida[caminho] = v;
+      });
+      return saida;
+    }
+
+    function chaveLocal(p) { return "mercado:" + p; }
+    function lerLocal(p) {
+      try { return JSON.parse(localStorage.getItem(chaveLocal(p)) || "null"); } catch (e) { return null; }
+    }
+    function gravarLocal(p, corpo) {
+      local[p] = corpo;
+      try { localStorage.setItem(chaveLocal(p), JSON.stringify(corpo)); } catch (e) {}
+      if (ouvintes[p]) ouvintes[p](corpo);
+    }
+    function mesclar(alvo, remendo) {
+      Object.keys(remendo).forEach(function (k) {
+        var v = remendo[k];
+        if (v && typeof v === "object" && !Array.isArray(v)) {
+          alvo[k] = mesclar(Object.assign({}, alvo[k] || {}), v);
+        } else { alvo[k] = v; }
+      });
+      return alvo;
+    }
+
+    return {
+      temBanco: function () { return !!db || !!fb; },
+      comoGuarda: function () { return db ? "claude" : fb ? "firebase" : "local"; },
+
+      async abrir() {
+        try {
+          db = (window.claude && typeof window.claude.use === "function") ? await window.claude.use("db") : null;
+        } catch (e) { db = null; }
+        return !!db;
+      },
+
+      // Página hospedada: a senha vira o nome do nó, e é só ele que as regras
+      // do Firebase deixam ler. Sem a senha não há caminho para adivinhar.
+      abrirFirebase(config, chave) {
+        if (!window.firebase || !config || !config.databaseURL) return false;
+        try {
+          if (!firebase.apps.length) firebase.initializeApp(config);
+          fb = firebase.database().ref("listas/" + chave);
+          return true;
+        } catch (e) { fb = null; return false; }
+      },
+
+      async existeNoFirebase(config, chave) {
+        if (!window.firebase || !config || !config.databaseURL) return null;
+        try {
+          if (!firebase.apps.length) firebase.initializeApp(config);
+          var snap = await firebase.database().ref("listas/" + chave + "/marca").get();
+          return snap.exists();
+        } catch (e) { return null; }
+      },
+
+      async marcarCasa(nome) {
+        if (fb) await fb.child("marca").set({ nome: nome || "casa", criada: new Date().toISOString() });
+      },
+
+      async garantir(p, inicial) {
+        if (db) {
+          try {
+            var snap = await db.doc(p).get();
+            if (!snap.exists) await db.doc(p).set(inicial);
+          } catch (e) { /* outro visualizador pode ter criado na mesma hora */ }
+          return;
+        }
+        if (fb) {
+          var s2 = await fb.child(p).get();
+          if (!s2.exists()) await fb.child(p).set(inicial);
+          return;
+        }
+        if (!lerLocal(p)) gravarLocal(p, inicial);
+      },
+
+      escutar(p, cb) {
+        ouvintes[p] = cb;
+        if (db) {
+          return db.doc(p).onSnapshot(function (snap) {
+            var corpo = snap.exists ? snap.data() : null;
+            local[p] = corpo ? Object.assign({}, corpo) : {};
+            cb(corpo);
+          }, function () { /* assinatura morreu; a tela segue com o que tem */ });
+        }
+        if (fb) {
+          var no = fb.child(p);
+          var fn = no.on("value", function (snap) {
+            var corpo = snap.val();
+            local[p] = corpo ? Object.assign({}, corpo) : {};
+            cb(corpo);
+          });
+          return function () { no.off("value", fn); };
+        }
+        cb(lerLocal(p));
+        return function () {};
+      },
+
+      async mesclarDoc(p, remendo) {
+        if (db) {
+          try { await db.doc(p).update(remendo); }
+          catch (e) { await db.doc(p).set(mesclar(Object.assign({}, local[p] || lerLocal(p) || {}), remendo)); }
+          return;
+        }
+        if (fb) { await fb.child(p).update(achatar(remendo)); return; }
+        gravarLocal(p, mesclar(Object.assign({}, lerLocal(p) || {}), remendo));
+      },
+
+      async gravarDoc(p, corpo) {
+        if (db) { await db.doc(p).set(corpo); return; }
+        if (fb) { await fb.child(p).set(corpo); return; }
+        gravarLocal(p, corpo);
+      },
+
+      async lerDoc(p) {
+        if (db) { var s = await db.doc(p).get(); return s.exists ? s.data() : null; }
+        if (fb) { var s3 = await fb.child(p).get(); return s3.exists() ? s3.val() : null; }
+        return lerLocal(p);
+      },
+
+      guardarCopia(p, corpo) { local[p] = corpo; }
+    };
+  })();
+
+  /* ---------------- classificação na importação ---------------- */
+
+  // As categorias são as que a casa usa (o Vinicius as ditou em 09/09/2026),
+  // não uma taxonomia de supermercado. "Temperos" atravessa as duas listas:
+  // cheiro-verde vem do Hiperideal, cominho vem do mercado.
+  var CATEGORIAS = [
+    { cat: "Verduras e legumes", destino: "horti", p: ["abobora", "abobrinha", "acelga", "agriao", "aipim", "alface", "alho", "batata", "batata doce", "berinjela", "beterraba", "brocolis", "cebola", "cebola roxa", "cenoura", "chuchu", "couve", "couve flor", "espinafre", "inhame", "jilo", "mandioca", "macaxeira", "maxixe", "milho", "milho espiga", "pepino", "pimentao", "quiabo", "rabanete", "repolho", "rucula", "vagem", "ervilha fresca", "feijao verde", "tomate", "tomate cereja", "verdura", "legume", "salada", "banana da terra"] },
+    { cat: "Frutas", destino: "horti", p: ["abacate", "abacaxi", "ameixa", "banana", "banana da prata", "caju", "caja", "acerola", "coco", "goiaba", "graviola", "kiwi", "laranja", "lima", "limao", "maca", "mamao", "manga", "manga palmer", "maracuja", "melancia", "melao", "morango", "pera", "pinha", "tangerina", "umbu", "uva", "uva verde", "fruta"] },
+    { cat: "Temperos", destino: "horti", p: ["cebolinha", "salsinha", "salsa", "coentro", "cheiro verde", "hortela", "manjericao", "gengibre", "alecrim"] },
+    { cat: "Temperos", destino: "mercado", p: ["sal", "pimenta", "pimenta do reino", "paprica", "cominho", "oregano", "louro", "folha de louro", "canela", "curcuma", "acafrao", "colorau", "tempero", "noz moscada", "cravo"] },
+    { cat: "Geladeira", destino: "mercado", p: ["leite", "queijo", "mussarela", "requeijao", "iogurte", "manteiga", "margarina", "creme de leite", "ovo", "ovos", "coalhada", "ricota", "nata", "cottage", "cream cheese", "presunto", "mortadela", "salame", "molho ingles", "shoyu", "mostarda", "ketchup", "maionese"] },
+    { cat: "Freezer", destino: "mercado", p: ["carne", "picanha", "alcatra", "coxao", "coxao duro", "patinho", "acem", "moida", "frango", "peito de frango", "coxa", "sobrecoxa", "linguica", "bacon", "salsicha", "peixe", "tilapia", "camarao", "salmao", "file", "filezinho", "costela", "peru", "hamburguer", "charque", "carne seca", "carne do sol", "bacalhau", "cha de dentro", "cha de fora", "maminha", "fraldinha", "pernil", "suina", "suino", "polpa"] },
+    { cat: "Materiais de limpeza", destino: "mercado", p: ["detergente", "sabao", "amaciante", "desinfetante", "agua sanitaria", "candida", "esponja", "bucha", "alvejante", "multiuso", "veja", "cif", "omo", "vanish", "tixan", "limpador", "limpa vidro", "brilux", "tira limo", "azulim", "higienizador", "saco de lixo", "papel toalha", "lustra", "cloro", "bombril", "perfex", "vassoura", "rodo", "pano de chao", "flanela", "alcool", "desengordurante", "bicarbonato", "papel aluminio", "papel filme", "papel manteiga", "saco plastico", "guardanapo", "fosforo", "vela", "palito", "pilha", "lampada", "isqueiro"] },
+    { cat: "Outros", destino: "mercado", p: ["papel higienico", "sabonete", "shampoo", "condicionador", "pasta de dente", "creme dental", "escova de dente", "desodorante", "absorvente", "fralda", "lenco", "algodao", "cotonete", "hidratante", "protetor solar", "aparelho de barbear", "gilete", "fio dental", "fita dental", "enxaguante", "band aid", "curativo", "acetona", "higi", "hastes"] },
+    { cat: "Dispensa", destino: "mercado", p: ["arroz", "feijao", "macarrao", "massa", "massinha", "penne", "spaguetti", "espaguete", "talharim", "farinha", "farinha de mandioca", "acucar", "oleo", "azeite", "vinagre", "molho", "extrato", "milho verde", "ervilha", "atum", "sardinha", "fermento", "gelatina", "aveia", "granola", "cuscuz", "tapioca", "goma", "flocao", "biscoito", "bolacha", "cracker", "cream cracker", "beiju", "cereal", "geleia", "mel", "amendoim", "castanha", "nozes", "chia", "linhaca", "uva passa", "chocolate", "chiclete", "bala", "azeitona", "leite de coco", "leite em po", "lentilha", "grao de bico", "sopa", "miojo", "pipoca", "polvilho", "batata palha", "banana chips", "bananada", "achocolatado em po", "pao", "paes", "bisnaga", "broa", "torrada", "bolo", "pao de queijo", "agua", "refrigerante", "coca", "guarana", "suco", "cerveja", "heineken", "vinho", "cafe", "filtro cafe", "cha", "energetico", "isotonico", "agua de coco", "agua com gas", "achocolatado", "toddy", "nescau", "tonica", "gin", "vodka", "whisky", "racao"] }
+  ];
+
+  // "Outros" é a gaveta que só o Vinicius e a esposa marcam; a tela de quem
+  // cuida da casa não a mostra. O que o app não reconhece vai para "Sem
+  // gaveta", que todos veem — senão um item acrescentado por ela poderia
+  // desaparecer da própria tela dela.
+  var SEM_GAVETA = "Sem gaveta";
+  var OCULTAS_DA_CASA = ["Outros"];
+
+  function escondidaDaCasa(it) {
+    return OCULTAS_DA_CASA.indexOf(it.categoria) >= 0;
+  }
+
+  var GRUPOS = [
+    { cat: "Verduras e legumes", destino: "horti", palavras: ["verduras", "legumes", "verduras e legumes", "hortifruti", "feira", "hiperideal", "sacolao"] },
+    { cat: "Frutas", destino: "horti", palavras: ["frutas", "fruta"] },
+    { cat: "Temperos", destino: "horti", palavras: ["temperos", "tempero", "cheiro verde"] },
+    { cat: "Geladeira", destino: "mercado", palavras: ["geladeira", "laticinios", "frios"] },
+    { cat: "Freezer", destino: "mercado", palavras: ["freezer", "congelados", "carnes", "carne", "acougue"] },
+    { cat: "Materiais de limpeza", destino: "mercado", palavras: ["limpeza", "materiais de limpeza", "produtos de limpeza"] },
+    { cat: "Outros", destino: "mercado", palavras: ["banheiro", "higiene", "farmacia", "outros"] },
+    { cat: "Dispensa", destino: "mercado", palavras: ["dispensa", "despensa", "alimentacao", "alimentacao (dispensa)", "mercearia", "secos", "bebidas", "padaria", "atacadao", "assai", "ifood"] }
+  ];
+
+  // Ganha a palavra mais específica, não a primeira encontrada: "Sabão de coco"
+  // é sabão e não coco, "Extrato tomate" é extrato e não tomate, "Chã de
+  // dentro" é carne e não chá. Sem isso a ordem das listas decidia, e errado.
+  function adivinhar(nome, grupoAtual) {
+    var palavras = normalizar(nome).split(/[ ,/()\-]+/).filter(Boolean);
+    var seco = " " + palavras.join(" ") + " ";
+    var melhor = null;
+
+    CATEGORIAS.forEach(function (g) {
+      g.p.forEach(function (alvo) {
+        if (seco.indexOf(" " + alvo + " ") < 0) return;
+        if (!melhor || alvo.length > melhor.tamanho) {
+          melhor = { categoria: g.cat, destino: g.destino, tamanho: alvo.length };
+        }
+      });
+    });
+
+    if (melhor) return { categoria: melhor.categoria, destino: melhor.destino };
+    if (grupoAtual) return { categoria: grupoAtual.cat, destino: grupoAtual.destino };
+    return { categoria: SEM_GAVETA, destino: "mercado" };
+  }
+
+  function grupoDaLinha(linha) {
+    var n = normalizar(linha).replace(/:$/, "");
+    for (var i = 0; i < GRUPOS.length; i++) {
+      if (GRUPOS[i].palavras.indexOf(n) >= 0) return GRUPOS[i];
+    }
+    return null;
+  }
+
+  function analisarTexto(texto) {
+    var linhas = String(texto || "").split(/\r?\n/);
+
+    function limpar(bruta) {
+      return bruta
+        .replace(/^[\s\u2022\u25e6\u25aa\u00b7*\-\u2013\u2014+>]+/, "")
+        .replace(/^\[[\sxX\u2713\u2714]?\]\s*/, "")
+        .replace(/^\d+[.)]\s+/, "")
+        .replace(/[\u2705\u2611\u274c\u2714\ufe0f]/g, "")
+        .trim();
+    }
+
+    // Número no fim do nome é a conta da semana passada, não o nome do item:
+    // "Arroz 2" vira "Arroz". "Arroz 5kg" e "Papel alumínio 30x4" ficam como
+    // estão, porque ali o número está colado ao que vem antes.
+    function tirarConta(l) {
+      var semConta = l.replace(/\s+[-\u2013\u2014:=xX\u00d7]?\s*[([]?\s*\d+(?:[.,]\d+)?\s*[)\]]?\s*$/, "").trim();
+      return semConta || l;
+    }
+
+    // Se a nota inteira está em maiúsculas, MAIÚSCULA não pode significar
+    // categoria — senão nada seria importado. Aí só os dois-pontos contam.
+    var uteis = linhas.map(limpar).filter(Boolean);
+    var caixaAlta = uteis.filter(function (l) { return l === l.toUpperCase() && /[A-ZÀ-Ú]/.test(l); }).length;
+    var maiusculaValeCategoria = uteis.length > 0 && caixaAlta / uteis.length < 0.6;
+
+    var grupo = null, saida = [], vistos = {};
+    linhas.forEach(function (bruta) {
+      var l = limpar(bruta);
+      if (!l) return;
+      var doisPontos = /:\s*$/.test(bruta);
+      var soMaiuscula = maiusculaValeCategoria && l === l.toUpperCase() && /[A-ZÀ-Ú]/.test(l) && l.length <= 28 && !/\d/.test(l);
+      if (doisPontos || soMaiuscula) {
+        var rotulo = l.replace(/:\s*$/, "").trim();
+        if (!rotulo) return;
+        // "(Hiperideal)" / "(Mercado)" no fim do cabeçalho diz quem compra —
+        // é assim que a bancada devolve as correções sem o app readivinhar.
+        var forcado = "";
+        var marca = /\(([^)]*)\)\s*$/.exec(rotulo);
+        if (marca) {
+          var m = normalizar(marca[1]);
+          if (m === "hiperideal" || m === "esposa" || m === "horti") forcado = "horti";
+          else if (m === "mercado" || m === "ifood" || m === "voce") forcado = "mercado";
+          if (forcado) rotulo = rotulo.replace(/\s*\([^)]*\)\s*$/, "").trim();
+        }
+        if (!rotulo) return;
+        var conhecido = grupoDaLinha(rotulo);
+        var arrumado = rotulo === rotulo.toUpperCase()
+          ? rotulo.charAt(0).toUpperCase() + rotulo.slice(1).toLowerCase()
+          : rotulo;
+        grupo = {
+          cat: conhecido && !forcado ? conhecido.cat : arrumado,
+          destino: forcado || (conhecido ? conhecido.destino : adivinhar(rotulo, null).destino)
+        };
+        return;
+      }
+      l = l.replace(/\s{2,}/g, " ");
+      l = tirarConta(l);
+      var chave = normalizar(l);
+      if (!chave || vistos[chave]) return;
+      vistos[chave] = true;
+      // Categoria escrita à mão vale mais que palpite: é o que o texto que sai
+      // da bancada de edição usa para trazer as correções de volta.
+      var palpite = adivinhar(l, grupo);
+      if (grupo) palpite = { categoria: grupo.cat, destino: grupo.destino };
+      saida.push({ nome: l, categoria: palpite.categoria, destino: palpite.destino });
+    });
+    return saida;
+  }
+
+  var LISTA_BASE = [
+    "Banana prata", "Maçã", "Mamão", "Melancia", "Laranja", "Limão", "Abacate",
+    "Tomate", "Cebola", "Alho", "Batata", "Batata-doce", "Cenoura", "Chuchu", "Abobrinha",
+    "Pimentão", "Alface", "Couve", "Cheiro-verde", "Coentro", "Brócolis", "Aipim",
+    "Pão francês", "Pão de forma", "Bolo",
+    "Carne moída", "Peito de frango", "Coxa e sobrecoxa", "Linguiça", "Bacon", "Presunto", "Peixe",
+    "Leite", "Queijo mussarela", "Requeijão", "Iogurte", "Manteiga", "Ovos", "Creme de leite",
+    "Arroz", "Feijão", "Macarrão", "Farinha de mandioca", "Açúcar", "Sal", "Óleo", "Azeite",
+    "Molho de tomate", "Café", "Achocolatado em pó", "Biscoito", "Aveia", "Tapioca", "Cuscuz",
+    "Água mineral", "Refrigerante", "Suco", "Cerveja",
+    "Detergente", "Sabão em pó", "Amaciante", "Água sanitária", "Desinfetante", "Esponja", "Saco de lixo", "Papel toalha",
+    "Papel higiênico", "Sabonete", "Shampoo", "Condicionador", "Creme dental", "Desodorante",
+    "Papel alumínio", "Fósforo", "Pilha"
+  ];
+
+  /* ---------------- cadência ---------------- */
+
+  function rodadasPassadas() {
+    var r = S.historico && S.historico.rodadas ? S.historico.rodadas : {};
+    return Object.keys(r).sort().reverse();
+  }
+
+  function estat(id) {
+    var datas = rodadasPassadas().filter(function (d) {
+      var arr = S.historico.rodadas[d];
+      return Array.isArray(arr) && arr.indexOf(id) >= 0;
+    });
+    var total = rodadasPassadas().length;
+    if (!datas.length) return { vezes: 0, total: total, ultima: null, dica: total ? "não precisou ainda" : "", quente: false };
+    var ultima = datas[0];
+    var freq = datas.length / Math.max(total, 1);
+    var intervalo;
+    if (datas.length >= 2) {
+      var somas = 0;
+      for (var i = 0; i < datas.length - 1; i++) somas += diasEntre(datas[i + 1], datas[i]);
+      intervalo = somas / (datas.length - 1);
+    } else {
+      intervalo = freq > 0 ? 7 / freq : 21;
+    }
+    var desde = diasEntre(ultima, hoje());
+    var ritmo = freq >= 0.75 ? "toda semana"
+      : freq >= 0.4 ? "a cada 2 semanas"
+      : freq >= 0.2 ? "a cada 3 ou 4 semanas"
+      : "de vez em quando";
+    var quente = desde >= intervalo * 0.9;
+    var quandoTxt = desde <= 1 ? "hoje" : desde < 14 ? "há " + desde + " dias" : "há " + Math.round(desde / 7) + " semanas";
+    return {
+      vezes: datas.length, total: total, ultima: ultima, quente: quente,
+      dica: ritmo + " · última " + quandoTxt
+    };
+  }
+
+  /* ---------------- listas derivadas ---------------- */
+
+  // A lista mestra é a memória da casa: um toque errado tira o item de todo
+  // mundo. Aparelho que entrou por link de convite fica travado no seu papel e
+  // só marca e acrescenta; editar é de quem entrou digitando a senha.
+  function podeEditar() {
+    return !S.travado && S.quem === "vini";
+  }
+
+  // Item comprado quase sempre merece um aviso embaixo do nome: é o que faz
+  // alguém parar e conferir se ainda tem em casa. Só aparece com histórico —
+  // antes de três semanas o app não sabe o que é frequente.
+  function avisoFrequencia(id) {
+    var e = estat(id);
+    if (e.total < 3 || !e.vezes) return "";
+    var freq = e.vezes / e.total;
+    if (freq >= 0.7) return "comprado toda semana";
+    if (freq >= 0.35) return "comprado quase toda semana";
+    return "";
+  }
+
+  function itensArray() {
+    return Object.keys(S.itens).map(function (id) {
+      return Object.assign({ id: id }, S.itens[id]);
+    }).filter(function (it) { return it && it.nome; });
+  }
+
+  // A gaveta segue a ordem em que apareceu na lista mestra; dentro dela, A-Z,
+  // para achar o item sem varrer a tela inteira.
+  function ordemLista() {
+    var arr = itensArray();
+    var ordemCat = {};
+    arr.forEach(function (it) {
+      var o = it.ordem == null ? 9999 : it.ordem;
+      if (ordemCat[it.categoria] === undefined) ordemCat[it.categoria] = o;
+      else ordemCat[it.categoria] = Math.min(ordemCat[it.categoria], o);
+    });
+    arr.sort(function (a, b) {
+      var da = ordemCat[a.categoria] - ordemCat[b.categoria];
+      if (da) return da;
+      return normalizar(a.nome).localeCompare(normalizar(b.nome), "pt-BR");
+    });
+    return arr;
+  }
+
+  function marcado(id) {
+    var m = S.rodada && S.rodada.marcados ? S.rodada.marcados[id] : null;
+    return m || null;
+  }
+  function precisa(id) {
+    var m = marcado(id);
+    return !!(m && m.precisa);
+  }
+  function decidido(id) {
+    return !!marcado(id);
+  }
+  function decididos() {
+    return itensArray().filter(function (it) { return decidido(it.id); }).length;
+  }
+  function daLista(destino) {
+    return ordemLista().filter(function (it) {
+      return precisa(it.id) && (!destino || destino === "tudo" || it.destino === destino);
+    });
+  }
+  function feito(id) {
+    return !!(S.rodada && S.rodada.feitos && S.rodada.feitos[id]);
+  }
+
+  function textoDaLista(destino) {
+    var itens = daLista(destino);
+    var quando = dataCurta(S.rodada && S.rodada.data ? S.rodada.data : hoje());
+    var cab = destino === "horti" ? "Hiperideal · " + quando
+      : destino === "mercado" ? "iFood · " + quando
+      : "Compra da semana · " + quando;
+    var catAtual = null;
+    var linhas = [];
+    itens.forEach(function (it) {
+      if (it.categoria !== catAtual) {
+        catAtual = it.categoria;
+        linhas.push((linhas.length ? "\n" : "") + catAtual + ":");
+      }
+      linhas.push(linhaDoTexto(it));
+    });
+    return cab + "\n\n" + (linhas.length ? linhas.join("\n") : "(nada nesta semana)");
+  }
+
+  function linhaDoTexto(it) {
+    return it.obs ? it.nome + " — " + it.obs : it.nome;
+  }
+
+  /* ---------------- desenho das telas ---------------- */
+
+  var CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l6 6L20 6"/></svg>';
+
+  function pilula(acao, valor, ativo, rotulo, extra) {
+    return '<button class="pilula" type="button" data-acao="' + acao + '" data-valor="' + valor + '" aria-pressed="' + (ativo ? "true" : "false") + '"' + (extra || "") + '>' + esc(rotulo) + "</button>";
+  }
+
+  function desenhaRodada() {
+    var alvo = document.getElementById("tela-rodada");
+    var arr = ordemLista();
+
+    if (!arr.length) {
+      alvo.innerHTML =
+        '<div class="card"><h2>Comece pela lista</h2><div class="corpo">' +
+        '<p class="sub">Esta é a lista de tudo que costumam comprar — a mesma das Notas do iPhone. ' +
+        'Com ela no lugar, quem cuida da casa marca o que vai acabando durante a semana e, na sexta, ' +
+        'a compra já está montada: uma lista de frutas e verduras e uma do mercado.</p>' +
+        (podeEditar()
+          ? '<div class="linha-btns">' +
+            '<button class="btn principal" type="button" data-acao="importar">Colar a lista das Notas</button>' +
+            '<button class="btn" type="button" data-acao="base">Começar com uma lista base</button>' +
+            "</div>"
+          : '<div class="nota">A lista ainda não foi montada.</div>') +
+        "</div></div>";
+      return;
+    }
+
+    var marcados = arr.filter(function (it) { return precisa(it.id); });
+    var topo =
+      '<div class="card"><h2>Semana de ' + esc(dataCurta(S.rodada && S.rodada.data ? S.rodada.data : hoje())) +
+      '<span class="cont">' + plural(marcados.length, "marcado", "marcados") + "</span></h2><div class=\"corpo\">" +
+      pilulasDaLista(marcados.length) +
+      '<input class="campo" id="busca-lista" type="search" placeholder="Buscar item" value="' + esc(S.busca) + '" style="margin-top:10px">' +
+      "</div></div>";
+
+    var daCasa = arr.filter(function (it) {
+      var m = marcado(it.id);
+      return m && m.precisa && m.por === "casa";
+    });
+    var aviso = "";
+    if (daCasa.length) {
+      aviso = '<div class="card"><h2>Marcado durante a semana<span class="cont">' +
+        plural(daCasa.length, "item", "itens") + "</span></h2>";
+      daCasa.forEach(function (it) {
+        var m = marcado(it.id) || {};
+        aviso += '<div class="fila marcado"><span class="caixa">' + CHECK + "</span>" +
+          '<span class="nome">' + esc(it.nome) + "</span>" +
+          '<span class="meta">' + esc(dataCurta(m.quando || "")) + "</span></div>";
+      });
+      aviso += "</div>";
+    }
+
+    var pe = "";
+    if (marcados.length) {
+      pe = '<button class="btn principal larga" type="button" data-acao="fechar">' +
+        (S.rodada && S.rodada.fechada ? "Atualizar as listas" : "Gerar as listas") +
+        " (" + marcados.length + ")</button>";
+    }
+    var extras = '<div style="text-align:center;margin-top:10px">' +
+      '<button class="btn miuda" type="button" data-acao="faltou">+ Faltou uma coisa que não está na lista</button></div>' +
+      (podeEditar()
+        ? '<div style="text-align:center;margin-top:10px"><button class="link" type="button" data-acao="nova">Começar uma semana nova</button></div>'
+        : "");
+
+    alvo.innerHTML = topo + aviso + listaMarcavel(S.soMarcados ? marcados : arr) + pe + extras;
+    ligarBusca("busca-lista", "tela-rodada");
+  }
+
+  function ligarBusca(idCampo, idTela) {
+    aplicarBusca(idTela);
+    var campo = document.getElementById(idCampo);
+    if (campo) campo.addEventListener("input", function () { S.busca = campo.value; aplicarBusca(idTela); });
+  }
+
+  function listaMarcavel(arr) {
+    if (!arr.length) return '<div class="card"><div class="vazio">Nada marcado ainda.</div></div>';
+    var html = '<div class="card">';
+    var catAtual = null;
+    arr.forEach(function (it) {
+      if (it.categoria !== catAtual) {
+        catAtual = it.categoria;
+        html += '<div class="grupo-titulo">' + esc(catAtual || "Outros") + "</div>";
+      }
+      var aviso = avisoFrequencia(it.id);
+      html += '<button class="fila' + (precisa(it.id) ? " marcado" : "") +
+        '" type="button" data-acao="alternar" data-id="' + it.id +
+        '" data-busca="' + esc(normalizar(it.nome + " " + it.categoria)) + '">' +
+        '<span class="caixa">' + CHECK + "</span>" +
+        '<span class="nome">' + esc(it.nome) +
+        (aviso ? '<span class="freq">' + esc(aviso) + "</span>" : "") +
+        "</span></button>";
+    });
+    return html + "</div>";
+  }
+
+  function pilulasDaLista(marcados) {
+    return '<div class="pilulas">' +
+      pilula("so-marcados", "tudo", !S.soMarcados, "A lista toda") +
+      pilula("so-marcados", "marcados", S.soMarcados, "Só os marcados (" + marcados + ")") +
+      "</div>";
+  }
+
+  function desenhaCasa() {
+    var alvo = document.getElementById("tela-rodada");
+    var arr = ordemLista().filter(function (it) { return !escondidaDaCasa(it); });
+    if (!arr.length) {
+      alvo.innerHTML = '<div class="card"><div class="vazio">A lista ainda não foi montada.</div></div>';
+      return;
+    }
+    var marcados = arr.filter(function (it) { return precisa(it.id); });
+
+    var html = '<div class="card"><h2>O que está acabando<span class="cont">' +
+      plural(marcados.length, "marcado", "marcados") + "</span></h2><div class=\"corpo\">" +
+      '<p class="sub">Toque no item assim que ele estiver acabando — não precisa esperar a sexta. ' +
+      "A compra da semana sai do que estiver marcado aqui.</p>" +
+      '<button class="btn larga" type="button" data-acao="faltou">+ Faltou uma coisa que não está na lista</button>' +
+      '<div style="margin-top:12px">' + pilulasDaLista(marcados.length) + "</div>" +
+      '<input class="campo" id="busca-casa" type="search" placeholder="Buscar item" value="' + esc(S.busca) + '" style="margin-top:10px">' +
+      "</div></div>";
+
+    alvo.innerHTML = html + listaMarcavel(S.soMarcados ? marcados : arr);
+    ligarBusca("busca-casa", "tela-rodada");
+  }
+
+  function cartaoSemana() {
+    var itens = daLista("tudo");
+    var html = '<div class="card"><h2>Compra desta semana<span class="cont">' +
+      plural(itens.length, "item", "itens") + "</span></h2>";
+    if (!itens.length) {
+      return html + '<div class="vazio">Nada marcado nesta semana.</div></div>';
+    }
+    var catAtual = null;
+    itens.forEach(function (it) {
+      if (it.categoria !== catAtual) {
+        catAtual = it.categoria;
+        html += '<div class="grupo-titulo">' + esc(catAtual || "Outros") + "</div>";
+      }
+      html += '<div class="fila' + (feito(it.id) ? " feito" : "") + '">' +
+        '<button class="caixa" type="button" data-acao="feito" data-id="' + it.id + '" aria-label="marcar como pedido">' + CHECK + "</button>" +
+        '<span class="nome">' + esc(it.nome) + (it.obs ? ' <span class="meta">(' + esc(it.obs) + ")</span>" : "") + "</span>" +
+        "</div>";
+    });
+    return html + "</div>";
+  }
+
+  var EXPORTACOES = [
+    { chave: "tudo", nome: "Lista toda", onde: "para conferir ou mandar por mensagem", pede: false },
+    { chave: "horti", nome: "Hiperideal", onde: "frutas, verduras e cheiro-verde", pede: true },
+    { chave: "mercado", nome: "iFood", onde: "Atacadão ou Assaí", pede: true }
+  ];
+
+  function cartaoExportar() {
+    var html = '<div class="card"><h2>Exportar</h2>';
+    EXPORTACOES.forEach(function (e) {
+      var quantos = daLista(e.chave).length;
+      html += '<div class="exp">' +
+        '<div class="exp-nome">' + esc(e.nome) +
+        '<span class="meta"> · ' + plural(quantos, "item", "itens") + "</span>" +
+        '<div class="meta">' + esc(e.onde) + "</div></div>" +
+        '<div class="exp-botoes">' +
+        '<button class="btn miuda" type="button" data-acao="copiar" data-valor="' + e.chave + '"' +
+        (quantos ? "" : " disabled") + ">Copiar</button>" +
+        (e.pede
+          ? '<button class="btn miuda principal" type="button" data-acao="pedir" data-valor="' + e.chave + '"' +
+            (quantos ? "" : " disabled") + ">Pedir</button>"
+          : "") +
+        "</div>" +
+        '<div class="exp-texto" id="txt-' + e.chave + '" hidden><textarea class="texto-lista" readonly>' +
+        esc(textoDaLista(e.chave)) + "</textarea></div>" +
+        "</div>";
+    });
+    return html + '<div class="corpo"><div class="aviso-copia">"Pedir" abre um item por vez, com o nome já copiado para colar na busca do app.</div></div></div>';
+  }
+
+  function desenhaPedido() {
+    var alvo = document.getElementById("tela-listas");
+    var destino = S.pedido.destino;
+    var itens = daLista(destino);
+    var onde = destino === "horti" ? "Hiperideal" : "iFood · Atacadão ou Assaí";
+
+    if (!itens.length) { S.pedido = null; desenhaListas(); return; }
+
+    var prontos = itens.filter(function (it) { return feito(it.id); }).length;
+    var pct = Math.round((prontos / itens.length) * 100);
+    var topo = '<div class="card"><h2>Pedindo no ' + esc(onde) +
+      '<span class="cont">' + prontos + " de " + itens.length + "</span></h2><div class=\"corpo\">" +
+      '<div class="progresso"><i style="width:' + pct + '%"></i></div>' +
+      '<div class="progresso-txt"><span>' + plural(itens.length - prontos, "item faltando", "itens faltando") + "</span><span>" + pct + "%</span></div>" +
+      "</div></div>";
+
+    if (S.pedido.idx >= itens.length) {
+      alvo.innerHTML = topo +
+        '<div class="card"><h2>Fim da lista</h2><div class="corpo">' +
+        "<p class=\"sub\">" + (prontos === itens.length
+          ? "Todos os " + itens.length + " itens entraram no carrinho."
+          : plural(itens.length - prontos, "item ficou", "itens ficaram") + " sem marcar — dá para voltar e ver quais.") + "</p>" +
+        '<div class="linha-btns"><button class="btn principal" type="button" data-acao="pedido-sair">Ver a lista</button>' +
+        '<button class="btn" type="button" data-acao="pedido-voltar">Voltar um item</button></div>' +
+        "</div></div>";
+      return;
+    }
+
+    var it = itens[S.pedido.idx];
+    var ultimo = S.pedido.idx >= itens.length - 1;
+    alvo.innerHTML = topo +
+      '<div class="card"><div class="corpo">' +
+      '<div class="foco">' +
+      '<div class="cat">item ' + (S.pedido.idx + 1) + " de " + itens.length + "</div>" +
+      '<div class="nome">' + esc(it.nome) + "</div>" +
+      '<div class="qtd-grande">' + esc(it.obs || "") +
+      (feito(it.id) ? (it.obs ? " · " : "") + "já no carrinho" : "") + "</div>" +
+      "</div>" +
+      '<div class="linha-btns" style="margin-top:16px">' +
+      '<button class="btn larga" type="button" data-acao="pedido-copiar">Copiar só o nome</button></div>' +
+      '<div class="linha-btns" style="margin-top:8px">' +
+      '<button class="btn principal larga" type="button" data-acao="pedido-feito">' +
+      (ultimo ? "Adicionei — terminar" : "Adicionei — copiar o próximo") + "</button></div>" +
+      '<div class="copiado" id="copiado"></div>' +
+      '<div class="pe">' +
+      '<button class="link" type="button" data-acao="pedido-voltar"' + (S.pedido.idx === 0 ? " disabled" : "") + ">← Voltar</button>" +
+      '<button class="link" type="button" data-acao="pedido-sair">Sair do pedido</button>' +
+      '<button class="link" type="button" data-acao="pedido-pular">Pular →</button>' +
+      "</div></div></div>";
+  }
+
+  function avisoCopia(texto) {
+    var el = document.getElementById("copiado");
+    if (el) el.textContent = texto;
+  }
+
+  function copiarNome(texto) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(texto).then(
+        function () { avisoCopia("copiado: " + texto); },
+        function () { avisoCopia("não deu para copiar — segure no nome acima"); }
+      );
+      return;
+    }
+    var ta = document.createElement("textarea");
+    ta.value = texto; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    var ok = false;
+    try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+    document.body.removeChild(ta);
+    avisoCopia(ok ? "copiado: " + texto : "não deu para copiar — segure no nome acima");
+  }
+
+  function desenhaListas() {
+    if (S.pedido) return desenhaPedido();
+    var alvo = document.getElementById("tela-listas");
+    var arr = ordemLista();
+    if (!arr.length) { alvo.innerHTML = '<div class="card"><div class="vazio">Sem lista ainda. Comece pela aba Itens.</div></div>'; return; }
+    alvo.innerHTML = cartaoSemana() + cartaoExportar();
+  }
+
+  function desenhaItens() {
+    var alvo = document.getElementById("tela-itens");
+    var arr = ordemLista();
+    var cabecalho = '<div class="card"><h2>Lista mestra<span class="cont">' + arr.length + " itens</span></h2><div class=\"corpo\">" +
+      (podeEditar()
+        ? '<div class="linha-btns" style="margin-bottom:10px">' +
+          '<button class="btn" type="button" data-acao="novo">+ Item</button>' +
+          '<button class="btn" type="button" data-acao="importar">Colar das Notas</button>' +
+          (arr.length ? "" : '<button class="btn" type="button" data-acao="base">Lista base</button>') +
+          "</div>"
+        : '<p class="sub">Esta é a lista fixa da casa, e ela não se mexe por aqui. ' +
+          'Para pedir uma coisa que não está nela, use “+ Faltou uma coisa” na aba Semana.</p>') +
+      '<input class="campo" id="busca" type="search" placeholder="Buscar item" value="' + esc(S.busca) + '">' +
+      "</div></div>";
+
+    if (!arr.length) {
+      alvo.innerHTML = cabecalho + '<div class="card"><div class="vazio">Nenhum item ainda.</div></div>';
+      return;
+    }
+
+    var html = '<div class="card">';
+    var catAtual = null;
+    var visiveis = arr;
+    visiveis.forEach(function (it) {
+      if (it.categoria !== catAtual) {
+        catAtual = it.categoria;
+        html += '<div class="grupo-titulo" data-grupo="' + esc(normalizar(catAtual)) + '">' + esc(catAtual || "Outros") + "</div>";
+      }
+      var e = estat(it.id);
+      var edita = podeEditar();
+      html += "<" + (edita ? "button" : "div") + ' class="fila"' +
+        (edita ? ' type="button" data-acao="editar" data-id="' + it.id + '"' : "") +
+        ' data-busca="' + esc(normalizar(it.nome + " " + it.categoria)) + '">' +
+        '<span class="nome">' + esc(it.nome) + "</span>" +
+        '<span class="meta">' + esc(e.vezes ? e.vezes + "x" : "") + "</span>" +
+        "</" + (edita ? "button" : "div") + ">";
+    });
+    // Carimbo da versão: quando algo parecer "código antigo fazendo o app
+    // mudar as coisas", esta linha diz se o celular está com a página de agora
+    // ou com uma cópia guardada pelo navegador.
+    var carimbo = window.MERCADO_VERSAO
+      ? '<div class="versao">versão de ' + esc(window.MERCADO_VERSAO) + "</div>"
+      : "";
+    alvo.innerHTML = cabecalho + html + "</div>" + carimbo;
+    aplicarBusca();
+    var campo = document.getElementById("busca");
+    if (campo) {
+      campo.addEventListener("input", function () { S.busca = campo.value; aplicarBusca(); });
+    }
+  }
+
+  function aplicarBusca(ondeId) {
+    var termo = normalizar(S.busca);
+    var alvo = document.getElementById(ondeId || "tela-itens");
+    if (!alvo) return;
+    alvo.querySelectorAll(".fila[data-busca]").forEach(function (el) {
+      el.hidden = !!termo && el.getAttribute("data-busca").indexOf(termo) < 0;
+    });
+    alvo.querySelectorAll(".grupo-titulo").forEach(function (t) {
+      var algum = false, n = t.nextElementSibling;
+      while (n && n.classList.contains("fila")) { if (!n.hidden) algum = true; n = n.nextElementSibling; }
+      t.hidden = !algum;
+    });
+  }
+
+  function desenhar() {
+    var y = window.scrollY;
+    document.getElementById("rot-semana").textContent = S.pronto ? (Store.temBanco() ? "compartilhado" : "só neste aparelho") : "carregando…";
+    
+    var q = document.getElementById("btn-quem");
+    q.textContent = S.quem === "esposa" ? "Esposa" : S.quem === "casa" ? "Casa" : S.quem === "vini" ? "Vinicius" : "Quem sou eu";
+    var soCasa = S.quem === "casa";
+    document.querySelector(".abas").hidden = soCasa;
+    if (soCasa) S.tela = "rodada";
+    ["rodada", "listas", "itens"].forEach(function (t) {
+      document.getElementById("tela-" + t).hidden = S.tela !== t;
+    });
+    document.querySelectorAll(".abas .aba").forEach(function (b) {
+      b.setAttribute("aria-current", b.getAttribute("data-tela") === S.tela ? "true" : "false");
+    });
+    if (soCasa) desenhaCasa();
+    else if (S.tela === "rodada") desenhaRodada();
+    else if (S.tela === "listas") desenhaListas();
+    else desenhaItens();
+    window.scrollTo(0, y);
+  }
+
+  /* ---------------- ações ---------------- */
+
+  async function garantirRodada() {
+    if (S.rodada && S.rodada.data) return;
+    var nova = { data: hoje(), marcados: {}, feitos: {}, fechada: false };
+    S.rodada = nova;
+    await Store.gravarDoc(CAMINHOS.rodada, nova);
+  }
+
+  async function marcar(id, quer) {
+    await garantirRodada();
+    var m = marcado(id) || {};
+    var corpo = { precisa: !!quer, quando: hoje(), por: S.quem || "" };
+    S.rodada.marcados = S.rodada.marcados || {};
+    S.rodada.marcados[id] = Object.assign({}, m, corpo);
+    desenhar();
+    await Store.mesclarDoc(CAMINHOS.rodada, { marcados: (function (o) { o[id] = corpo; return o; })({}) });
+  }
+
+  async function alternarFeito(id) { return definirFeito(id, !feito(id)); }
+
+  async function definirFeito(id, novo) {
+    await garantirRodada();
+    S.rodada.feitos = S.rodada.feitos || {};
+    S.rodada.feitos[id] = novo;
+    desenhar();
+    await Store.mesclarDoc(CAMINHOS.rodada, { feitos: (function (o) { o[id] = novo; return o; })({}) });
+  }
+
+  async function fecharRodada() {
+    await garantirRodada();
+    var ids = itensArray().filter(function (it) { return precisa(it.id); }).map(function (it) { return it.id; });
+    var data = S.rodada.data || hoje();
+    var rodadas = Object.assign({}, S.historico.rodadas || {});
+    rodadas[data] = ids;
+    var chaves = Object.keys(rodadas).sort();
+    while (chaves.length > 60) { delete rodadas[chaves.shift()]; }
+    S.historico.rodadas = rodadas;
+    S.rodada.fechada = true;
+    S.tela = "listas";
+    desenhar();
+    await Store.mesclarDoc(CAMINHOS.historico, { rodadas: (function (o) { o[data] = ids; return o; })({}) });
+    await Store.mesclarDoc(CAMINHOS.rodada, { fechada: true });
+  }
+
+  async function novaRodada() {
+    if (S.rodada && decididos() && !S.rodada.fechada) {
+      if (!confirm("A semana de " + dataCurta(S.rodada.data) + " ainda não virou lista. Começar uma nova mesmo assim?")) return;
+    }
+    var nova = { data: hoje(), marcados: {}, feitos: {}, fechada: false };
+    S.rodada = nova;
+    S.tela = "rodada";
+    desenhar();
+    await Store.gravarDoc(CAMINHOS.rodada, nova);
+  }
+
+  async function gravarItem(id, dados) {
+    S.itens[id] = Object.assign({}, S.itens[id] || {}, dados);
+    desenhar();
+    await Store.mesclarDoc(CAMINHOS.itens, { itens: (function (o) { o[id] = dados; return o; })({}) });
+  }
+
+  async function excluirItem(id) {
+    var doc = (await Store.lerDoc(CAMINHOS.itens)) || { itens: {} };
+    var itens = Object.assign({}, doc.itens || {});
+    delete itens[id];
+    S.itens = itens;
+    desenhar();
+    await Store.gravarDoc(CAMINHOS.itens, { itens: itens });
+  }
+
+  async function adicionarVarios(lista, substituir) {
+    var base = substituir ? {} : Object.assign({}, S.itens);
+    var maiorOrdem = 0;
+    Object.keys(base).forEach(function (k) { maiorOrdem = Math.max(maiorOrdem, base[k].ordem || 0); });
+    var novos = {};
+    var existentes = {};
+    Object.keys(base).forEach(function (k) { existentes[normalizar(base[k].nome)] = true; });
+    lista.forEach(function (it, i) {
+      var chave = normalizar(it.nome);
+      if (existentes[chave]) return;
+      existentes[chave] = true;
+      novos[novoId()] = {
+        nome: it.nome, categoria: it.categoria, destino: it.destino,
+        obs: it.obs || "", ordem: maiorOrdem + i + 1
+      };
+    });
+    if (substituir) {
+      S.itens = novos;
+      await Store.gravarDoc(CAMINHOS.itens, { itens: novos });
+      await novaRodada();
+    } else {
+      Object.assign(S.itens, novos);
+      await Store.mesclarDoc(CAMINHOS.itens, { itens: novos });
+    }
+    desenhar();
+    return Object.keys(novos).length;
+  }
+
+  function copiar(texto, botao) {
+    function feedback(ok) {
+      if (!botao) return;
+      var antes = botao.textContent;
+      botao.textContent = ok ? "Copiado" : "Copie do texto abaixo";
+      setTimeout(function () { botao.textContent = antes; }, 1800);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(texto).then(function () { feedback(true); }, function () { manual(); });
+    } else { manual(); }
+    function manual() {
+      var ta = document.createElement("textarea");
+      ta.value = texto;
+      ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      var ok = false;
+      try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+      document.body.removeChild(ta);
+      feedback(ok);
+      if (botao) {
+        var caixa = document.getElementById("txt-" + botao.getAttribute("data-valor"));
+        if (caixa && !ok) caixa.hidden = false;
+      }
+    }
+  }
+
+  /* ---------------- modais ---------------- */
+
+  var previa = [];
+
+  function abrirModal(html) {
+    document.getElementById("area-modal").innerHTML =
+      '<div class="fundo-modal" data-acao="fundo">' + html + "</div>";
+  }
+  function fecharModal() { document.getElementById("area-modal").innerHTML = ""; previa = []; }
+
+  function modalDestravar() {
+    abrirModal(
+      '<div class="modal"><h3>Trocar de pessoa<button class="fechar" type="button" data-acao="fechar-modal">×</button></h3>' +
+      '<div class="corpo"><p class="sub">Este aparelho entrou pelo link de convite, então fica no papel que o link trouxe. ' +
+      "Para trocar, é preciso a senha da casa.</p>" +
+      '<input class="campo" id="f-destravar" type="password" autocomplete="current-password" placeholder="Senha da casa">' +
+      '<div id="destravar-aviso"></div>' +
+      '<div class="acoes-fim"><button class="btn principal larga" type="button" data-acao="destravar">Destravar</button></div>' +
+      "</div></div>"
+    );
+    var c = document.getElementById("f-destravar");
+    setTimeout(function () { c.focus(); }, 40);
+    c.addEventListener("keydown", function (ev) { if (ev.key === "Enter") { ev.preventDefault(); destravar(); } });
+  }
+
+  async function destravar() {
+    var campo = document.getElementById("f-destravar");
+    var aviso = document.getElementById("destravar-aviso");
+    var guardada = "";
+    try { guardada = localStorage.getItem("mercado:chave") || ""; } catch (e) {}
+    var tentativa = await digerir(campo.value);
+    if (!guardada || tentativa !== guardada) {
+      aviso.innerHTML = '<div class="nota" style="margin-top:10px">Senha errada.</div>';
+      campo.select();
+      return;
+    }
+    S.travado = false;
+    try {
+      localStorage.removeItem("mercado:travado");
+      localStorage.setItem("mercado:senha", campo.value.trim());
+    } catch (e) {}
+    fecharModal();
+    modalQuem();
+  }
+
+  function modalQuem() {
+    abrirModal(
+      '<div class="modal"><h3>Quem está usando<button class="fechar" type="button" data-acao="fechar-modal">×</button></h3>' +
+      '<div class="corpo"><p class="sub">Só para a página abrir na lista certa. Dá para trocar depois no topo.</p>' +
+      '<div class="linha-btns"><button class="btn larga" type="button" data-acao="sou" data-valor="vini">Vinicius — mercado no iFood</button></div>' +
+      '<div class="linha-btns" style="margin-top:8px"><button class="btn larga" type="button" data-acao="sou" data-valor="esposa">Esposa — frutas e verduras no Hiperideal</button></div>' +
+      '<div class="linha-btns" style="margin-top:8px"><button class="btn larga" type="button" data-acao="sou" data-valor="casa">Quem cuida da casa — marca o que está acabando</button></div>' +
+      (Store.comoGuarda() === "firebase"
+        ? '<div class="rotulo" style="margin-top:18px">Convidar</div>' +
+          '<div class="linha-btns"><button class="btn miuda" type="button" data-acao="convidar" data-valor="esposa">Link para a esposa</button>' +
+          '<button class="btn miuda" type="button" data-acao="convidar" data-valor="casa">Link para quem cuida da casa</button></div>' +
+          '<div class="aviso-copia" id="convite-aviso">Quem abre o link entra sem digitar nada, já no papel certo, e não consegue mexer na lista fixa.</div>' +
+          '<div style="text-align:center;margin-top:14px"><button class="link" type="button" data-acao="esquecer">Esquecer a senha neste aparelho</button></div>'
+        : "") +
+      "</div></div>"
+    );
+  }
+
+  function modalImportar() {
+    abrirModal(
+      '<div class="modal"><h3>Colar a lista das Notas<button class="fechar" type="button" data-acao="fechar-modal">×</button></h3>' +
+      '<div class="corpo"><p class="sub">Cole o texto inteiro da nota do iPhone. Um item por linha; marcadores, caixinhas e numeração são ignorados. ' +
+      'Linha em maiúsculas ou terminada em dois-pontos vira categoria.</p>' +
+      '<textarea class="campo" id="txt-importar" rows="6" placeholder="HORTIFRUTI&#10;- Banana&#10;- Tomate&#10;&#10;MERCEARIA&#10;- Arroz&#10;- Café"></textarea>' +
+      '<div id="previa-area"></div>' +
+      "</div></div>"
+    );
+    var t = document.getElementById("txt-importar");
+    var espera = null;
+    t.addEventListener("input", function () {
+      clearTimeout(espera);
+      espera = setTimeout(function () {
+        previa = analisarTexto(t.value);
+        desenhaPrevia();
+      }, 200);
+    });
+    setTimeout(function () { t.focus(); }, 40);
+  }
+
+  function desenhaPrevia() {
+    var area = document.getElementById("previa-area");
+    if (!area) return;
+    if (!previa.length) {
+      area.innerHTML = document.getElementById("txt-importar").value.trim()
+        ? '<div class="nota" style="margin-top:10px">Não achei nenhum item nesse texto.</div>' : "";
+      return;
+    }
+    var jaTem = {};
+    Object.keys(S.itens).forEach(function (k) { jaTem[normalizar(S.itens[k].nome)] = true; });
+    var novos = previa.filter(function (p) { return !jaTem[normalizar(p.nome)]; }).length;
+    var html = '<div class="linha-btns" style="margin-top:12px">' +
+      '<button class="btn principal" type="button" data-acao="importar-add"' + (novos ? "" : " disabled") + ">Adicionar " + plural(novos, "item", "itens") + "</button>" +
+      '<button class="btn" type="button" data-acao="importar-sub">Substituir a lista toda</button></div>' +
+      '<p class="sub" style="margin-top:10px">' + previa.length + " itens lidos" + (novos < previa.length ? " · " + (previa.length - novos) + " já estão na lista" : "") +
+      ". Confira embaixo; toque na etiqueta para trocar de lista.</p>" +
+      '<div class="previa">';
+    previa.forEach(function (p, i) {
+      html += '<div class="fila ' + p.destino + (jaTem[normalizar(p.nome)] ? " feito" : "") + '">' +
+        '<span class="nome">' + esc(p.nome) + '<span class="meta"> · ' + esc(p.categoria) + "</span></span>" +
+        '<button class="tag ' + p.destino + '" type="button" data-acao="virar" data-valor="' + i + '">' +
+        (p.destino === "horti" ? "Hiperideal" : "Mercado") + "</button></div>";
+    });
+    html += "</div>";
+    area.innerHTML = html;
+  }
+
+  // Desmarcar apaga o item da compra da semana para todo mundo, e ninguém
+  // repara na falta até o mercado chegar sem ele. Toque em item marcado
+  // pergunta antes; marcar continua sendo um toque só.
+  function modalDesmarcar(id) {
+    var it = S.itens[id];
+    if (!it) return;
+    abrirModal(
+      '<div class="modal"><h3>Tirar da compra?<button class="fechar" type="button" data-acao="fechar-modal">×</button></h3>' +
+      '<div class="corpo"><p class="sub" style="margin-bottom:0"><b>' + esc(it.nome) + "</b> está marcado como " +
+      "necessário nesta semana. Tirando, ele sai da compra.</p>" +
+      '<div class="acoes-fim"><div class="linha-btns">' +
+      '<button class="btn principal" type="button" data-acao="desmarcar" data-id="' + id + '">Tirar da compra</button>' +
+      '<button class="btn" type="button" data-acao="fechar-modal">Deixar marcado</button>' +
+      "</div></div></div></div>"
+    );
+  }
+
+  function modalFaltou() {
+    abrirModal(
+      '<div class="modal"><h3>Faltou o quê?<button class="fechar" type="button" data-acao="fechar-modal">×</button></h3>' +
+      '<div class="corpo"><p class="sub">Entra na compra desta semana e passa a fazer parte da lista, para aparecer nas próximas.</p>' +
+      '<input class="campo" id="f-faltou" placeholder="Papel alumínio" autocomplete="off">' +
+      '<div class="acoes-fim"><div class="linha-btns">' +
+      '<button class="btn principal larga" type="button" data-acao="salvar-faltou">Adicionar à compra</button>' +
+      "</div></div></div></div>"
+    );
+    var c = document.getElementById("f-faltou");
+    setTimeout(function () { c.focus(); }, 40);
+    c.addEventListener("keydown", function (ev) {
+      if (ev.key === "Enter") { ev.preventDefault(); salvarFaltou(); }
+    });
+  }
+
+  async function salvarFaltou() {
+    var campo = document.getElementById("f-faltou");
+    var nome = campo.value.trim();
+    if (!nome) { campo.focus(); return; }
+    var existente = itensArray().filter(function (x) { return normalizar(x.nome) === normalizar(nome); })[0];
+    var id = existente ? existente.id : novoId();
+    if (!existente) {
+      var palpite = adivinhar(nome, null);
+      if (S.quem === "casa" && OCULTAS_DA_CASA.indexOf(palpite.categoria) >= 0) {
+        palpite = { categoria: SEM_GAVETA, destino: palpite.destino };
+      }
+      var maior = 0;
+      itensArray().forEach(function (x) { maior = Math.max(maior, x.ordem || 0); });
+      await gravarItem(id, {
+        nome: nome, categoria: palpite.categoria, destino: palpite.destino,
+        obs: "", ordem: maior + 1
+      });
+    }
+    await marcar(id, true);
+    fecharModal();
+  }
+
+  function modalItem(id) {
+    var it = id ? S.itens[id] : null;
+    var cats = {};
+    itensArray().forEach(function (x) { if (x.categoria) cats[x.categoria] = true; });
+    var opcoes = Object.keys(cats).sort().map(function (c) { return '<option value="' + esc(c) + '"></option>'; }).join("");
+    abrirModal(
+      '<div class="modal"><h3>' + (it ? "Editar item" : "Novo item") + '<button class="fechar" type="button" data-acao="fechar-modal">×</button></h3>' +
+      '<div class="corpo">' +
+      '<div class="campo-bloco"><label class="rotulo" for="f-nome">Nome</label>' +
+      '<input class="campo" id="f-nome" value="' + esc(it ? it.nome : "") + '" placeholder="Banana prata"></div>' +
+      '<div class="campo-bloco"><label class="rotulo" for="f-cat">Categoria</label>' +
+      '<input class="campo" id="f-cat" list="lista-cats" value="' + esc(it ? it.categoria : "") + '" placeholder="Mercearia">' +
+      '<datalist id="lista-cats">' + opcoes + "</datalist></div>" +
+      '<div class="campo-bloco"><span class="rotulo">Quem pede</span><div class="pilulas" id="f-destino">' +
+      pilula("destino", "horti", (it ? it.destino : "mercado") === "horti", "Hiperideal · esposa") +
+      pilula("destino", "mercado", (it ? it.destino : "mercado") !== "horti", "iFood · você") +
+      "</div></div>" +
+
+      '<div class="campo-bloco"><label class="rotulo" for="f-obs">Observação fixa (opcional)</label>' +
+      '<input class="campo" id="f-obs" value="' + esc(it ? it.obs || "" : "") + '" placeholder="da marca X, bem verde"></div>' +
+      '<div class="acoes-fim"><div class="linha-btns"><button class="btn principal" type="button" data-acao="salvar-item" data-id="' + (id || "") + '">Salvar</button>' +
+      (id ? '<button class="btn" type="button" data-acao="excluir-item" data-id="' + id + '">Excluir</button>' : "") +
+      "</div></div></div></div>"
+    );
+    setTimeout(function () { var n = document.getElementById("f-nome"); if (n && !it) n.focus(); }, 40);
+  }
+
+  /* ---------------- eventos ---------------- */
+
+  function acaoDe(alvo) {
+    var el = alvo.closest("[data-acao]");
+    return el ? { el: el, acao: el.getAttribute("data-acao"), valor: el.getAttribute("data-valor"), id: el.getAttribute("data-id") } : null;
+  }
+
+  document.getElementById("app").addEventListener("click", function (ev) {
+    var a = acaoDe(ev.target);
+    if (!a) return;
+    var arr = ordemLista();
+    switch (a.acao) {
+      case "so-marcados": S.soMarcados = a.valor === "marcados"; desenhar(); break;
+      case "faltou": modalFaltou(); break;
+      case "alternar":
+        if (precisa(a.id)) modalDesmarcar(a.id); else marcar(a.id, true);
+        break;
+      case "feito": alternarFeito(a.id); break;
+      case "fechar": fecharRodada(); break;
+      case "nova": novaRodada(); break;
+      case "copiar": copiar(textoDaLista(a.valor), a.el); break;
+      case "pedir": {
+        var lista = daLista(a.valor);
+        var i0 = 0;
+        while (i0 < lista.length && feito(lista[i0].id)) i0++;
+        S.pedido = { destino: a.valor, idx: Math.min(i0, lista.length) };
+        S.tela = "listas";
+        desenhar();
+        if (lista[S.pedido.idx]) copiarNome(lista[S.pedido.idx].nome);
+        break;
+      }
+      case "pedido-feito": {
+        var lista2 = daLista(S.pedido.destino);
+        var atual = lista2[S.pedido.idx];
+        if (atual) definirFeito(atual.id, true);
+        S.pedido.idx++;
+        desenhar();
+        var prox = daLista(S.pedido.destino)[S.pedido.idx];
+        if (prox) copiarNome(prox.nome);
+        break;
+      }
+      case "pedido-pular": {
+        S.pedido.idx++;
+        desenhar();
+        var seguinte = daLista(S.pedido.destino)[S.pedido.idx];
+        if (seguinte) copiarNome(seguinte.nome);
+        break;
+      }
+      case "pedido-voltar":
+        if (S.pedido.idx > 0) {
+          S.pedido.idx--;
+          desenhar();
+          var anterior = daLista(S.pedido.destino)[S.pedido.idx];
+          if (anterior) copiarNome(anterior.nome);
+        }
+        break;
+      case "pedido-copiar": {
+        var agora = daLista(S.pedido.destino)[S.pedido.idx];
+        if (agora) copiarNome(agora.nome);
+        break;
+      }
+      case "pedido-sair": S.pedido = null; desenhar(); break;
+      case "ver-texto": var c = document.getElementById("txt-" + a.valor); if (c) c.hidden = !c.hidden; break;
+      case "editar": modalItem(a.id); break;
+      case "novo": modalItem(null); break;
+      case "importar": modalImportar(); break;
+      case "base":
+        adicionarVarios(analisarTexto(LISTA_BASE.join("\n")), false);
+        break;
+    }
+  });
+
+  document.getElementById("btn-quem").addEventListener("click", function () {
+    if (S.travado) modalDestravar(); else modalQuem();
+  });
+
+  document.querySelector(".abas").addEventListener("click", function (ev) {
+    var b = ev.target.closest(".aba");
+    if (!b) return;
+    S.tela = b.getAttribute("data-tela");
+    desenhar();
+  });
+
+  document.getElementById("area-modal").addEventListener("click", function (ev) {
+    var a = acaoDe(ev.target);
+    if (!a) {
+      if (ev.target.classList.contains("fundo-modal")) fecharModal();
+      return;
+    }
+    switch (a.acao) {
+      case "fechar-modal": fecharModal(); break;
+      case "salvar-faltou": salvarFaltou(); break;
+      case "desmarcar": marcar(a.id, false); fecharModal(); break;
+      case "destravar": destravar(); break;
+      case "convidar": {
+        var senhaGuardada = "";
+        try { senhaGuardada = localStorage.getItem("mercado:senha") || ""; } catch (e) {}
+        var caixa = document.getElementById("convite-aviso");
+        if (!senhaGuardada) {
+          caixa.textContent = "Este aparelho entrou antes de eu guardar a senha. Toque em \u201cEsquecer a senha neste aparelho\u201d, entre de novo e o link fica pronto.";
+          break;
+        }
+        var papel = a.valor === "casa" ? "casa" : "esposa";
+        var convite = location.origin + location.pathname +
+          "#casa=" + encodeURIComponent(senhaGuardada) + "&papel=" + papel;
+        copiar(convite, a.el);
+        caixa.textContent = "Link copiado, já no papel de " +
+          (papel === "casa" ? "quem cuida da casa" : "esposa") +
+          ". Ele carrega a senha: mande só para essa pessoa.";
+        break;
+      }
+      case "esquecer":
+        if (confirm("Este aparelho vai pedir a senha de novo na próxima vez. Continuar?")) {
+          try { localStorage.removeItem("mercado:chave"); localStorage.removeItem("mercado:senha"); } catch (e) {}
+          location.reload();
+        }
+        break;
+      case "sou":
+        S.quem = a.valor;
+        localStorage.setItem("mercado:quem", a.valor);
+        fecharModal(); desenhar();
+        break;
+      case "virar":
+        var i = Number(a.valor);
+        previa[i].destino = previa[i].destino === "horti" ? "mercado" : "horti";
+        if (previa[i].destino === "horti" && previa[i].categoria === "Outros") previa[i].categoria = "Frutas e verduras";
+        desenhaPrevia();
+        break;
+      case "importar-add":
+        adicionarVarios(previa, false).then(function () { fecharModal(); });
+        break;
+      case "importar-sub":
+        if (confirm("Isso apaga a lista atual e põe estes " + previa.length + " itens no lugar. Continuar?")) {
+          adicionarVarios(previa, true).then(function () { fecharModal(); });
+        }
+        break;
+      case "destino":
+        document.querySelectorAll("#f-destino .pilula").forEach(function (p) {
+          p.setAttribute("aria-pressed", p === a.el ? "true" : "false");
+        });
+        break;
+      case "salvar-item":
+        var nome = document.getElementById("f-nome").value.trim();
+        if (!nome) { document.getElementById("f-nome").focus(); return; }
+        var escolhido = document.querySelector('#f-destino .pilula[aria-pressed="true"]');
+        var dest = escolhido ? escolhido.getAttribute("data-valor") : "mercado";
+        var cat = document.getElementById("f-cat").value.trim() || adivinhar(nome, null).categoria;
+        var dados = {
+          nome: nome, categoria: cat, destino: dest,
+          obs: document.getElementById("f-obs").value.trim()
+        };
+        if (!a.id) {
+          var maior = 0;
+          itensArray().forEach(function (x) { maior = Math.max(maior, x.ordem || 0); });
+          dados.ordem = maior + 1;
+        }
+        gravarItem(a.id || novoId(), dados);
+        fecharModal();
+        break;
+      case "excluir-item":
+        if (confirm("Tirar este item da lista mestra?")) { excluirItem(a.id); fecharModal(); }
+        break;
+    }
+  });
+
+  /* ---------------- partida ---------------- */
+
+  async function digerir(senha) {
+    var txt = "mercado:" + String(senha || "").trim().toLowerCase();
+    if (window.crypto && crypto.subtle && crypto.subtle.digest) {
+      var buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(txt));
+      return Array.prototype.map.call(new Uint8Array(buf), function (b) {
+        return ("0" + b.toString(16)).slice(-2);
+      }).join("");
+    }
+    var h = 0;
+    for (var i = 0; i < txt.length; i++) { h = (h * 31 + txt.charCodeAt(i)) >>> 0; }
+    return "sc" + h.toString(16);
+  }
+
+  function senhaDoEndereco() {
+    var bruto = (location.hash || "").replace(/^#/, "") + "&" + (location.search || "").replace(/^\?/, "");
+    var achado = /(?:^|&)casa=([^&]+)/.exec(bruto);
+    if (!achado) return "";
+    try { return decodeURIComponent(achado[1]); } catch (e) { return achado[1]; }
+  }
+
+  function papelDoEndereco() {
+    var bruto = (location.hash || "").replace(/^#/, "") + "&" + (location.search || "").replace(/^\?/, "");
+    var achado = /(?:^|&)papel=(vini|esposa|casa)(?:&|$)/.exec(bruto);
+    return achado ? achado[1] : "";
+  }
+
+  function limparEndereco() {
+    if (window.history && history.replaceState) {
+      try { history.replaceState(null, "", location.pathname); } catch (e) {}
+    }
+  }
+
+  function mostrarPortao(cfg, senhaInicial, papelInicial) {
+    var portao = document.getElementById("portao");
+    var corpoApp = document.querySelector("main");
+    var topo = document.querySelector(".top");
+    portao.hidden = false;
+    corpoApp.hidden = true;
+    topo.hidden = true;
+    document.querySelector(".abas").hidden = true;
+
+    var campo = document.getElementById("senha");
+    var botao = document.getElementById("btn-entrar");
+    var aviso = document.getElementById("portao-aviso");
+    var chavePendente = null;
+
+    function dizer(html) { aviso.innerHTML = html; }
+
+    async function tentar() {
+      var senha = campo.value.trim();
+      if (senha.length < 4) { dizer('<div class="nota" style="margin-top:12px">A senha precisa de pelo menos 4 letras.</div>'); return; }
+      botao.disabled = true;
+      dizer('<p class="sub" style="margin-top:12px">Conferindo…</p>');
+      var chave = await digerir(senha);
+      var existe = await Store.existeNoFirebase(cfg, chave);
+      botao.disabled = false;
+      if (existe === null) {
+        dizer('<div class="nota" style="margin-top:12px">Não consegui falar com o banco de dados. Veja a conexão e tente de novo.</div>');
+        return;
+      }
+      if (existe) { entrar(cfg, chave, false, senha, papelInicial); return; }
+      chavePendente = chave;
+      dizer('<p class="sub" style="margin-top:12px">Ninguém entrou com essa senha ainda. Se é a primeira vez da casa, ' +
+        'crie a lista agora — esta senha passa a ser a de todo mundo. Se já existe lista, confira se digitou certo.</p>' +
+        '<div class="linha-btns">' +
+        '<button class="btn principal larga" type="button" id="btn-criar">Criar a lista com esta senha</button></div>');
+      document.getElementById("btn-criar").addEventListener("click", function () {
+        entrar(cfg, chavePendente, true, senha, papelInicial);
+      });
+    }
+
+    botao.addEventListener("click", tentar);
+    campo.addEventListener("keydown", function (ev) { if (ev.key === "Enter") tentar(); });
+
+    // Link de convite: a senha vem no endereço, ninguém digita nada. Sai da
+    // barra assim que é lida, para não ficar em foto de tela nem no histórico.
+    if (senhaInicial) {
+      campo.value = senhaInicial;
+      limparEndereco();
+      document.getElementById("portao-texto").textContent = "Entrando com a senha do link…";
+      tentar();
+      return;
+    }
+    setTimeout(function () { campo.focus(); }, 60);
+  }
+
+  async function entrar(cfg, chave, criar, senha, papel) {
+    if (!Store.abrirFirebase(cfg, chave)) {
+      document.getElementById("portao-aviso").innerHTML =
+        '<div class="nota" style="margin-top:12px">Não consegui abrir o banco de dados.</div>';
+      return;
+    }
+    try {
+      localStorage.setItem("mercado:chave", chave);
+      if (senha) localStorage.setItem("mercado:senha", senha);
+      if (papel) {
+        localStorage.setItem("mercado:quem", papel);
+        localStorage.setItem("mercado:travado", "1");
+        localStorage.removeItem("mercado:senha");
+        S.quem = papel;
+        S.travado = true;
+      }
+    } catch (e) {}
+    if (criar) await Store.marcarCasa();
+    document.getElementById("portao").hidden = true;
+    document.querySelector("main").hidden = false;
+    document.querySelector(".top").hidden = false;
+    await comecar();
+  }
+
+  (async function iniciar() {
+    var cfg = window.MERCADO_FIREBASE || null;
+    var temClaude = await Store.abrir();
+    if (!temClaude && cfg && cfg.databaseURL) {
+      var doLink = senhaDoEndereco();
+      if (doLink) { mostrarPortao(cfg, doLink, papelDoEndereco()); return; }
+      var guardada = null;
+      try { guardada = localStorage.getItem("mercado:chave"); } catch (e) {}
+      if (guardada && Store.abrirFirebase(cfg, guardada)) { await comecar(); return; }
+      mostrarPortao(cfg);
+      return;
+    }
+    await comecar();
+  })();
+
+  async function comecar() {
+    await Store.garantir(CAMINHOS.itens, { itens: {} });
+    await Store.garantir(CAMINHOS.historico, { rodadas: {} });
+    await Store.garantir(CAMINHOS.rodada, { data: hoje(), marcados: {}, feitos: {}, fechada: false });
+
+    Store.escutar(CAMINHOS.itens, function (doc) {
+      S.itens = (doc && doc.itens) ? doc.itens : {};
+      if (S.pronto) desenhar();
+    });
+    Store.escutar(CAMINHOS.rodada, function (doc) {
+      S.rodada = doc || { data: hoje(), marcados: {}, feitos: {}, fechada: false };
+      if (S.pronto) desenhar();
+    });
+    Store.escutar(CAMINHOS.historico, function (doc) {
+      S.historico = doc || { rodadas: {} };
+      if (S.pronto) desenhar();
+    });
+
+    S.pronto = true;
+    desenhar();
+    if (!S.quem && !S.travado) modalQuem();
+  }
+})();
