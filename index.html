@@ -290,7 +290,7 @@
     <div class="card portao-card">
       <h2>Lista da casa</h2>
       <div class="corpo">
-        <p class="sub" id="portao-texto">A mesma senha para todo mundo da casa. Digite uma vez; este aparelho lembra.</p>
+        <p class="sub" id="portao-texto">A mesma senha para todo mundo da casa. Se ninguém entrou ainda, a que você digitar agora vira a senha. Digita uma vez; este aparelho lembra.</p>
         <label class="rotulo" for="senha">Senha</label>
         <input class="campo" id="senha" type="password" autocomplete="current-password" enterkeyhint="go">
         <div class="linha-btns" style="margin-top:12px">
@@ -1643,9 +1643,10 @@
       }
       if (existe) { entrar(cfg, chave, false, senha); return; }
       chavePendente = chave;
-      dizer('<div class="nota" style="margin-top:12px">Não existe lista com essa senha.</div>' +
-        '<div class="linha-btns" style="margin-top:10px">' +
-        '<button class="btn" type="button" id="btn-criar">Criar uma lista nova com ela</button></div>');
+      dizer('<p class="sub" style="margin-top:12px">Ninguém entrou com essa senha ainda. Se é a primeira vez da casa, ' +
+        'crie a lista agora — esta senha passa a ser a de todo mundo. Se já existe lista, confira se digitou certo.</p>' +
+        '<div class="linha-btns">' +
+        '<button class="btn principal larga" type="button" id="btn-criar">Criar a lista com esta senha</button></div>');
       document.getElementById("btn-criar").addEventListener("click", function () {
         entrar(cfg, chavePendente, true, senha);
       });
