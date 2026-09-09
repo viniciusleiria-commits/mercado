@@ -545,9 +545,20 @@
     { cat: "Geladeira", destino: "mercado", p: ["leite", "queijo", "mussarela", "requeijao", "iogurte", "manteiga", "margarina", "creme de leite", "ovo", "ovos", "coalhada", "ricota", "nata", "cottage", "cream cheese", "presunto", "mortadela", "salame", "molho ingles", "shoyu", "mostarda", "ketchup", "maionese"] },
     { cat: "Freezer", destino: "mercado", p: ["carne", "picanha", "alcatra", "coxao", "coxao duro", "patinho", "acem", "moida", "frango", "peito de frango", "coxa", "sobrecoxa", "linguica", "bacon", "salsicha", "peixe", "tilapia", "camarao", "salmao", "file", "filezinho", "costela", "peru", "hamburguer", "charque", "carne seca", "carne do sol", "bacalhau", "cha de dentro", "cha de fora", "maminha", "fraldinha", "pernil", "suina", "suino", "polpa"] },
     { cat: "Materiais de limpeza", destino: "mercado", p: ["detergente", "sabao", "amaciante", "desinfetante", "agua sanitaria", "candida", "esponja", "bucha", "alvejante", "multiuso", "veja", "cif", "omo", "vanish", "tixan", "limpador", "limpa vidro", "brilux", "tira limo", "azulim", "higienizador", "saco de lixo", "papel toalha", "lustra", "cloro", "bombril", "perfex", "vassoura", "rodo", "pano de chao", "flanela", "alcool", "desengordurante", "bicarbonato", "papel aluminio", "papel filme", "papel manteiga", "saco plastico", "guardanapo", "fosforo", "vela", "palito", "pilha", "lampada", "isqueiro"] },
-    { cat: "Banheiro", destino: "mercado", p: ["papel higienico", "sabonete", "shampoo", "condicionador", "pasta de dente", "creme dental", "escova de dente", "desodorante", "absorvente", "fralda", "lenco", "algodao", "cotonete", "hidratante", "protetor solar", "aparelho de barbear", "gilete", "fio dental", "fita dental", "enxaguante", "band aid", "curativo", "acetona", "higi", "hastes"] },
+    { cat: "Outros", destino: "mercado", p: ["papel higienico", "sabonete", "shampoo", "condicionador", "pasta de dente", "creme dental", "escova de dente", "desodorante", "absorvente", "fralda", "lenco", "algodao", "cotonete", "hidratante", "protetor solar", "aparelho de barbear", "gilete", "fio dental", "fita dental", "enxaguante", "band aid", "curativo", "acetona", "higi", "hastes"] },
     { cat: "Alimentação (dispensa)", destino: "mercado", p: ["arroz", "feijao", "macarrao", "massa", "massinha", "penne", "spaguetti", "espaguete", "talharim", "farinha", "farinha de mandioca", "acucar", "oleo", "azeite", "vinagre", "molho", "extrato", "milho verde", "ervilha", "atum", "sardinha", "fermento", "gelatina", "aveia", "granola", "cuscuz", "tapioca", "goma", "flocao", "biscoito", "bolacha", "cracker", "cream cracker", "beiju", "cereal", "geleia", "mel", "amendoim", "castanha", "nozes", "chia", "linhaca", "uva passa", "chocolate", "chiclete", "bala", "azeitona", "leite de coco", "leite em po", "lentilha", "grao de bico", "sopa", "miojo", "pipoca", "polvilho", "batata palha", "banana chips", "bananada", "achocolatado em po", "pao", "paes", "bisnaga", "broa", "torrada", "bolo", "pao de queijo", "agua", "refrigerante", "coca", "guarana", "suco", "cerveja", "heineken", "vinho", "cafe", "filtro cafe", "cha", "energetico", "isotonico", "agua de coco", "agua com gas", "achocolatado", "toddy", "nescau", "tonica", "gin", "vodka", "whisky", "racao"] }
   ];
+
+  // "Outros" é a gaveta que só o Vinicius e a esposa marcam; a tela de quem
+  // cuida da casa não a mostra. O que o app não reconhece vai para "Sem
+  // gaveta", que todos veem — senão um item acrescentado por ela poderia
+  // desaparecer da própria tela dela.
+  var SEM_GAVETA = "Sem gaveta";
+  var OCULTAS_DA_CASA = ["Outros"];
+
+  function escondidaDaCasa(it) {
+    return OCULTAS_DA_CASA.indexOf(it.categoria) >= 0;
+  }
 
   var GRUPOS = [
     { cat: "Verduras e legumes", destino: "horti", palavras: ["verduras", "legumes", "verduras e legumes", "hortifruti", "feira", "hiperideal", "sacolao"] },
@@ -556,7 +567,7 @@
     { cat: "Geladeira", destino: "mercado", palavras: ["geladeira", "laticinios", "frios"] },
     { cat: "Freezer", destino: "mercado", palavras: ["freezer", "congelados", "carnes", "carne", "acougue"] },
     { cat: "Materiais de limpeza", destino: "mercado", palavras: ["limpeza", "materiais de limpeza", "produtos de limpeza"] },
-    { cat: "Banheiro", destino: "mercado", palavras: ["banheiro", "higiene", "farmacia"] },
+    { cat: "Outros", destino: "mercado", palavras: ["banheiro", "higiene", "farmacia", "outros"] },
     { cat: "Alimentação (dispensa)", destino: "mercado", palavras: ["dispensa", "despensa", "alimentacao", "mercearia", "secos", "bebidas", "padaria", "atacadao", "assai", "ifood"] }
   ];
 
@@ -579,7 +590,7 @@
 
     if (melhor) return { categoria: melhor.categoria, destino: melhor.destino };
     if (grupoAtual) return { categoria: grupoAtual.cat, destino: grupoAtual.destino };
-    return { categoria: "Outros", destino: "mercado" };
+    return { categoria: SEM_GAVETA, destino: "mercado" };
   }
 
   function grupoDaLinha(linha) {
@@ -912,7 +923,7 @@
 
   function desenhaCasa() {
     var alvo = document.getElementById("tela-rodada");
-    var arr = ordemLista();
+    var arr = ordemLista().filter(function (it) { return !escondidaDaCasa(it); });
     if (!arr.length) {
       alvo.innerHTML = '<div class="card"><div class="vazio">A lista ainda não foi montada.</div></div>';
       return;
@@ -1440,6 +1451,9 @@
     var id = existente ? existente.id : novoId();
     if (!existente) {
       var palpite = adivinhar(nome, null);
+      if (S.quem === "casa" && OCULTAS_DA_CASA.indexOf(palpite.categoria) >= 0) {
+        palpite = { categoria: SEM_GAVETA, destino: palpite.destino };
+      }
       var maior = 0;
       itensArray().forEach(function (x) { maior = Math.max(maior, x.ordem || 0); });
       await gravarItem(id, {
@@ -1492,6 +1506,7 @@
     var arr = ordemLista();
     switch (a.acao) {
       case "so-marcados": S.soMarcados = a.valor === "marcados"; desenhar(); break;
+      case "faltou": modalFaltou(); break;
       case "alternar":
         if (precisa(a.id)) modalDesmarcar(a.id); else marcar(a.id, true);
         break;
