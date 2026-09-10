@@ -1,5 +1,5 @@
 // Gerado por site/gerar.py a partir de mercado.html. Não editar aqui.
-window.MERCADO_VERSAO = "10/09 11:24";
+window.MERCADO_VERSAO = "10/09 11:27";
 (function () {
   // Casca velha demais para este app: manda buscar uma nova, num
   // endereço que o cache não tem guardado. O #senha do link de convite
@@ -241,11 +241,11 @@ window.MERCADO_VERSAO = "10/09 11:24";
     { cat: "Frutas", destino: "horti", p: ["abacate", "abacaxi", "ameixa", "banana", "banana da prata", "caju", "caja", "acerola", "coco", "goiaba", "graviola", "kiwi", "laranja", "lima", "limao", "maca", "mamao", "manga", "manga palmer", "maracuja", "melancia", "melao", "morango", "pera", "pinha", "tangerina", "umbu", "uva", "uva verde", "fruta"] },
     { cat: "Temperos", destino: "horti", p: ["cebolinha", "salsinha", "salsa", "coentro", "cheiro verde", "hortela", "manjericao", "gengibre", "alecrim"] },
     { cat: "Temperos", destino: "mercado", p: ["sal", "pimenta", "pimenta do reino", "paprica", "cominho", "oregano", "louro", "folha de louro", "canela", "curcuma", "acafrao", "colorau", "tempero", "noz moscada", "cravo"] },
+    { cat: "Dispensa", destino: "mercado", p: ["arroz", "feijao", "macarrao", "massa", "massinha", "penne", "spaguetti", "espaguete", "talharim", "farinha", "farinha de mandioca", "acucar", "oleo", "azeite", "vinagre", "molho", "extrato", "milho verde", "ervilha", "atum", "sardinha", "fermento", "gelatina", "aveia", "granola", "cuscuz", "tapioca", "goma", "flocao", "biscoito", "bolacha", "cracker", "cream cracker", "beiju", "cereal", "geleia", "mel", "amendoim", "castanha", "nozes", "chia", "linhaca", "uva passa", "chocolate", "chiclete", "bala", "azeitona", "leite de coco", "leite em po", "lentilha", "grao de bico", "sopa", "miojo", "pipoca", "polvilho", "batata palha", "banana chips", "bananada", "achocolatado em po", "pao", "paes", "bisnaga", "broa", "torrada", "bolo", "pao de queijo", "agua", "refrigerante", "coca", "guarana", "suco", "cerveja", "heineken", "vinho", "cafe", "filtro cafe", "cha", "energetico", "isotonico", "agua de coco", "agua com gas", "achocolatado", "toddy", "nescau", "tonica", "gin", "vodka", "whisky", "racao"] },
     { cat: "Geladeira", destino: "mercado", p: ["leite", "queijo", "mussarela", "requeijao", "iogurte", "manteiga", "margarina", "creme de leite", "ovo", "ovos", "coalhada", "ricota", "nata", "cottage", "cream cheese", "presunto", "mortadela", "salame", "molho ingles", "shoyu", "mostarda", "ketchup", "maionese"] },
     { cat: "Freezer", destino: "mercado", p: ["carne", "picanha", "alcatra", "coxao", "coxao duro", "patinho", "acem", "moida", "frango", "peito de frango", "coxa", "sobrecoxa", "linguica", "bacon", "salsicha", "peixe", "tilapia", "camarao", "salmao", "file", "filezinho", "costela", "peru", "hamburguer", "charque", "carne seca", "carne do sol", "bacalhau", "cha de dentro", "cha de fora", "maminha", "fraldinha", "pernil", "suina", "suino", "polpa"] },
     { cat: "Materiais de limpeza", destino: "mercado", p: ["detergente", "sabao", "amaciante", "desinfetante", "agua sanitaria", "candida", "esponja", "bucha", "alvejante", "multiuso", "veja", "cif", "omo", "vanish", "tixan", "limpador", "limpa vidro", "brilux", "tira limo", "azulim", "higienizador", "saco de lixo", "papel toalha", "lustra", "cloro", "bombril", "perfex", "vassoura", "rodo", "pano de chao", "flanela", "alcool", "desengordurante", "bicarbonato", "papel aluminio", "papel filme", "papel manteiga", "saco plastico", "guardanapo", "fosforo", "vela", "palito", "pilha", "lampada", "isqueiro"] },
-    { cat: "Outros", destino: "mercado", p: ["papel higienico", "sabonete", "shampoo", "condicionador", "pasta de dente", "creme dental", "escova de dente", "desodorante", "absorvente", "fralda", "lenco", "algodao", "cotonete", "hidratante", "protetor solar", "aparelho de barbear", "gilete", "fio dental", "fita dental", "enxaguante", "band aid", "curativo", "acetona", "higi", "hastes"] },
-    { cat: "Dispensa", destino: "mercado", p: ["arroz", "feijao", "macarrao", "massa", "massinha", "penne", "spaguetti", "espaguete", "talharim", "farinha", "farinha de mandioca", "acucar", "oleo", "azeite", "vinagre", "molho", "extrato", "milho verde", "ervilha", "atum", "sardinha", "fermento", "gelatina", "aveia", "granola", "cuscuz", "tapioca", "goma", "flocao", "biscoito", "bolacha", "cracker", "cream cracker", "beiju", "cereal", "geleia", "mel", "amendoim", "castanha", "nozes", "chia", "linhaca", "uva passa", "chocolate", "chiclete", "bala", "azeitona", "leite de coco", "leite em po", "lentilha", "grao de bico", "sopa", "miojo", "pipoca", "polvilho", "batata palha", "banana chips", "bananada", "achocolatado em po", "pao", "paes", "bisnaga", "broa", "torrada", "bolo", "pao de queijo", "agua", "refrigerante", "coca", "guarana", "suco", "cerveja", "heineken", "vinho", "cafe", "filtro cafe", "cha", "energetico", "isotonico", "agua de coco", "agua com gas", "achocolatado", "toddy", "nescau", "tonica", "gin", "vodka", "whisky", "racao"] }
+    { cat: "Outros", destino: "mercado", p: ["papel higienico", "sabonete", "shampoo", "condicionador", "pasta de dente", "creme dental", "escova de dente", "desodorante", "absorvente", "fralda", "lenco", "algodao", "cotonete", "hidratante", "protetor solar", "aparelho de barbear", "gilete", "fio dental", "fita dental", "enxaguante", "band aid", "curativo", "acetona", "higi", "hastes"] }
   ];
 
   // "Outros" é a gaveta que só o Vinicius e a esposa marcam; a tela de quem
@@ -462,6 +462,25 @@ window.MERCADO_VERSAO = "10/09 11:24";
     if (freq >= 0.7) return "comprado toda semana";
     if (freq >= 0.35) return "comprado quase toda semana";
     return "";
+  }
+
+  // As gavetas que existem: as do código, na ordem, mais qualquer uma que
+  // tenha entrado pela importação e não esteja prevista.
+  function gavetas() {
+    var vistas = {}, fora = [];
+    CATEGORIAS.forEach(function (g) { if (!vistas[g.cat]) { vistas[g.cat] = true; fora.push(g.cat); } });
+    fora.push(SEM_GAVETA);
+    vistas[SEM_GAVETA] = true;
+    itensArray().forEach(function (it) {
+      if (it.categoria && !vistas[it.categoria]) { vistas[it.categoria] = true; fora.push(it.categoria); }
+    });
+    return fora;
+  }
+
+  function donoDaGaveta(cat) {
+    var achou = null;
+    CATEGORIAS.forEach(function (g) { if (!achou && g.cat === cat) achou = g.destino; });
+    return achou || "mercado";
   }
 
   function itensArray() {
@@ -1163,17 +1182,35 @@ window.MERCADO_VERSAO = "10/09 11:24";
   }
 
   function modalFaltou() {
+    var opcoes = gavetas();
     abrirModal(
       '<div class="modal"><h3>Faltou o quê?<button class="fechar" type="button" data-acao="fechar-modal">×</button></h3>' +
-      '<div class="corpo"><p class="sub">Entra na compra desta semana e passa a fazer parte da lista, para aparecer nas próximas.</p>' +
-      '<input class="campo" id="f-faltou" placeholder="Papel alumínio" autocomplete="off">' +
-      '<div class="acoes-fim"><div class="linha-btns">' +
-      '<button class="btn principal larga" type="button" data-acao="salvar-faltou">Adicionar à compra</button>' +
-      "</div></div></div></div>"
+      '<div class="corpo"><p class="sub">Entra nesta lista e passa a fazer parte da lista da casa, ' +
+      "para aparecer nas próximas.</p>" +
+      '<div class="campo-bloco"><label class="rotulo" for="f-faltou">O que é</label>' +
+      '<input class="campo" id="f-faltou" placeholder="Papel alumínio" autocomplete="off"></div>' +
+      '<div class="campo-bloco"><label class="rotulo" for="f-faltou-cat">Em qual gaveta</label>' +
+      '<select class="campo" id="f-faltou-cat">' +
+      opcoes.map(function (c) { return '<option value="' + esc(c) + '">' + esc(c) + "</option>"; }).join("") +
+      "</select></div>" +
+      '<div class="acoes-fim">' +
+      '<button class="btn principal larga" type="button" data-acao="salvar-faltou">Adicionar</button>' +
+      "</div></div></div>"
     );
-    var c = document.getElementById("f-faltou");
-    setTimeout(function () { c.focus(); }, 40);
-    c.addEventListener("keydown", function (ev) {
+    var campo = document.getElementById("f-faltou");
+    var gaveta = document.getElementById("f-faltou-cat");
+    gaveta.value = SEM_GAVETA;
+    // Enquanto ele não escolher, a gaveta acompanha o que está sendo digitado.
+    // Escolheu, para de acompanhar: palpite não desfaz decisão de gente.
+    var escolhida = false;
+    gaveta.addEventListener("change", function () { escolhida = true; });
+    campo.addEventListener("input", function () {
+      if (escolhida) return;
+      var nome = campo.value.trim();
+      gaveta.value = nome ? adivinhar(nome, null).categoria : SEM_GAVETA;
+    });
+    setTimeout(function () { campo.focus(); }, 40);
+    campo.addEventListener("keydown", function (ev) {
       if (ev.key === "Enter") { ev.preventDefault(); salvarFaltou(); }
     });
   }
@@ -1185,14 +1222,17 @@ window.MERCADO_VERSAO = "10/09 11:24";
     var existente = itensArray().filter(function (x) { return normalizar(x.nome) === normalizar(nome); })[0];
     var id = existente ? existente.id : novoId();
     if (!existente) {
+      var seletor = document.getElementById("f-faltou-cat");
       var palpite = adivinhar(nome, null);
-      if (S.quem === "casa" && OCULTAS_DA_CASA.indexOf(palpite.categoria) >= 0) {
-        palpite = { categoria: SEM_GAVETA, destino: palpite.destino };
-      }
+      var cat = seletor ? seletor.value : palpite.categoria;
+      // Mantendo a gaveta do palpite, o dono dela vem do palpite também (é ele
+      // que sabe que cheiro-verde é do Hiperideal). Trocando, vem do padrão da
+      // gaveta escolhida, e o resto se ajusta no item.
+      var dono = cat === palpite.categoria ? palpite.destino : donoDaGaveta(cat);
       var maior = 0;
       itensArray().forEach(function (x) { maior = Math.max(maior, x.ordem || 0); });
       await gravarItem(id, {
-        nome: nome, categoria: palpite.categoria, destino: palpite.destino,
+        nome: nome, categoria: cat, destino: dono,
         obs: "", ordem: maior + 1
       });
     }
