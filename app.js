@@ -1,5 +1,5 @@
 // Gerado por site/gerar.py a partir de mercado.html. Não editar aqui.
-window.MERCADO_VERSAO = "10/09 17:11";
+window.MERCADO_VERSAO = "10/09 17:34";
 (function () {
   // Casca velha demais para este app: manda buscar uma nova, num
   // endereço que o cache não tem guardado. O #senha do link de convite
@@ -389,12 +389,18 @@ window.MERCADO_VERSAO = "10/09 17:11";
       // que abrir item por item. O corte vem antes de tirarConta, senão um
       // número no fim da observação ("Brigitta 103") seria lido como a conta
       // da semana passada e sumiria.
-      var obs = "";
-      var corte = l.indexOf("\u00b7");
-      if (corte < 0) corte = l.indexOf("|");
-      if (corte > 0) {
-        obs = l.slice(corte + 1).trim();
-        l = l.slice(0, corte).trim();
+      // Depois do "·" vem a marca. "sempre 1" nesse lugar não é marca: é a
+      // trava de quantidade, para item que nunca vai ser mais de um.
+      var obs = "", sempre1 = false, temCampo = false;
+      var pedacos = l.split(/\s*[\u00b7|]\s*/);
+      if (pedacos.length > 1) {
+        temCampo = true;
+        l = pedacos.shift().trim();
+        pedacos = pedacos.filter(function (pe) {
+          if (/^sempre\s*1$/.test(normalizar(pe))) { sempre1 = true; return false; }
+          return !!pe.trim();
+        });
+        obs = pedacos.join(" \u00b7 ").trim();
       }
       // "Nome antigo > Nome novo" corrige o nome de um item que já existe.
       // Sem isso, item cujo nome precisa mudar (tirar a marca de dentro do
@@ -414,7 +420,10 @@ window.MERCADO_VERSAO = "10/09 17:11";
       // da bancada de edição usa para trazer as correções de volta.
       var palpite = adivinhar(l, grupo);
       if (grupo) palpite = { categoria: grupo.cat, destino: grupo.destino };
-      saida.push({ nome: l, categoria: palpite.categoria, destino: palpite.destino, obs: obs, de: de });
+      saida.push({
+        nome: l, categoria: palpite.categoria, destino: palpite.destino,
+        obs: obs, de: de, sempre1: sempre1, soAjuste: temCampo || !!de
+      });
     });
     return saida;
   }
@@ -684,9 +693,13 @@ window.MERCADO_VERSAO = "10/09 17:11";
       // vários marcados, dez botões embaixo de cada um viravam uma parede e o
       // nome do item sumia no meio. Escolhido o número, a fileira vira uma
       // pastilha pequena ao lado do nome; um toque nela reabre.
+      // Item travado em 1 não mostra número nenhum: marcar já quer dizer um,
+      // e a fileira só atrapalharia. Ele listou 78 assim em 10/09/2026.
       var teclas = "";
       var pastilha = "";
-      if (quer && S.abertoQtd === it.id) {
+      if (it.sempre1) {
+        // sem fileira e sem pastilha
+      } else if (quer && S.abertoQtd === it.id) {
         teclas = '<div class="teclas">' +
           (m.naoSei && !m.qtd ? '<span class="nao-sabe">não sabe</span>' : "");
         for (var n = 1; n <= 9; n++) {
@@ -838,13 +851,17 @@ window.MERCADO_VERSAO = "10/09 17:11";
   // desmarcava depois voltava para a fila numa posição atrás da dela, então ela
   // nunca chegava nele. Daqui em diante a busca é sempre pelo primeiro sem
   // resposta — para a frente e, não achando, desde o começo.
-  function proximaSemResposta(deIdx) {
+  // "pular" é o item que ela acabou de responder: a gravação é assíncrona e,
+  // sem isso, a volta ao começo caía de novo nele — parecia que o Sim não
+  // tinha valido.
+  function proximaSemResposta(deIdx, pular) {
     var fila = universoDaCasa();
+    function serve(it) { return !respondeuEla(it.id) && it.id !== pular; }
     for (var i = Math.max(0, deIdx); i < fila.length; i++) {
-      if (!respondeuEla(fila[i].id)) return i;
+      if (serve(fila[i])) return i;
     }
     for (var j = 0; j < Math.min(deIdx, fila.length); j++) {
-      if (!respondeuEla(fila[j].id)) return j;
+      if (serve(fila[j])) return j;
     }
     return -1;
   }
@@ -853,10 +870,10 @@ window.MERCADO_VERSAO = "10/09 17:11";
     return universoDaCasa().filter(function (it) { return !respondeuEla(it.id); }).length;
   }
 
-  function avancarPergunta() {
+  function avancarPergunta(respondido) {
     var fila = universoDaCasa();
     S.perguntando = null;
-    var prox = proximaSemResposta(S.perguntaIdx + 1);
+    var prox = proximaSemResposta(S.perguntaIdx + 1, respondido);
     S.perguntaIdx = prox < 0 ? fila.length : prox;
     desenhar();
   }
@@ -866,7 +883,7 @@ window.MERCADO_VERSAO = "10/09 17:11";
     await marcar(id, true, quanto > 0 ? quanto : 1);
     S.digitando = "";
     S.digitou = false;
-    avancarPergunta();
+    avancarPergunta(id);
   }
 
   function cartaoSemana() {
@@ -1047,7 +1064,12 @@ window.MERCADO_VERSAO = "10/09 17:11";
     await garantirRodada();
     var m = marcado(id) || {};
     var corpo = { precisa: !!quer, quando: hoje(), por: S.quem || "" };
-    if (quanto !== undefined) {
+    var travado = !!(S.itens[id] && S.itens[id].sempre1);
+    if (travado) {
+      // a trava vale para os dois lados: nem o teclado dela nem o "9+" mudam
+      corpo.qtd = quer ? 1 : null;
+      corpo.naoSei = false;
+    } else if (quanto !== undefined) {
       corpo.qtd = quanto === null ? null : Number(quanto);
       corpo.naoSei = quanto === null;
     } else if (quer) {
@@ -1124,6 +1146,7 @@ window.MERCADO_VERSAO = "10/09 17:11";
     Object.keys(base).forEach(function (k) { maiorOrdem = Math.max(maiorOrdem, base[k].ordem || 0); });
     var novos = {};
     var mudados = {};
+    var naoAchados = [];
     var existentes = {};
     var idPorNome = {};
     Object.keys(base).forEach(function (k) {
@@ -1139,6 +1162,7 @@ window.MERCADO_VERSAO = "10/09 17:11";
         if (idDe) {
           var corrigido = Object.assign({}, base[idDe], { nome: it.nome });
           if (it.obs) corrigido.obs = it.obs;
+          if (it.sempre1) corrigido.sempre1 = true;
           mudados[idDe] = corrigido;
           existentes[chave] = true;
           idPorNome[chave] = idDe;
@@ -1146,18 +1170,26 @@ window.MERCADO_VERSAO = "10/09 17:11";
         }
       }
       if (existentes[chave]) {
-        // Já está na lista: a linha só serve para trazer a observação (as
-        // marcas). Linha sem observação não mexe no que já está gravado.
+        // Já está na lista: a linha serve para trazer a marca e a trava de
+        // quantidade. Linha sem nenhum dos dois não mexe no que está gravado.
         var idJa = idPorNome[chave];
-        if (!substituir && it.obs && idJa && (base[idJa].obs || "") !== it.obs) {
-          mudados[idJa] = Object.assign({}, base[idJa], { obs: it.obs });
+        if (!substituir && idJa) {
+          var antes = base[idJa], remendo = null;
+          if (it.obs && (antes.obs || "") !== it.obs) remendo = { obs: it.obs };
+          if (it.sempre1 && !antes.sempre1) remendo = Object.assign(remendo || {}, { sempre1: true });
+          if (remendo) mudados[idJa] = Object.assign({}, antes, remendo);
         }
         return;
       }
+      // Linha que traz marca, trava ou renomeação é ajuste de item existente:
+      // não achando o item, ela não vira item novo. Sem isso, um nome escrito
+      // de outro jeito criava um duplicado silencioso — e ele quase apertou
+      // "Adicionar 9 itens" por causa disso.
+      if (it.soAjuste) { naoAchados.push(it.nome); return; }
       existentes[chave] = true;
       novos[novoId()] = {
         nome: it.nome, categoria: it.categoria, destino: it.destino,
-        obs: it.obs || "", ordem: maiorOrdem + i + 1
+        obs: it.obs || "", sempre1: !!it.sempre1, ordem: maiorOrdem + i + 1
       };
     });
     if (substituir) {
@@ -1249,8 +1281,11 @@ window.MERCADO_VERSAO = "10/09 17:11";
       jaTem[normalizar(S.itens[k].nome)] = true;
       idPorNome[normalizar(S.itens[k].nome)] = k;
     });
+    var somem = previa.filter(function (p) {
+      return p.soAjuste && !jaTem[normalizar(p.nome)] && !(p.de && jaTem[normalizar(p.de)]);
+    });
     var novos = previa.filter(function (p) {
-      return !jaTem[normalizar(p.nome)] && !(p.de && jaTem[normalizar(p.de)]);
+      return !p.soAjuste && !jaTem[normalizar(p.nome)];
     }).length;
     // Colar só observações (as marcas) não traz item novo nenhum: o botão
     // precisa contar isso também, senão fica desabilitado justo nesse caso.
@@ -1261,25 +1296,44 @@ window.MERCADO_VERSAO = "10/09 17:11";
       var id = idPorNome[normalizar(p.nome)] || (p.de ? idPorNome[normalizar(p.de)] : null);
       return p.obs && id && (S.itens[id].obs || "") !== p.obs;
     }).length;
+    var travas = previa.filter(function (p) {
+      var id = idPorNome[normalizar(p.nome)] || (p.de ? idPorNome[normalizar(p.de)] : null);
+      return p.sempre1 && id && !S.itens[id].sempre1;
+    }).length;
     var partes = [];
     if (novos) partes.push("Adicionar " + plural(novos, "item", "itens"));
     if (renomeia) partes.push(plural(renomeia, "nome", "nomes"));
     if (comObs) partes.push(plural(comObs, "marca", "marcas"));
+    if (travas) partes.push(plural(travas, "trava", "travas") + " de quantidade");
+    // "8 nomes, 39 marcas e 79 travas" — vírgula até o penúltimo, "e" no fim
+    function juntar(arr) {
+      return arr.length < 2 ? (arr[0] || "") : arr.slice(0, -1).join(", ") + " e " + arr[arr.length - 1];
+    }
     var rotulo = partes.length
-      ? (novos ? partes.join(" e ") : "Gravar " + partes.join(" e "))
+      ? (novos ? juntar(partes) : "Gravar " + juntar(partes))
       : "Adicionar";
     var html = '<div class="linha-btns" style="margin-top:12px">' +
-      '<button class="btn principal" type="button" data-acao="importar-add"' + (novos || comObs || renomeia ? "" : " disabled") + ">" + rotulo + "</button>" +
+      '<button class="btn principal" type="button" data-acao="importar-add"' + (novos || comObs || renomeia || travas ? "" : " disabled") + ">" + rotulo + "</button>" +
       '<button class="btn" type="button" data-acao="importar-sub">Substituir a lista toda</button></div>' +
-      '<p class="sub" style="margin-top:10px">' + previa.length + " itens lidos" + (novos < previa.length ? " · " + (previa.length - novos) + " já estão na lista" : "") +
+      '<p class="sub" style="margin-top:10px">' + previa.length + " itens lidos" +
+      (novos < previa.length ? " · " + (previa.length - novos - somem.length) + " já estão na lista" : "") +
       ". Confira embaixo; toque na etiqueta para trocar de lista.</p>" +
+      (somem.length
+        ? '<div class="nota" style="margin-top:8px">Não achei na lista, então ' +
+          (somem.length === 1 ? "esta linha vai ser pulada" : "estas " + somem.length + " linhas vão ser puladas") +
+          " (linha com marca ou trava só ajusta item que já existe): " +
+          esc(somem.map(function (p) { return p.de || p.nome; }).join(", ")) + "</div>"
+        : "") +
       '<div class="previa">';
     previa.forEach(function (p, i) {
       var vaiRenomear = p.de && jaTem[normalizar(p.de)] && normalizar(p.de) !== normalizar(p.nome);
+      var some = p.soAjuste && !jaTem[normalizar(p.nome)] && !vaiRenomear;
       html += '<div class="fila ' + p.destino + (jaTem[normalizar(p.nome)] || vaiRenomear ? " feito" : "") + '">' +
         '<span class="nome">' + esc(p.nome) + '<span class="meta"> · ' + esc(p.categoria) +
         (vaiRenomear ? " · era “" + esc(p.de) + "”" : "") +
-        (p.obs ? " · " + esc(p.obs) : "") + "</span></span>" +
+        (p.obs ? " · " + esc(p.obs) : "") +
+        (p.sempre1 ? " · sempre 1" : "") +
+        (some ? ' · <b style="color:var(--alerta)">não achei</b>' : "") + "</span></span>" +
         '<button class="tag ' + p.destino + '" type="button" data-acao="virar" data-valor="' + i + '">' +
         (p.destino === "horti" ? "Hiperideal" : "Mercado") + "</button></div>";
     });
@@ -1415,6 +1469,10 @@ window.MERCADO_VERSAO = "10/09 17:11";
 
       '<div class="campo-bloco"><label class="rotulo" for="f-obs">Marca (opcional)</label>' +
       '<input class="campo" id="f-obs" value="' + esc(it ? it.obs || "" : "") + '" placeholder="Piracanjuba, ou Ypê não"></div>' +
+      '<div class="campo-bloco"><span class="rotulo">Quantidade</span><div class="pilulas" id="f-sempre1">' +
+      pilula("sempre1", "nao", !(it && it.sempre1), "Eu escolho") +
+      pilula("sempre1", "sim", !!(it && it.sempre1), "Sempre 1") +
+      "</div></div>" +
       '<div class="acoes-fim"><div class="linha-btns"><button class="btn principal" type="button" data-acao="salvar-item" data-id="' + (id || "") + '">Salvar</button>' +
       (id ? '<button class="btn" type="button" data-acao="excluir-item" data-id="' + id + '">Excluir</button>' : "") +
       "</div></div></div></div>"
@@ -1468,14 +1526,17 @@ window.MERCADO_VERSAO = "10/09 17:11";
         }
         break;
       case "responder":
-        if (a.valor === "1") {
+        if (a.valor !== "1") { marcar(a.id, false); avancarPergunta(a.id); }
+        else if (S.itens[a.id] && S.itens[a.id].sempre1) {
+          // travado em 1: não há o que perguntar, marca e passa
+          marcar(a.id, true, 1); avancarPergunta(a.id);
+        } else {
           var jaTem = marcado(a.id) || {};
           S.perguntando = a.id;
           S.digitando = jaTem.qtd ? String(jaTem.qtd) : "";
           S.digitou = false;
           desenhar();
         }
-        else { marcar(a.id, false); avancarPergunta(); }
         break;
       case "quanto-ok": confirmarQuanto(a.id); break;
       case "digito":
@@ -1494,7 +1555,7 @@ window.MERCADO_VERSAO = "10/09 17:11";
         marcar(a.id, true, null);
         S.digitando = "";
         S.digitou = false;
-        avancarPergunta();
+        avancarPergunta(a.id);
         break;
       case "pergunta-voltar":
         if (S.perguntaIdx > 0) { S.perguntaIdx--; S.perguntando = null; desenhar(); }
@@ -1565,6 +1626,11 @@ window.MERCADO_VERSAO = "10/09 17:11";
           p.setAttribute("aria-pressed", p === a.el ? "true" : "false");
         });
         break;
+      case "sempre1":
+        document.querySelectorAll("#f-sempre1 .pilula").forEach(function (p) {
+          p.setAttribute("aria-pressed", p === a.el ? "true" : "false");
+        });
+        break;
       case "salvar-item":
         var nome = document.getElementById("f-nome").value.trim();
         if (!nome) { document.getElementById("f-nome").focus(); return; }
@@ -1573,7 +1639,8 @@ window.MERCADO_VERSAO = "10/09 17:11";
         var cat = document.getElementById("f-cat").value.trim() || adivinhar(nome, null).categoria;
         var dados = {
           nome: nome, categoria: cat, destino: dest,
-          obs: document.getElementById("f-obs").value.trim()
+          obs: document.getElementById("f-obs").value.trim(),
+          sempre1: document.querySelector('#f-sempre1 .pilula[aria-pressed="true"]').getAttribute("data-valor") === "sim"
         };
         if (!a.id) {
           var maior = 0;
