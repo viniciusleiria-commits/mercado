@@ -1,4 +1,4 @@
-# Mercado de Sexta
+# Mercado
 
 A lista de compras da casa, numa página só. Quem cuida da casa marca o que vai
 acabando durante a semana; na sexta a compra já está montada em duas listas —
