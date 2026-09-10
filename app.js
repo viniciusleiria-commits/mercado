@@ -1,5 +1,5 @@
 // Gerado por site/gerar.py a partir de mercado.html. Não editar aqui.
-window.MERCADO_VERSAO = "10/09 17:34";
+window.MERCADO_VERSAO = "10/09 18:01";
 (function () {
   // Casca velha demais para este app: manda buscar uma nova, num
   // endereço que o cache não tem guardado. O #senha do link de convite
@@ -1531,7 +1531,12 @@ window.MERCADO_VERSAO = "10/09 17:34";
           // travado em 1: não há o que perguntar, marca e passa
           marcar(a.id, true, 1); avancarPergunta(a.id);
         } else {
+          // "Sim" já é resposta: marca na hora, com um, e o teclado só ajusta
+          // o número. Antes ele só abria o teclado, e quem saísse dali sem
+          // tocar em "Pronto" — em "Avançar →", por exemplo — deixava o item
+          // sem marca nenhuma, como se não tivesse respondido.
           var jaTem = marcado(a.id) || {};
+          marcar(a.id, true);
           S.perguntando = a.id;
           S.digitando = jaTem.qtd ? String(jaTem.qtd) : "";
           S.digitou = false;
