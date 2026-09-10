@@ -1,5 +1,5 @@
 // Gerado por site/gerar.py a partir de mercado.html. Não editar aqui.
-window.MERCADO_VERSAO = "10/09 15:27";
+window.MERCADO_VERSAO = "10/09 15:46";
 (function () {
   // Casca velha demais para este app: manda buscar uma nova, num
   // endereço que o cache não tem guardado. O #senha do link de convite
@@ -864,7 +864,12 @@ window.MERCADO_VERSAO = "10/09 15:27";
       var mq = marcado(it.id) || {};
       html += '<div class="fila' + (feito(it.id) ? " feito" : "") + '">' +
         '<button class="caixa" type="button" data-acao="feito" data-id="' + it.id + '" aria-label="marcar como pedido">' + CHECK + "</button>" +
-        '<span class="nome">' + esc(it.nome) + (it.obs ? ' <span class="meta">(' + esc(it.obs) + ")</span>" : "") + "</span>" +
+        '<span class="nome">' + esc(it.nome) +
+        // A observação já costuma trazer parêntese dentro ("desnatado (La
+        // Serenissima ou Piracanjuba)"); pôr outro em volta virava parêntese
+        // duplo. Ela entra em cinza, emendada no nome, e a linha se lê como
+        // ele escreveu: Leite em pó desnatado (La Serenissima ou Piracanjuba).
+        (it.obs ? ' <span class="meta">' + esc(it.obs) + "</span>" : "") + "</span>" +
         (mq.qtd ? '<span class="meta">' + esc(mq.qtd) + "</span>" : mq.naoSei ? '<span class="meta">não sei</span>' : "") +
         "</div>";
     });
