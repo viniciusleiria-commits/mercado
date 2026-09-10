@@ -1,5 +1,5 @@
 // Gerado por site/gerar.py a partir de mercado.html. Não editar aqui.
-window.MERCADO_VERSAO = "10/09 13:14";
+window.MERCADO_VERSAO = "10/09 13:33";
 (function () {
   // Casca velha demais para este app: manda buscar uma nova, num
   // endereço que o cache não tem guardado. O #senha do link de convite
@@ -540,15 +540,9 @@ window.MERCADO_VERSAO = "10/09 13:14";
     var cab = destino === "horti" ? "Hiperideal · " + quando
       : destino === "mercado" ? "iFood · " + quando
       : nomeDaLista();
-    var catAtual = null;
-    var linhas = [];
-    itens.forEach(function (it) {
-      if (it.categoria !== catAtual) {
-        catAtual = it.categoria;
-        linhas.push((linhas.length ? "\n" : "") + catAtual + ":");
-      }
-      linhas.push(linhaDoTexto(it));
-    });
+    // Sem o nome da gaveta: um item por linha, direto. A ordem continua a da
+    // tela (gaveta por gaveta, A-Z dentro de cada uma), só sem os títulos.
+    var linhas = itens.map(linhaDoTexto);
     return cab + "\n\n" + (linhas.length ? linhas.join("\n") : "(nada nesta semana)");
   }
 
