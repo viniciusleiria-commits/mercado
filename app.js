@@ -1,5 +1,5 @@
 // Gerado por site/gerar.py a partir de mercado.html. Não editar aqui.
-window.MERCADO_VERSAO = "10/09 13:33";
+window.MERCADO_VERSAO = "10/09 13:53";
 (function () {
   // Casca velha demais para este app: manda buscar uma nova, num
   // endereço que o cache não tem guardado. O #senha do link de convite
@@ -264,13 +264,17 @@ window.MERCADO_VERSAO = "10/09 13:33";
   }
 
   // O que ela pode responder: fora das gavetas privadas e fora do que o
-  // Vinicius ou a esposa já decidiram — item que eles marcaram some da fila
-  // dela, para ela não desfazer sem querer o que já foi resolvido.
+  // Vinicius ou a esposa já puseram na compra — item que eles marcaram some da
+  // fila dela, para ela não desfazer sem querer o que já foi resolvido.
+  // Some só o que eles marcaram COMO NECESSÁRIO. "Tirar da compra" não apaga a
+  // marcação, grava precisa: false com o nome deles; se isso também escondesse,
+  // item marcado e desmarcado por engano sumia da fila dela para sempre — e era
+  // justamente o que ela precisava ser perguntada.
   function universoDaCasa() {
     return ordemLista().filter(function (it) {
       if (escondidaDaCasa(it)) return false;
       var m = marcado(it.id);
-      return !m || m.por === "casa";
+      return !m || m.por === "casa" || !m.precisa;
     });
   }
 
