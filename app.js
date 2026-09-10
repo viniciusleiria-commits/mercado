@@ -1,5 +1,5 @@
 // Gerado por site/gerar.py a partir de mercado.html. Não editar aqui.
-window.MERCADO_VERSAO = "10/09 15:56";
+window.MERCADO_VERSAO = "10/09 16:56";
 (function () {
   // Casca velha demais para este app: manda buscar uma nova, num
   // endereço que o cache não tem guardado. O #senha do link de convite
@@ -396,6 +396,16 @@ window.MERCADO_VERSAO = "10/09 15:56";
         obs = l.slice(corte + 1).trim();
         l = l.slice(0, corte).trim();
       }
+      // "Nome antigo > Nome novo" corrige o nome de um item que já existe.
+      // Sem isso, item cujo nome precisa mudar (tirar a marca de dentro do
+      // nome, por exemplo) viraria item novo em vez de ser corrigido.
+      var de = "";
+      var seta = l.indexOf(">");
+      if (seta > 0) {
+        de = l.slice(0, seta).trim();
+        l = l.slice(seta + 1).trim();
+        if (!l) { l = de; de = ""; }
+      }
       l = tirarConta(l);
       var chave = normalizar(l);
       if (!chave || vistos[chave]) return;
@@ -404,7 +414,7 @@ window.MERCADO_VERSAO = "10/09 15:56";
       // da bancada de edição usa para trazer as correções de volta.
       var palpite = adivinhar(l, grupo);
       if (grupo) palpite = { categoria: grupo.cat, destino: grupo.destino };
-      saida.push({ nome: l, categoria: palpite.categoria, destino: palpite.destino, obs: obs });
+      saida.push({ nome: l, categoria: palpite.categoria, destino: palpite.destino, obs: obs, de: de });
     });
     return saida;
   }
@@ -1119,6 +1129,19 @@ window.MERCADO_VERSAO = "10/09 15:56";
     });
     lista.forEach(function (it, i) {
       var chave = normalizar(it.nome);
+      // "Nome antigo > Nome novo": acha pelo nome antigo e corrige o nome.
+      // Se o antigo não existe, a linha vale como item de nome novo.
+      if (it.de && !substituir) {
+        var idDe = idPorNome[normalizar(it.de)];
+        if (idDe) {
+          var corrigido = Object.assign({}, base[idDe], { nome: it.nome });
+          if (it.obs) corrigido.obs = it.obs;
+          mudados[idDe] = corrigido;
+          existentes[chave] = true;
+          idPorNome[chave] = idDe;
+          return;
+        }
+      }
       if (existentes[chave]) {
         // Já está na lista: a linha só serve para trazer a observação (as
         // marcas). Linha sem observação não mexe no que já está gravado.
@@ -1223,25 +1246,36 @@ window.MERCADO_VERSAO = "10/09 15:56";
       jaTem[normalizar(S.itens[k].nome)] = true;
       idPorNome[normalizar(S.itens[k].nome)] = k;
     });
-    var novos = previa.filter(function (p) { return !jaTem[normalizar(p.nome)]; }).length;
+    var novos = previa.filter(function (p) {
+      return !jaTem[normalizar(p.nome)] && !(p.de && jaTem[normalizar(p.de)]);
+    }).length;
     // Colar só observações (as marcas) não traz item novo nenhum: o botão
     // precisa contar isso também, senão fica desabilitado justo nesse caso.
+    var renomeia = previa.filter(function (p) {
+      return p.de && idPorNome[normalizar(p.de)] && normalizar(p.de) !== normalizar(p.nome);
+    }).length;
     var comObs = previa.filter(function (p) {
-      var id = idPorNome[normalizar(p.nome)];
+      var id = idPorNome[normalizar(p.nome)] || (p.de ? idPorNome[normalizar(p.de)] : null);
       return p.obs && id && (S.itens[id].obs || "") !== p.obs;
     }).length;
-    var rotulo = novos
-      ? "Adicionar " + plural(novos, "item", "itens") + (comObs ? " e " + plural(comObs, "observação", "observações") : "")
-      : comObs ? "Gravar " + plural(comObs, "observação", "observações") : "Adicionar";
+    var partes = [];
+    if (novos) partes.push("Adicionar " + plural(novos, "item", "itens"));
+    if (renomeia) partes.push(plural(renomeia, "nome", "nomes"));
+    if (comObs) partes.push(plural(comObs, "marca", "marcas"));
+    var rotulo = partes.length
+      ? (novos ? partes.join(" e ") : "Gravar " + partes.join(" e "))
+      : "Adicionar";
     var html = '<div class="linha-btns" style="margin-top:12px">' +
-      '<button class="btn principal" type="button" data-acao="importar-add"' + (novos || comObs ? "" : " disabled") + ">" + rotulo + "</button>" +
+      '<button class="btn principal" type="button" data-acao="importar-add"' + (novos || comObs || renomeia ? "" : " disabled") + ">" + rotulo + "</button>" +
       '<button class="btn" type="button" data-acao="importar-sub">Substituir a lista toda</button></div>' +
       '<p class="sub" style="margin-top:10px">' + previa.length + " itens lidos" + (novos < previa.length ? " · " + (previa.length - novos) + " já estão na lista" : "") +
       ". Confira embaixo; toque na etiqueta para trocar de lista.</p>" +
       '<div class="previa">';
     previa.forEach(function (p, i) {
-      html += '<div class="fila ' + p.destino + (jaTem[normalizar(p.nome)] ? " feito" : "") + '">' +
+      var vaiRenomear = p.de && jaTem[normalizar(p.de)] && normalizar(p.de) !== normalizar(p.nome);
+      html += '<div class="fila ' + p.destino + (jaTem[normalizar(p.nome)] || vaiRenomear ? " feito" : "") + '">' +
         '<span class="nome">' + esc(p.nome) + '<span class="meta"> · ' + esc(p.categoria) +
+        (vaiRenomear ? " · era “" + esc(p.de) + "”" : "") +
         (p.obs ? " · " + esc(p.obs) : "") + "</span></span>" +
         '<button class="tag ' + p.destino + '" type="button" data-acao="virar" data-valor="' + i + '">' +
         (p.destino === "horti" ? "Hiperideal" : "Mercado") + "</button></div>";
@@ -1376,8 +1410,8 @@ window.MERCADO_VERSAO = "10/09 15:56";
       pilula("destino", "mercado", (it ? it.destino : "mercado") !== "horti", "iFood · você") +
       "</div></div>" +
 
-      '<div class="campo-bloco"><label class="rotulo" for="f-obs">Observação fixa (opcional)</label>' +
-      '<input class="campo" id="f-obs" value="' + esc(it ? it.obs || "" : "") + '" placeholder="da marca X, bem verde"></div>' +
+      '<div class="campo-bloco"><label class="rotulo" for="f-obs">Marca (opcional)</label>' +
+      '<input class="campo" id="f-obs" value="' + esc(it ? it.obs || "" : "") + '" placeholder="Piracanjuba, ou Ypê não"></div>' +
       '<div class="acoes-fim"><div class="linha-btns"><button class="btn principal" type="button" data-acao="salvar-item" data-id="' + (id || "") + '">Salvar</button>' +
       (id ? '<button class="btn" type="button" data-acao="excluir-item" data-id="' + id + '">Excluir</button>' : "") +
       "</div></div></div></div>"
