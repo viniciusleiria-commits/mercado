@@ -8,7 +8,6 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Mercado">
-<meta name="description" content="A lista de compras da casa: marcar o que está acabando durante a semana e pedir na sexta.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600&display=swap" rel="stylesheet">
@@ -21,22 +20,27 @@
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
-<script src="config.js"></script>
 </head>
 <body>
 <script>
-  // Esta casca pode estar guardada há dias no navegador; o app, não. O número
-  // muda a cada minuto, então o endereço de app.js muda com ele e o navegador
-  // é obrigado a buscar de novo.
+  window.MERCADO_CASCA = 2;
+  // Esta casca pode estar guardada há dias no navegador; o que ela carrega,
+  // não. O número muda a cada minuto, então os endereços mudam com ele e o
+  // navegador é obrigado a buscar de novo. async=false mantém a ordem: a
+  // configuração antes do app.
   (function () {
-    var s = document.createElement("script");
-    s.src = "app.js?v=" + Math.floor(Date.now() / 60000);
-    s.onerror = function () {
-      document.body.innerHTML =
-        '<p style="font:14px/1.5 -apple-system,sans-serif;color:#5D6B64;padding:24px;text-align:center">' +
-        "Não consegui carregar o app. Veja a conexão e recarregue a página.</p>";
-    };
-    document.body.appendChild(s);
+    var v = Math.floor(Date.now() / 60000);
+    ["config.js", "app.js"].forEach(function (arquivo) {
+      var s = document.createElement("script");
+      s.src = arquivo + "?v=" + v;
+      s.async = false;
+      s.onerror = function () {
+        document.body.innerHTML =
+          '<p style="font:14px/1.5 -apple-system,sans-serif;color:#5D6B64;padding:24px;text-align:center">' +
+          "Não consegui carregar o app. Veja a conexão e recarregue a página.</p>";
+      };
+      document.body.appendChild(s);
+    });
   })();
 </script>
 </body>
