@@ -1,5 +1,5 @@
 // Gerado por site/gerar.py a partir de mercado.html. Não editar aqui.
-window.MERCADO_VERSAO = "10/09 12:58";
+window.MERCADO_VERSAO = "10/09 13:14";
 (function () {
   // Casca velha demais para este app: manda buscar uma nova, num
   // endereço que o cache não tem guardado. O #senha do link de convite
@@ -824,9 +824,9 @@ window.MERCADO_VERSAO = "10/09 12:58";
   }
 
   var EXPORTACOES = [
-    { chave: "tudo", nome: "Lista toda", onde: "para conferir ou mandar por mensagem" },
-    { chave: "horti", nome: "Hiperideal", onde: "frutas, verduras e cheiro-verde" },
-    { chave: "mercado", nome: "iFood", onde: "Atacadão ou Assaí" }
+    { chave: "tudo", nome: "Lista toda" },
+    { chave: "horti", nome: "Hiperideal" },
+    { chave: "mercado", nome: "iFood" }
   ];
 
   function cartaoExportar() {
@@ -836,7 +836,7 @@ window.MERCADO_VERSAO = "10/09 12:58";
       html += '<div class="exp">' +
         '<div class="exp-nome">' + esc(e.nome) +
         '<span class="meta"> · ' + plural(quantos, "item", "itens") + "</span>" +
-        '<div class="meta">' + esc(e.onde) + "</div></div>" +
+        "</div>" +
         '<div class="exp-botoes">' +
         '<button class="btn miuda" type="button" data-acao="copiar" data-valor="' + e.chave + '"' +
         (quantos ? "" : " disabled") + ">Copiar</button>" +
