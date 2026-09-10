@@ -1,5 +1,5 @@
 // Gerado por site/gerar.py a partir de mercado.html. Não editar aqui.
-window.MERCADO_VERSAO = "10/09 15:46";
+window.MERCADO_VERSAO = "10/09 15:56";
 (function () {
   // Casca velha demais para este app: manda buscar uma nova, num
   // endereço que o cache não tem guardado. O #senha do link de convite
@@ -385,6 +385,17 @@ window.MERCADO_VERSAO = "10/09 15:46";
         return;
       }
       l = l.replace(/\s{2,}/g, " ");
+      // "Nome · observação" é como as marcas chegam de uma vez só, sem ele ter
+      // que abrir item por item. O corte vem antes de tirarConta, senão um
+      // número no fim da observação ("Brigitta 103") seria lido como a conta
+      // da semana passada e sumiria.
+      var obs = "";
+      var corte = l.indexOf("\u00b7");
+      if (corte < 0) corte = l.indexOf("|");
+      if (corte > 0) {
+        obs = l.slice(corte + 1).trim();
+        l = l.slice(0, corte).trim();
+      }
       l = tirarConta(l);
       var chave = normalizar(l);
       if (!chave || vistos[chave]) return;
@@ -393,7 +404,7 @@ window.MERCADO_VERSAO = "10/09 15:46";
       // da bancada de edição usa para trazer as correções de volta.
       var palpite = adivinhar(l, grupo);
       if (grupo) palpite = { categoria: grupo.cat, destino: grupo.destino };
-      saida.push({ nome: l, categoria: palpite.categoria, destino: palpite.destino });
+      saida.push({ nome: l, categoria: palpite.categoria, destino: palpite.destino, obs: obs });
     });
     return saida;
   }
@@ -1099,11 +1110,24 @@ window.MERCADO_VERSAO = "10/09 15:46";
     var maiorOrdem = 0;
     Object.keys(base).forEach(function (k) { maiorOrdem = Math.max(maiorOrdem, base[k].ordem || 0); });
     var novos = {};
+    var mudados = {};
     var existentes = {};
-    Object.keys(base).forEach(function (k) { existentes[normalizar(base[k].nome)] = true; });
+    var idPorNome = {};
+    Object.keys(base).forEach(function (k) {
+      existentes[normalizar(base[k].nome)] = true;
+      idPorNome[normalizar(base[k].nome)] = k;
+    });
     lista.forEach(function (it, i) {
       var chave = normalizar(it.nome);
-      if (existentes[chave]) return;
+      if (existentes[chave]) {
+        // Já está na lista: a linha só serve para trazer a observação (as
+        // marcas). Linha sem observação não mexe no que já está gravado.
+        var idJa = idPorNome[chave];
+        if (!substituir && it.obs && idJa && (base[idJa].obs || "") !== it.obs) {
+          mudados[idJa] = Object.assign({}, base[idJa], { obs: it.obs });
+        }
+        return;
+      }
       existentes[chave] = true;
       novos[novoId()] = {
         nome: it.nome, categoria: it.categoria, destino: it.destino,
@@ -1116,10 +1140,15 @@ window.MERCADO_VERSAO = "10/09 15:46";
       await novaRodada();
     } else {
       Object.assign(S.itens, novos);
-      await Store.mesclarDoc(CAMINHOS.itens, { itens: novos });
+      Object.keys(mudados).forEach(function (id) {
+        S.itens[id] = Object.assign({}, S.itens[id], mudados[id]);
+      });
+      var mescla = Object.assign({}, novos);
+      Object.keys(mudados).forEach(function (id) { mescla[id] = mudados[id]; });
+      if (Object.keys(mescla).length) await Store.mesclarDoc(CAMINHOS.itens, { itens: mescla });
     }
     desenhar();
-    return Object.keys(novos).length;
+    return { novos: Object.keys(novos).length, mudados: Object.keys(mudados).length };
   }
 
   function copiar(texto, botao) {
@@ -1163,7 +1192,8 @@ window.MERCADO_VERSAO = "10/09 15:46";
     abrirModal(
       '<div class="modal"><h3>Colar a lista das Notas<button class="fechar" type="button" data-acao="fechar-modal">×</button></h3>' +
       '<div class="corpo"><p class="sub">Cole o texto inteiro da nota do iPhone. Um item por linha; marcadores, caixinhas e numeração são ignorados. ' +
-      'Linha em maiúsculas ou terminada em dois-pontos vira categoria.</p>' +
+      'Linha em maiúsculas ou terminada em dois-pontos vira categoria. ' +
+      'Depois de um “·” vai a observação fixa (“Café · Melitta tradicional”): item que já está na lista recebe só isso.</p>' +
       '<textarea class="campo" id="txt-importar" rows="6" placeholder="HORTIFRUTI&#10;- Banana&#10;- Tomate&#10;&#10;MERCEARIA&#10;- Arroz&#10;- Café"></textarea>' +
       '<div id="previa-area"></div>' +
       "</div></div>"
@@ -1188,18 +1218,31 @@ window.MERCADO_VERSAO = "10/09 15:46";
         ? '<div class="nota" style="margin-top:10px">Não achei nenhum item nesse texto.</div>' : "";
       return;
     }
-    var jaTem = {};
-    Object.keys(S.itens).forEach(function (k) { jaTem[normalizar(S.itens[k].nome)] = true; });
+    var jaTem = {}, idPorNome = {};
+    Object.keys(S.itens).forEach(function (k) {
+      jaTem[normalizar(S.itens[k].nome)] = true;
+      idPorNome[normalizar(S.itens[k].nome)] = k;
+    });
     var novos = previa.filter(function (p) { return !jaTem[normalizar(p.nome)]; }).length;
+    // Colar só observações (as marcas) não traz item novo nenhum: o botão
+    // precisa contar isso também, senão fica desabilitado justo nesse caso.
+    var comObs = previa.filter(function (p) {
+      var id = idPorNome[normalizar(p.nome)];
+      return p.obs && id && (S.itens[id].obs || "") !== p.obs;
+    }).length;
+    var rotulo = novos
+      ? "Adicionar " + plural(novos, "item", "itens") + (comObs ? " e " + plural(comObs, "observação", "observações") : "")
+      : comObs ? "Gravar " + plural(comObs, "observação", "observações") : "Adicionar";
     var html = '<div class="linha-btns" style="margin-top:12px">' +
-      '<button class="btn principal" type="button" data-acao="importar-add"' + (novos ? "" : " disabled") + ">Adicionar " + plural(novos, "item", "itens") + "</button>" +
+      '<button class="btn principal" type="button" data-acao="importar-add"' + (novos || comObs ? "" : " disabled") + ">" + rotulo + "</button>" +
       '<button class="btn" type="button" data-acao="importar-sub">Substituir a lista toda</button></div>' +
       '<p class="sub" style="margin-top:10px">' + previa.length + " itens lidos" + (novos < previa.length ? " · " + (previa.length - novos) + " já estão na lista" : "") +
       ". Confira embaixo; toque na etiqueta para trocar de lista.</p>" +
       '<div class="previa">';
     previa.forEach(function (p, i) {
       html += '<div class="fila ' + p.destino + (jaTem[normalizar(p.nome)] ? " feito" : "") + '">' +
-        '<span class="nome">' + esc(p.nome) + '<span class="meta"> · ' + esc(p.categoria) + "</span></span>" +
+        '<span class="nome">' + esc(p.nome) + '<span class="meta"> · ' + esc(p.categoria) +
+        (p.obs ? " · " + esc(p.obs) : "") + "</span></span>" +
         '<button class="tag ' + p.destino + '" type="button" data-acao="virar" data-valor="' + i + '">' +
         (p.destino === "horti" ? "Hiperideal" : "Mercado") + "</button></div>";
     });
