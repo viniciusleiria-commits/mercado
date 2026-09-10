@@ -1,5 +1,5 @@
 // Gerado por site/gerar.py a partir de mercado.html. Não editar aqui.
-window.MERCADO_VERSAO = "10/09 10:34";
+window.MERCADO_VERSAO = "10/09 10:41";
 (function () {
   var st = document.createElement('style');
   st.textContent = "\n  :root {\n    --verde: #2A5E5E;\n    --verde-fundo: rgba(42,94,94,.09);\n    --verde-fundo-fraco: rgba(42,94,94,.04);\n    --horti: #3F7D52;\n    --horti-fundo: rgba(63,125,82,.10);\n    --mercado: #B4691F;\n    --mercado-fundo: rgba(180,105,31,.10);\n    --chao: #F6F7F5;\n    --folha: #FFFFFF;\n    --folha-2: #FBFCFB;\n    --linha: #E3E7E3;\n    --linha-forte: #CFD6D1;\n    --tinta: #1C2320;\n    --tinta-fraca: #5D6B64;\n    --tinta-fraquinha: #8A968F;\n    --alerta: #9B6B12;\n    --alerta-fundo: rgba(155,107,18,.10);\n    --sombra: 0 1px 2px rgba(28,35,32,.05);\n    --raio: 12px;\n    --raio-p: 8px;\n    --fonte: \"Sora\", -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif;\n  }\n  @media (prefers-color-scheme: dark) {\n    :root:not([data-theme=\"light\"]) {\n      --verde: #7FBDB4;\n      --verde-fundo: rgba(127,189,180,.12);\n      --verde-fundo-fraco: rgba(127,189,180,.06);\n      --horti: #83C193;\n      --horti-fundo: rgba(131,193,147,.13);\n      --mercado: #E0A45E;\n      --mercado-fundo: rgba(224,164,94,.13);\n      --chao: #111614;\n      --folha: #1A211E;\n      --folha-2: #1E2622;\n      --linha: #2B3531;\n      --linha-forte: #3C4842;\n      --tinta: #E7EDE9;\n      --tinta-fraca: #9BA9A1;\n      --tinta-fraquinha: #74827A;\n      --alerta: #E4B75F;\n      --alerta-fundo: rgba(228,183,95,.13);\n      --sombra: 0 1px 2px rgba(0,0,0,.3);\n    }\n  }\n  :root[data-theme=\"dark\"] {\n    --verde: #7FBDB4;\n    --verde-fundo: rgba(127,189,180,.12);\n    --verde-fundo-fraco: rgba(127,189,180,.06);\n    --horti: #83C193;\n    --horti-fundo: rgba(131,193,147,.13);\n    --mercado: #E0A45E;\n    --mercado-fundo: rgba(224,164,94,.13);\n    --chao: #111614;\n    --folha: #1A211E;\n    --folha-2: #1E2622;\n    --linha: #2B3531;\n    --linha-forte: #3C4842;\n    --tinta: #E7EDE9;\n    --tinta-fraca: #9BA9A1;\n    --tinta-fraquinha: #74827A;\n    --alerta: #E4B75F;\n    --alerta-fundo: rgba(228,183,95,.13);\n    --sombra: 0 1px 2px rgba(0,0,0,.3);\n  }\n\n  * { box-sizing: border-box; }\n  [hidden] { display: none !important; }\n  body {\n    margin: 0;\n    background: var(--chao);\n    color: var(--tinta);\n    font-family: var(--fonte);\n    font-size: 14px;\n    font-weight: 400;\n    line-height: 1.45;\n    -webkit-text-size-adjust: 100%;\n  }\n  button, input, select, textarea { font: inherit; color: inherit; }\n  button { cursor: pointer; }\n  :focus-visible { outline: 2px solid var(--verde); outline-offset: 2px; }\n  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }\n\n  #app { max-width: 620px; margin: 0 auto; padding: 0 12px 92px; }\n  #portao { padding-top: 18vh; }\n  .portao-card { max-width: 380px; margin: 0 auto; }\n\n  /* ---- topo ---- */\n  .top {\n    position: sticky; top: 0; z-index: 20;\n    background: var(--chao);\n    padding: 14px 0 10px;\n    display: flex; align-items: baseline; gap: 10px;\n    border-bottom: 1px solid var(--linha);\n    margin-bottom: 14px;\n  }\n  .top h1 { margin: 0; font-size: 17px; font-weight: 500; letter-spacing: -.2px; color: var(--verde); }\n\n  /* ---- cart\u00f5es ---- */\n  .card {\n    background: var(--folha); border: 1px solid var(--linha);\n    border-radius: var(--raio); box-shadow: var(--sombra);\n    margin-bottom: 12px; overflow: hidden;\n  }\n  .card > h2 {\n    margin: 0; padding: 9px 14px;\n    font-size: 12px; font-weight: 500; letter-spacing: .3px; text-transform: uppercase;\n    color: var(--verde); background: var(--verde-fundo);\n    display: flex; align-items: center; gap: 8px;\n  }\n  .card > h2 .cont { margin-left: auto; font-size: 11px; letter-spacing: 0; text-transform: none; color: var(--tinta-fraca); font-variant-numeric: tabular-nums; }\n  .corpo { padding: 14px; }\n  .corpo.sem-topo { padding-top: 12px; }\n\n  .sub { font-size: 12px; color: var(--tinta-fraca); margin: 0 0 10px; }\n  .vazio { padding: 22px 14px; text-align: center; color: var(--tinta-fraca); font-size: 13px; }\n\n  /* ---- bot\u00f5es ---- */\n  .btn {\n    border: 1px solid var(--linha-forte); background: var(--folha);\n    border-radius: var(--raio-p); padding: 9px 14px; font-size: 13px; font-weight: 500;\n    color: var(--tinta); display: inline-flex; align-items: center; gap: 7px; justify-content: center;\n  }\n  .btn:active { background: var(--folha-2); }\n  .btn.principal { background: var(--verde); border-color: var(--verde); color: #fff; }\n  :root[data-theme=\"dark\"] .btn.principal, :root:not([data-theme=\"light\"]) .btn.principal { color: #10201E; }\n  @media (prefers-color-scheme: light) { :root:not([data-theme=\"dark\"]) .btn.principal { color: #fff; } }\n  .btn.larga { width: 100%; }\n  .btn.miuda { padding: 6px 10px; font-size: 12px; }\n  .btn[disabled] { opacity: .45; pointer-events: none; }\n  .linha-btns { display: flex; gap: 8px; flex-wrap: wrap; }\n\n  /* ---- p\u00edlulas / chips ---- */\n  .pilulas { display: flex; gap: 6px; flex-wrap: wrap; }\n  .pilula {\n    border: 1px solid var(--linha-forte); background: var(--folha);\n    border-radius: 999px; padding: 5px 12px; font-size: 12px; color: var(--tinta-fraca);\n  }\n  .pilula[aria-pressed=\"true\"] { background: var(--verde); border-color: var(--verde); color: #fff; font-weight: 500; }\n  :root[data-theme=\"dark\"] .pilula[aria-pressed=\"true\"] { color: #10201E; }\n  @media (prefers-color-scheme: dark) { :root:not([data-theme=\"light\"]) .pilula[aria-pressed=\"true\"] { color: #10201E; } }\n\n  .tag { font-size: 10px; letter-spacing: .3px; text-transform: uppercase; padding: 2px 7px; border-radius: 999px; font-weight: 500; white-space: nowrap; }\n  .tag.horti { background: var(--horti-fundo); color: var(--horti); }\n  .tag.mercado { background: var(--mercado-fundo); color: var(--mercado); }\n\n  /* ---- rodada: um por um ---- */\n  .progresso { height: 4px; background: var(--linha); border-radius: 999px; overflow: hidden; margin: 0 0 4px; }\n  .progresso i { display: block; height: 100%; background: var(--verde); border-radius: 999px; transition: width .18s ease; }\n  .progresso-txt { font-size: 11px; color: var(--tinta-fraquinha); font-variant-numeric: tabular-nums; display: flex; justify-content: space-between; }\n\n  .foco { text-align: center; padding: 6px 0 2px; }\n  .foco .cat { font-size: 11px; letter-spacing: .4px; text-transform: uppercase; color: var(--tinta-fraquinha); }\n  .foco .nome { font-size: 26px; font-weight: 500; letter-spacing: -.4px; margin: 4px 0 6px; text-wrap: balance; line-height: 1.2; user-select: text; -webkit-user-select: text; }\n  .foco .qtd-grande { font-size: 13px; color: var(--tinta-fraca); }\n  .copiado { font-size: 12px; color: var(--verde); text-align: center; margin-top: 8px; min-height: 17px; }\n  .foco .dica { font-size: 12px; color: var(--tinta-fraca); min-height: 16px; }\n  .foco .dica.quente { color: var(--alerta); }\n  .decisao { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }\n  .decisao .btn { padding: 16px 10px; font-size: 15px; }\n  .btn.sim { background: var(--verde); border-color: var(--verde); color: #fff; }\n  :root[data-theme=\"dark\"] .btn.sim { color: #10201E; }\n  @media (prefers-color-scheme: dark) { :root:not([data-theme=\"light\"]) .btn.sim { color: #10201E; } }\n  .btn.nao { background: var(--folha-2); }\n  .pe { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; }\n  .link { background: none; border: 0; color: var(--tinta-fraca); font-size: 12px; text-decoration: underline; text-underline-offset: 3px; padding: 4px 2px; }\n  .link.forte { color: var(--verde); }\n\n  .campo-quanto {\n    font-size: 26px; font-weight: 500; text-align: center; padding: 12px;\n    font-variant-numeric: tabular-nums; letter-spacing: 1px;\n  }\n  .quanto-passo { margin-top: 14px; }\n  .pe .meta { font-size: 11px; color: var(--tinta-fraquinha); font-variant-numeric: tabular-nums; }\n\n  /* ---- listas de itens ---- */\n  .grupo-titulo {\n    font-size: 11px; letter-spacing: .4px; text-transform: uppercase; color: var(--tinta-fraca);\n    background: var(--verde-fundo-fraco); padding: 5px 14px; border-top: 1px solid var(--linha); border-bottom: 1px solid var(--linha);\n  }\n  .fila { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid var(--linha); border-left: 3px solid transparent; width: 100%; text-align: left; background: none; border-top: 0; border-right: 0; }\n  .fila:last-child { border-bottom: 0; }\n  .fila.horti { border-left-color: var(--horti); }\n  .fila.mercado { border-left-color: var(--mercado); }\n  .fila .nome { flex: 1; min-width: 0; overflow-wrap: anywhere; }\n  .fila .meta { font-size: 11px; color: var(--tinta-fraquinha); }\n  .fila .freq { display: block; font-size: 11px; font-weight: 400; color: var(--verde); margin-top: 1px; }\n  .fila.marcado { background: var(--verde-fundo-fraco); }\n  .fila.marcado .nome { font-weight: 500; }\n  .fila.feito .nome { color: var(--tinta-fraquinha); text-decoration: line-through; }\n  .caixa {\n    width: 22px; height: 22px; flex: none; border: 1.5px solid var(--linha-forte); border-radius: 6px;\n    display: grid; place-items: center; background: var(--folha);\n  }\n  .caixa svg { width: 13px; height: 13px; opacity: 0; }\n  .fila.marcado .caixa, .fila.feito .caixa { background: var(--verde); border-color: var(--verde); }\n  .fila.marcado .caixa svg, .fila.feito .caixa svg { opacity: 1; }\n\n  .exp { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 14px; border-bottom: 1px solid var(--linha); }\n  .exp-nome { flex: 1; min-width: 150px; font-weight: 500; }\n  .exp-nome .meta { font-weight: 400; font-size: 11px; color: var(--tinta-fraquinha); }\n  .exp-botoes { display: flex; gap: 6px; flex: none; }\n  .exp-texto { flex-basis: 100%; }\n\n  /* ---- texto para copiar ---- */\n  .texto-lista {\n    width: 100%; min-height: 120px; resize: vertical; margin-top: 10px;\n    border: 1px solid var(--linha); border-radius: var(--raio-p); padding: 10px;\n    background: var(--folha-2); color: var(--tinta); font-size: 13px; line-height: 1.6;\n  }\n  .aviso-copia { font-size: 11px; color: var(--tinta-fraca); margin-top: 6px; }\n\n  /* ---- busca e campos ---- */\n  .campo, .selec {\n    width: 100%; border: 1px solid var(--linha-forte); border-radius: var(--raio-p);\n    padding: 9px 11px; background: var(--folha); font-size: 14px;\n  }\n  .rotulo { display: block; font-size: 11px; letter-spacing: .3px; text-transform: uppercase; color: var(--tinta-fraca); margin: 0 0 4px; }\n  .campo-bloco { margin-bottom: 12px; }\n\n  /* ---- abas de baixo ---- */\n  .abas {\n    position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;\n    background: var(--folha); border-top: 1px solid var(--linha);\n    display: flex; padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0px));\n  }\n  .abas .aba {\n    flex: 1; background: none; border: 0; padding: 6px 2px; border-radius: var(--raio-p);\n    display: flex; flex-direction: column; align-items: center; gap: 3px;\n    font-size: 11px; color: var(--tinta-fraca);\n  }\n  .abas .aba svg { width: 18px; height: 18px; }\n  .abas .aba[aria-current=\"true\"] { color: var(--verde); font-weight: 500; background: var(--verde-fundo); }\n\n  /* ---- modal ---- */\n  .fundo-modal {\n    position: fixed; top: 0; left: 0; right: 0; height: 100vh; height: 100dvh;\n    z-index: 50; background: rgba(16,22,20,.5);\n    display: flex; align-items: flex-end; justify-content: center; padding: 0;\n  }\n  @media (min-width: 560px) { .fundo-modal { align-items: center; padding: 20px; } }\n  .modal {\n    background: var(--folha); width: 100%; max-width: 560px; overflow: auto;\n    max-height: 86vh; max-height: 86dvh;\n    border-radius: var(--raio) var(--raio) 0 0; border: 1px solid var(--linha);\n  }\n  /* o rodap\u00e9 acompanha a rolagem: no iPhone a barra do Safari come o p\u00e9 da folha */\n  .acoes-fim {\n    position: sticky; bottom: -1px; z-index: 2;\n    background: var(--folha); border-top: 1px solid var(--linha);\n    margin: 12px -14px calc(-14px + env(safe-area-inset-bottom, 0px)) -14px;\n    padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0px));\n  }\n  @media (min-width: 560px) { .modal { border-radius: var(--raio); } }\n  .modal h3 {\n    margin: 0; padding: 12px 14px; font-size: 13px; font-weight: 500; color: var(--verde);\n    background: var(--verde-fundo); display: flex; align-items: center; gap: 8px;\n  }\n  .modal h3 .fechar { margin-left: auto; background: none; border: 0; color: var(--tinta-fraca); font-size: 20px; line-height: 1; padding: 0 4px; }\n  .modal .corpo { padding: 14px; }\n\n  .previa { border: 1px solid var(--linha); border-radius: var(--raio-p); margin: 10px 0; }\n  .previa .fila { padding: 8px 10px; }\n\n  .versao { text-align: center; font-size: 11px; color: var(--tinta-fraquinha); padding: 6px 0 2px; }\n  .nota { background: var(--alerta-fundo); color: var(--alerta); border-radius: var(--raio-p); padding: 9px 11px; font-size: 12px; }\n";
@@ -57,6 +57,22 @@ window.MERCADO_VERSAO = "10/09 10:34";
     if (!iso) return "";
     var p = iso.split("-");
     return p[2] + "/" + p[1];
+  }
+
+  // O nome da lista é a data em que ela começou e não muda mais: é assim que
+  // se sabe de quando é a compra que está na tela.
+  function dataLonga(iso) {
+    if (!iso) return "";
+    var p = iso.split("-");
+    return p[2] + "/" + p[1] + "/" + p[0];
+  }
+
+  function nomeDaLista() {
+    return "Lista de " + dataLonga(dataDaLista());
+  }
+
+  function dataDaLista() {
+    return S.rodada && S.rodada.data ? S.rodada.data : hoje();
   }
   function diasEntre(a, b) {
     return Math.round((new Date(b + "T12:00:00") - new Date(a + "T12:00:00")) / 86400000);
@@ -419,8 +435,15 @@ window.MERCADO_VERSAO = "10/09 10:34";
   // A lista mestra é a memória da casa: um toque errado tira o item de todo
   // mundo. Aparelho que entrou por link de convite fica travado no seu papel e
   // só marca e acrescenta; editar é de quem entrou digitando a senha.
+  // Duas permissões diferentes: mexer na lista mestra é só do dono; mexer na
+  // compra da semana (acrescentar o que faltou, começar uma lista nova) é dele
+  // e da esposa. Quem cuida da casa só responde as perguntas.
   function podeEditar() {
     return S.quem === "vini";
+  }
+
+  function podeMexerNaSemana() {
+    return S.quem !== "casa";
   }
 
   // Item comprado quase sempre merece um aviso embaixo do nome: é o que faz
@@ -484,10 +507,10 @@ window.MERCADO_VERSAO = "10/09 10:34";
 
   function textoDaLista(destino) {
     var itens = daLista(destino);
-    var quando = dataCurta(S.rodada && S.rodada.data ? S.rodada.data : hoje());
+    var quando = dataLonga(dataDaLista());
     var cab = destino === "horti" ? "Hiperideal · " + quando
       : destino === "mercado" ? "iFood · " + quando
-      : "Compra da semana · " + quando;
+      : nomeDaLista();
     var catAtual = null;
     var linhas = [];
     itens.forEach(function (it) {
@@ -538,7 +561,7 @@ window.MERCADO_VERSAO = "10/09 10:34";
 
     var marcados = arr.filter(function (it) { return precisa(it.id); });
     var topo =
-      '<div class="card"><h2>Semana de ' + esc(dataCurta(S.rodada && S.rodada.data ? S.rodada.data : hoje())) +
+      '<div class="card"><h2>' + esc(nomeDaLista()) +
       '<span class="cont">' + plural(marcados.length, "marcado", "marcados") + "</span></h2><div class=\"corpo\">" +
       pilulasDaLista(marcados.length) +
       (S.recado ? '<div class="nota" style="margin-top:10px">' + esc(S.recado) + "</div>" : "") +
@@ -568,11 +591,12 @@ window.MERCADO_VERSAO = "10/09 10:34";
         (S.rodada && S.rodada.fechada ? "Atualizar as listas" : "Gerar as listas") +
         " (" + marcados.length + ")</button>";
     }
-    var extras = '<div style="text-align:center;margin-top:10px">' +
-      '<button class="btn miuda" type="button" data-acao="faltou">+ Faltou uma coisa que não está na lista</button></div>' +
-      (podeEditar()
-        ? '<div style="text-align:center;margin-top:10px"><button class="link" type="button" data-acao="nova">Começar uma semana nova</button></div>'
-        : "");
+    var extras = podeMexerNaSemana()
+      ? '<div style="text-align:center;margin-top:10px">' +
+        '<button class="btn miuda" type="button" data-acao="faltou">+ Faltou uma coisa que não está na lista</button></div>' +
+        '<div style="text-align:center;margin-top:10px">' +
+        '<button class="link" type="button" data-acao="nova">Começar uma lista nova</button></div>'
+      : "";
 
     alvo.innerHTML = topo + aviso + listaMarcavel(S.soMarcados ? marcados : arr) + pe + extras;
     ligarBusca("busca-lista", "tela-rodada");
@@ -633,9 +657,6 @@ window.MERCADO_VERSAO = "10/09 10:34";
       '<span class="cont">' + plural(marcados, "marcado", "marcados") + "</span></h2><div class=\"corpo\">" +
       '<div class="progresso"><i style="width:' + pct + '%"></i></div>' +
       '<div class="progresso-txt"><span>' + respondidos + " de " + fila.length + " respondidos</span><span>" + pct + "%</span></div>" +
-      '<div style="margin-top:12px"><button class="btn miuda larga" type="button" data-acao="faltou">' +
-      "+ Faltou uma coisa que não está na lista</button></div>" +
-      (S.recado ? '<div class="nota" style="margin-top:10px">' + esc(S.recado) + "</div>" : "") +
       "</div></div>";
 
     if (S.perguntaIdx >= fila.length) {
@@ -725,7 +746,7 @@ window.MERCADO_VERSAO = "10/09 10:34";
 
   function cartaoSemana() {
     var itens = daLista("tudo");
-    var html = '<div class="card"><h2>Compra desta semana<span class="cont">' +
+    var html = '<div class="card"><h2>' + esc(nomeDaLista()) + '<span class="cont">' +
       plural(itens.length, "item", "itens") + "</span></h2>";
     if (!itens.length) {
       return html + '<div class="vazio">Nada marcado nesta semana.</div></div>';
@@ -1010,7 +1031,7 @@ window.MERCADO_VERSAO = "10/09 10:34";
 
   async function novaRodada() {
     if (S.rodada && decididos() && !S.rodada.fechada) {
-      if (!confirm("A semana de " + dataCurta(S.rodada.data) + " ainda não virou lista. Começar uma nova mesmo assim?")) return;
+      if (!confirm("A " + nomeDaLista().toLowerCase() + " ainda não virou pedido. Começar uma nova mesmo assim?")) return;
     }
     var nova = { data: hoje(), marcados: {}, feitos: {}, fechada: false };
     S.rodada = nova;
@@ -1199,7 +1220,7 @@ window.MERCADO_VERSAO = "10/09 10:34";
       });
     }
     await marcar(id, true);
-    S.recado = nome + " entrou na compra desta semana.";
+    S.recado = nome + " entrou na " + nomeDaLista().toLowerCase() + ".";
     fecharModal();
     desenhar();
   }
@@ -1245,7 +1266,7 @@ window.MERCADO_VERSAO = "10/09 10:34";
     var arr = ordemLista();
     switch (a.acao) {
       case "so-marcados": S.soMarcados = a.valor === "marcados"; desenhar(); break;
-      case "faltou": modalFaltou(); break;
+      case "faltou": if (podeMexerNaSemana()) modalFaltou(); break;
       case "convidar": {
         var senhaGuardada = "";
         try { senhaGuardada = localStorage.getItem("mercado:senha") || ""; } catch (e) {}
@@ -1296,7 +1317,7 @@ window.MERCADO_VERSAO = "10/09 10:34";
         break;
       case "feito": alternarFeito(a.id); break;
       case "fechar": fecharRodada(); break;
-      case "nova": novaRodada(); break;
+      case "nova": if (podeMexerNaSemana()) novaRodada(); break;
       case "copiar": copiar(textoDaLista(a.valor), a.el); break;
       case "pedir": {
         var lista = daLista(a.valor);
@@ -1555,6 +1576,12 @@ window.MERCADO_VERSAO = "10/09 10:34";
     });
 
     S.pronto = true;
+    // Lista sem data mostraria sempre a de hoje e pareceria mudar de nome
+    // todo dia. Grava a data uma vez, e daí em diante o nome é fixo.
+    if (S.rodada && !S.rodada.data) {
+      S.rodada.data = hoje();
+      Store.mesclarDoc(CAMINHOS.rodada, { data: S.rodada.data });
+    }
     desenhar();
   }
 })();
