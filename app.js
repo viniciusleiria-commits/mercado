@@ -1,5 +1,5 @@
 // Gerado por site/gerar.py a partir de mercado.html. Não editar aqui.
-window.MERCADO_VERSAO = "10/09 16:56";
+window.MERCADO_VERSAO = "10/09 17:11";
 (function () {
   // Casca velha demais para este app: manda buscar uma nova, num
   // endereço que o cache não tem guardado. O #senha do link de convite
@@ -961,8 +961,11 @@ window.MERCADO_VERSAO = "10/09 16:56";
       var edita = podeEditar();
       html += "<" + (edita ? "button" : "div") + ' class="fila"' +
         (edita ? ' type="button" data-acao="editar" data-id="' + it.id + '"' : "") +
-        ' data-busca="' + esc(normalizar(it.nome + " " + it.categoria)) + '">' +
-        '<span class="nome">' + esc(it.nome) + "</span>" +
+        // a marca entra na busca junto: procurar por "piracanjuba" acha o
+        // leite em pó sem ele ter que lembrar do nome do item
+        ' data-busca="' + esc(normalizar(it.nome + " " + it.categoria + " " + (it.obs || ""))) + '">' +
+        '<span class="nome">' + esc(it.nome) +
+        (it.obs ? ' <span class="meta">' + esc(it.obs) + "</span>" : "") + "</span>" +
         '<span class="meta">' + esc(e.vezes ? e.vezes + "x" : "") + "</span>" +
         "</" + (edita ? "button" : "div") + ">";
     });
