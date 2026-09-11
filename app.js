@@ -1,5 +1,5 @@
 // Gerado por site/gerar.py a partir de mercado.html. Não editar aqui.
-window.MERCADO_VERSAO = "10/09 18:01";
+window.MERCADO_VERSAO = "11/09 09:53";
 (function () {
   // Casca velha demais para este app: manda buscar uma nova, num
   // endereço que o cache não tem guardado. O #senha do link de convite
@@ -734,6 +734,29 @@ window.MERCADO_VERSAO = "10/09 18:01";
   // A tela de quem cuida da casa é uma pergunta por vez: item grande, Não ou
   // Sim, e quando é Sim abre o quanto, com teclado numérico e "não sei" — quem
   // lembra de uma coisa por vez nem sempre sabe a quantidade.
+  // O que já entrou na lista, só de ver. Ela pediu para conferir enquanto
+  // responde, então aparece embaixo da pergunta também — sem caixa de marcar e
+  // sem data-acao, para não desfazer sem querer. Gaveta escondida dela fica de
+  // fora aqui como fica na fila.
+  function cartaoJaEntrou(titulo, vazio) {
+    var lista = universoDaCasa().filter(function (it) { return precisa(it.id); });
+    var html = '<div class="card"><h2>' + esc(titulo) + '<span class="cont">' +
+      plural(lista.length, "item", "itens") + "</span></h2>";
+    if (!lista.length) return html + '<div class="vazio">' + esc(vazio) + "</div></div>";
+    var cat = null;
+    lista.forEach(function (it) {
+      if (it.categoria !== cat) {
+        cat = it.categoria;
+        html += '<div class="grupo-titulo">' + esc(cat || "Outros") + "</div>";
+      }
+      var m = marcado(it.id) || {};
+      html += '<div class="fila marcado"><span class="caixa">' + CHECK + "</span>" +
+        '<span class="nome">' + esc(it.nome) + "</span>" +
+        '<span class="meta">' + esc(m.qtd ? m.qtd : m.naoSei ? "não sei" : "") + "</span></div>";
+    });
+    return html + "</div>";
+  }
+
   function desenhaPergunta() {
     var alvo = document.getElementById("tela-rodada");
     var fila = universoDaCasa();
@@ -763,19 +786,7 @@ window.MERCADO_VERSAO = "10/09 18:01";
       "</div></div>";
 
     if (S.perguntaIdx >= fila.length) {
-      var lista = fila.filter(function (it) { return precisa(it.id); });
-      var resumo = '<div class="card"><h2>Já pode parar<span class="cont">' +
-        plural(lista.length, "item", "itens") + "</span></h2>";
-      if (lista.length) {
-        lista.forEach(function (it) {
-          var m = marcado(it.id) || {};
-          resumo += '<div class="fila marcado"><span class="caixa">' + CHECK + "</span>" +
-            '<span class="nome">' + esc(it.nome) + "</span>" +
-            '<span class="meta">' + esc(m.qtd ? m.qtd : m.naoSei ? "não sei" : "") + "</span></div>";
-        });
-      } else {
-        resumo += '<div class="vazio">Nada precisou desta vez.</div>';
-      }
+      var resumo = cartaoJaEntrou("O que você marcou", "Nada precisou desta vez.");
       var faltam = faltamSemResposta();
       if (faltam) {
         resumo += '<div class="corpo"><p class="sub" style="margin-bottom:8px">Ainda ' +
@@ -841,7 +852,8 @@ window.MERCADO_VERSAO = "10/09 18:01";
       '<button class="btn miuda" type="button" data-acao="pergunta-voltar"' + (S.perguntaIdx === 0 ? " disabled" : "") + ">← Voltar</button>" +
       '<span class="meta">' + (S.perguntaIdx + 1) + " de " + fila.length + "</span>" +
       '<button class="btn miuda" type="button" data-acao="pergunta-pular">Avançar →</button>' +
-      "</div></div></div>";
+      "</div></div></div>" +
+      cartaoJaEntrou("O que já entrou na lista", "Nada ainda. O que você marcar aparece aqui.");
 
   }
 
@@ -878,11 +890,19 @@ window.MERCADO_VERSAO = "10/09 18:01";
     desenhar();
   }
 
-  async function confirmarQuanto(id) {
+  // Guardar o que ela digitou é o mesmo trabalho em três saídas: "Pronto",
+  // "Avançar →" e "← Voltar". Sem isso, digitar 6 e tocar em Avançar perdia o
+  // 6 e o item ficava valendo um.
+  async function gravarQuanto(id) {
     var quanto = Number(S.digitando === "" ? 1 : S.digitando);
-    await marcar(id, true, quanto > 0 ? quanto : 1);
     S.digitando = "";
     S.digitou = false;
+    S.perguntando = null;
+    return marcar(id, true, quanto > 0 ? quanto : 1);
+  }
+
+  async function confirmarQuanto(id) {
+    await gravarQuanto(id);
     avancarPergunta(id);
   }
 
@@ -1563,9 +1583,11 @@ window.MERCADO_VERSAO = "10/09 18:01";
         avancarPergunta(a.id);
         break;
       case "pergunta-voltar":
+        if (S.perguntando) gravarQuanto(S.perguntando);
         if (S.perguntaIdx > 0) { S.perguntaIdx--; S.perguntando = null; desenhar(); }
         break;
       case "pergunta-pular":
+        if (S.perguntando) gravarQuanto(S.perguntando);
         S.perguntando = null; S.perguntaIdx++; desenhar();
         break;
       case "pergunta-recomecar":
