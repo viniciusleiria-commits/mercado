@@ -1,5 +1,5 @@
 // Gerado por site/gerar.py a partir de mercado.html. Não editar aqui.
-window.MERCADO_VERSAO = "12/09 09:43";
+window.MERCADO_VERSAO = "12/09 09:54";
 (function () {
   // Casca velha demais para este app: manda buscar uma nova, num
   // endereço que o cache não tem guardado. O #senha do link de convite
@@ -44,6 +44,8 @@ window.MERCADO_VERSAO = "12/09 09:43";
     // O papel vem do link de convite. Quem entra digitando a senha é o dono.
     quem: localStorage.getItem("mercado:quem") || "vini",
     perguntaIdx: 0,
+    // qual loja a tela Listas está mostrando: tudo, horti ou mercado
+    filtroLista: "tudo",
     // vira true assim que a fila dela é posicionada na primeira vez
     filaPosicionada: false,
     perguntando: null,
@@ -913,11 +915,25 @@ window.MERCADO_VERSAO = "12/09 09:43";
   }
 
   function cartaoSemana() {
-    var itens = daLista("tudo");
+    // Na hora de pedir ele está num app só: ver a lista inteira atrapalha, e
+    // riscar o que já pediu fica mais fácil com só aquela loja na tela.
+    var todos = daLista("tudo");
+    var filtro = S.filtroLista || "tudo";
+    var itens = filtro === "tudo" ? todos : todos.filter(function (it) { return it.destino === filtro; });
     var html = '<div class="card"><h2>' + esc(nomeDaLista()) + '<span class="cont">' +
       plural(itens.length, "item", "itens") + "</span></h2>";
-    if (!itens.length) {
+    if (!todos.length) {
       return html + '<div class="vazio">Nada marcado nesta semana.</div></div>';
+    }
+    html += '<div class="corpo"><div class="pilulas">' +
+      pilula("filtro-lista", "tudo", filtro === "tudo", "Tudo (" + todos.length + ")") +
+      pilula("filtro-lista", "horti", filtro === "horti",
+        "Hiperideal (" + todos.filter(function (it) { return it.destino === "horti"; }).length + ")") +
+      pilula("filtro-lista", "mercado", filtro === "mercado",
+        "iFood (" + todos.filter(function (it) { return it.destino === "mercado"; }).length + ")") +
+      "</div></div>";
+    if (!itens.length) {
+      return html + '<div class="vazio">Nada desta loja nesta semana.</div></div>';
     }
     var catAtual = null;
     itens.forEach(function (it) {
@@ -1520,6 +1536,7 @@ window.MERCADO_VERSAO = "12/09 09:43";
     var arr = ordemLista();
     switch (a.acao) {
       case "so-marcados": S.soMarcados = a.valor === "marcados"; desenhar(); break;
+      case "filtro-lista": S.filtroLista = a.valor; desenhar(); break;
       case "faltou": if (podeEditar()) modalFaltou(); break;
       case "quanto-num": S.abertoQtd = null; marcar(a.id, true, Number(a.valor)); break;
       case "quanto-mais": modalQuanto(a.id); break;
