@@ -1,5 +1,5 @@
 // Gerado por site/gerar.py a partir de mercado.html. Não editar aqui.
-window.MERCADO_VERSAO = "11/09 10:11";
+window.MERCADO_VERSAO = "12/09 09:43";
 (function () {
   // Casca velha demais para este app: manda buscar uma nova, num
   // endereço que o cache não tem guardado. O #senha do link de convite
@@ -561,9 +561,15 @@ window.MERCADO_VERSAO = "11/09 10:11";
   function decididos() {
     return itensArray().filter(function (it) { return decidido(it.id); }).length;
   }
-  function daLista(destino) {
+  // "semRiscados" é o que vai para o Exportar: item riscado na tela Listas já
+  // foi resolvido e não precisa entrar no texto que ele cola no mercado. A
+  // lista da tela continua mostrando o riscado, senão ele não teria como
+  // desfazer o risco.
+  function daLista(destino, semRiscados) {
     return ordemLista().filter(function (it) {
-      return precisa(it.id) && (!destino || destino === "tudo" || it.destino === destino);
+      if (!precisa(it.id)) return false;
+      if (semRiscados && feito(it.id)) return false;
+      return !destino || destino === "tudo" || it.destino === destino;
     });
   }
   function feito(id) {
@@ -571,7 +577,7 @@ window.MERCADO_VERSAO = "11/09 10:11";
   }
 
   function textoDaLista(destino) {
-    var itens = daLista(destino);
+    var itens = daLista(destino, true);
     var quando = dataLonga(dataDaLista());
     var cab = destino === "horti" ? "Hiperideal · " + quando
       : destino === "mercado" ? "iFood · " + quando
@@ -943,7 +949,7 @@ window.MERCADO_VERSAO = "11/09 10:11";
   function cartaoExportar() {
     var html = '<div class="card"><h2>Exportar</h2>';
     EXPORTACOES.forEach(function (e) {
-      var quantos = daLista(e.chave).length;
+      var quantos = daLista(e.chave, true).length;
       html += '<div class="exp">' +
         '<div class="exp-nome">' + esc(e.nome) +
         '<span class="meta"> · ' + plural(quantos, "item", "itens") + "</span>" +
